@@ -1,0 +1,440 @@
+import { Contests } from '@/api/contest';
+import { JudgesGroups } from '@/api/result';
+import { Button } from '@/components/ui/button';
+import { Card } from '@/components/ui/card';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { scoreMap, scoringTypeMap } from '@/lib/constant/contest';
+import { router, usePage } from '@inertiajs/react';
+import { Loader2 } from 'lucide-react';
+import { useState } from 'react';
+import { toast } from 'sonner';
+import ScoreResult from '../ScoreResult';
+import ScoreResultTeam from '../ScoreResultTeam';
+
+type JudgeData = {
+    judge: {
+        id: number;
+        name: string;
+    };
+    scores: Record<string, boolean>; // ✅ if it's just Finished/Unfinished
+};
+
+type JudgeItem = {
+    judges: { id: number; name: string };
+    criteria: string;
+    is_finished: boolean;
+};
+
+export type PROPS = {
+    rounds: JudgesGroups;
+    contest: Contests;
+};
+
+export default function Judges() {
+    const { rounds, contest, contestType, contestId, groupId } = usePage<PROPS>().props;
+
+    const scoringType = scoreMap[contest.contest_scoring_type || ''];
+    const resultType = scoringTypeMap[contest.contest_scoring_type || ''];
+    const [loadingTabulate, setLoadingTabulate] = useState(false);
+    const [loadingTabulateFinal, setLoadingTabulateFinal] = useState(false);
+    const isJudgePreliminary = rounds?.preliminary?.is_finished;
+    const isJudgeFinal = rounds?.final?.is_finished;
+    
+    const judgesData = rounds?.preliminary?.judge_group.sort((a, b) => {
+        const numA = parseInt(a.judges.name.replace(/\D/g, '')) || 0;
+        const numB = parseInt(b.judges.name.replace(/\D/g, '')) || 0;
+        return numA - numB;
+    });
+
+    const inertiaPost = (url, data = {}) =>
+        new Promise((resolve, reject) => {
+            router.post(url, data, {
+                onSuccess: resolve,
+                onError: reject,
+            });
+        });
+
+    const judgesDataFinal = rounds?.final?.judge_group.sort((a, b) => {
+        const numA = parseInt(a.judges.name.replace(/\D/g, '')) || 0;
+        const numB = parseInt(b.judges.name.replace(/\D/g, '')) || 0;
+        return numA - numB;
+    });
+
+    // const handleTabulate = async () => {
+    //     const roundType = 'Preliminary';
+    //     setLoading(true);
+    //     if (scoringType === 'mr' && contestType === 'Individual') {
+    //         router.post(
+    //             `/result/multiple-round/individual/${contestId}/${groupId}/${resultType}`,
+    //             { roundType },
+    //             {
+    //                 onSuccess: () => {
+    //                     toast.success('Score Tabulated');
+    //                     setLoading(false);
+    //                 },
+    //                 onError: () => {
+    //                     setLoading(false);
+    //                 },
+    //             },
+    //         );
+    //     }
+
+    //     if (scoringType === 'sr' && contestType === 'Individual') {
+    //         router.post(
+    //             `/result/single-round/individual/${contestId}/${groupId}/${resultType}`,
+    //             { roundType },
+    //             {
+    //                 onSuccess: () => {
+    //                     toast.success('Score Tabulated');
+    //                     setLoading(false);
+    //                 },
+    //                 onError: () => {
+    //                     setLoading(false);
+    //                 },
+    //             },
+    //         );
+    //     }
+
+    //     if (scoringType === 'mr' && contestType === 'Team') {
+    //         router.post(
+    //             `/result/multiple-round/team/${contestId}/${groupId}/${resultType}`,
+    //             { roundType },
+    //             {
+    //                 onSuccess: () => {
+    //                     toast.success('Score Tabulated');
+    //                     setLoading(false);
+    //                 },
+    //                 onError: () => {
+    //                     setLoading(false);
+    //                 },
+    //             },
+    //         );
+    //     }
+
+    //     if (scoringType === 'sr' && contestType === 'Team') {
+    //         router.post(
+    //             `/result/single-round/team/${contestId}/${groupId}/${resultType}`,
+    //             { roundType },
+    //             {
+    //                 onSuccess: () => {
+    //                     toast.success('Score Tabulated');
+    //                     setLoading(false);
+    //                 },
+    //                 onError: () => {
+    //                     setLoading(false);
+    //                 },
+    //             },
+    //         );
+    //     }
+    // };
+
+    // const handleTabulateFinal = async () => {
+    //     const roundType = 'Final';
+    //     setLoading(true);
+    //     const promise = new Promise((resolve, reject) => {
+    //         if (scoringType === 'mr' && contestType === 'Individual') {
+    //             router.post(
+    //                 `/result/multiple-round/individual/${contestId}/${groupId}/${resultType}`,
+    //                 { roundType },
+    //                 {
+    //                     onSuccess: (page) => {
+    //                         setLoading(false);
+    //                         resolve(page);
+    //                     },
+    //                     onError: (errors) => {
+    //                         setLoading(false);
+    //                         reject(errors);
+    //                     },
+    //                 },
+    //             );
+    //         }
+
+    //         if (scoringType === 'mr' && contestType === 'Individual') {
+    //             router.post(
+    //                 `/result/multiple-round/individual/${contestId}/${groupId}/${resultType}`,
+    //                 { roundType },
+    //                 {
+    //                     onSuccess: (page) => {
+    //                         setLoading(false);
+    //                         resolve(page);
+    //                     },
+    //                     onError: (errors) => {
+    //                         setLoading(false);
+    //                         reject(errors);
+    //                     },
+    //                 },
+    //             );
+    //         }
+
+    //         if (scoringType === 'mr' && contestType === 'Team') {
+    //             router.post(
+    //                 `/result/multiple-round/team/${contestId}/${groupId}/${resultType}`,
+    //                 { roundType },
+    //                 {
+    //                     onSuccess: (page) => {
+    //                         setLoading(false);
+    //                         resolve(page);
+    //                     },
+    //                     onError: (errors) => {
+    //                         setLoading(false);
+    //                         reject(errors);
+    //                     },
+    //                 },
+    //             );
+    //         }
+
+    //         router.post(
+    //             `/result/final/${contestId}/${groupId}/${resultType}`,
+    //             {},
+    //             {
+    //                 onSuccess: (page) => {
+    //                     resolve(page);
+    //                     setLoading(false);
+    //                 },
+    //                 onError: (errors) => {
+    //                     setLoading(false);
+    //                     reject(errors);
+    //                 },
+    //             },
+    //         );
+    //     });
+
+    //     toast.promise(promise, {
+    //         loading: 'Score is being tabulated...',
+    //         success: 'Score Tabulated successfully!',
+    //         error: 'Failed to tabulate score.',
+    //     });
+    // };
+
+    const handleTabulate = () => {
+        const roundType = 'Preliminary';
+
+        const url =
+            scoringType === 'mr' && contestType === 'Individual'
+                ? `/result/multiple-round/individual/${contestId}/${groupId}/${resultType}`
+                : scoringType === 'sr' && contestType === 'Individual'
+                  ? `/result/single-round/individual/${contestId}/${groupId}/${resultType}`
+                  : scoringType === 'mr' && contestType === 'Team'
+                    ? `/result/multiple-round/team/${contestId}/${groupId}/${resultType}`
+                    : `/result/single-round/team/${contestId}/${groupId}/${resultType}`;
+
+        return toast.promise(
+            inertiaPost(url, { roundType }).finally(() => setLoadingTabulate(false)),
+            {
+                loading: 'Score is being tabulated...',
+                success: 'Score Tabulated',
+                error: 'Failed to tabulate score.',
+            },
+        );
+    };
+
+    const handleTabulateFinal = () => {
+        const roundType = 'Final';
+        setLoadingTabulateFinal(true);
+        return toast.promise(
+            (async () => {
+                // MR + Individual
+                if (scoringType === 'mr' && contestType === 'Individual') {
+                    await inertiaPost(`/result/multiple-round/individual/${contestId}/${groupId}/${resultType}`, { roundType });
+                }
+
+                // MR + Team
+                if (scoringType === 'mr' && contestType === 'Team') {
+                    await inertiaPost(`/result/multiple-round/team/${contestId}/${groupId}/${resultType}`, { roundType });
+                }
+
+                // Always run final
+                await inertiaPost(`/result/final/${contestId}/${groupId}/${resultType}`);
+
+                return 'Score Tabulated successfully!';
+            })().finally(() => setLoadingTabulateFinal(false)),
+            {
+                loading: 'Score is being tabulated...',
+                success: 'Score tabulated successfully',
+                error: 'Failed to tabulate score.',
+            },
+        );
+    };
+
+    const grouped = judgesData?.reduce<{ preliminary: JudgeItem[] }>(
+        (acc, item) => {
+            acc.preliminary.push(item as unknown as JudgeItem);
+            return acc;
+        },
+        { preliminary: [] },
+    );
+
+    const groupedFinal = judgesDataFinal?.reduce<{ final: JudgeItem[] }>(
+        (acc, item) => {
+            acc.final.push(item as unknown as JudgeItem);
+            return acc;
+        },
+        { final: [] },
+    );
+
+    const handleEnabled = (judgeId: number, criteria: string) => {
+        const id = `${judgeId}-${criteria}`;
+        setLoadingButton(id);
+
+        const promise = new Promise((resolve, reject) => {
+            router.post(
+                `/judging/edit-score/${contestId}/${groupId}/${judgeId}`,
+                { criteria },
+                {
+                    onSuccess: (page) => {
+                        resolve(page);
+                        setLoadingButton(null);
+                    },
+                    onError: (errors) => {
+                        reject(errors);
+                        setLoadingButton(null);
+                    },
+                },
+            );
+        });
+
+        toast.promise(promise, {
+            loading: 'Loading...',
+            success: 'Judge enabled',
+            error: 'Judge enabled failed',
+        });
+    };
+    const [loadingButton, setLoadingButton] = useState<string | null>(null);
+    return (
+        <div className="w-full">
+            <Card className="p-4">
+                <h2 className="mb-4 text-lg font-bold">JUDGES OVERVIEW</h2>
+                <div>
+                    <h3 className="text-md mb-2 font-semibold uppercase">{scoringType === 'mr' && 'Preliminary Round Judges'}</h3>
+                    <Table>
+                        <TableHeader>
+                            <TableRow>
+                                <TableHead>JUDGE</TableHead>
+                                {grouped?.preliminary
+                                    ?.map((i) => i.criteria)
+                                    .filter((v, i, a) => a.indexOf(v) === i)
+                                    .map((criteria, index) => (
+                                        <TableHead className="uppercase" key={index}>
+                                            {criteria}
+                                        </TableHead>
+                                    ))}
+                            </TableRow>
+                        </TableHeader>
+                        <TableBody className="border-b">
+                            {Object.values(
+                                grouped?.preliminary?.reduce<Record<number, JudgeData>>((acc, item) => {
+                                    const judgeId = item.judges.id;
+                                    if (!acc[judgeId]) {
+                                        acc[judgeId] = { judge: item.judges, scores: {} };
+                                    }
+                                    acc[judgeId].scores[item.criteria] = item.is_finished;
+                                    return acc;
+                                }, {}) || {},
+                            ).map((judgeData) => (
+                                <TableRow key={judgeData.judge.id}>
+                                    <TableCell className="uppercase">{judgeData.judge.name}</TableCell>
+                                    {grouped?.preliminary
+                                        ?.map((i) => i.criteria)
+                                        .filter((v, i, a) => a.indexOf(v) === i)
+                                        .map((criteria, index) => {
+                                            const buttonId = `${judgeData.judge.id}-${criteria}`;
+                                            const isThisButtonLoading = loadingButton === buttonId;
+                                            return (
+                                                <TableCell key={index}>
+                                                    <div className="flex items-center justify-between uppercase">
+                                                        <p>{judgeData.scores[criteria] ? 'Submitted' : 'Pending'}</p>
+                                                        <Button
+                                                            className={`cursor-pointer ${
+                                                                judgeData.scores[criteria] ? 'border-l bg-emerald-600' : 'border-l bg-rose-600'
+                                                            }`}
+                                                            onClick={() => handleEnabled(judgeData.judge.id, criteria)}
+                                                            disabled={!judgeData.scores[criteria]}
+                                                        >
+                                                            {isThisButtonLoading && <Loader2 className="animate-spin" />}
+                                                            ENABLED
+                                                        </Button>
+                                                    </div>
+                                                </TableCell>
+                                            );
+                                        })}
+                                </TableRow>
+                            ))}
+                        </TableBody>
+                    </Table>
+                    <Button disabled={loadingTabulate} className="mt-2 w-full cursor-pointer" onClick={handleTabulate}>
+                        {loadingTabulate && <Loader2 className="mr-2 animate-spin" />}
+                        TABULATE
+                    </Button>
+                </div>
+
+                {scoringType === 'mr' && (
+                    <div className="mb-6">
+                        <h3 className="text-md mb-2 font-semibold uppercase">Final Round Judges</h3>
+                        <Table>
+                            <TableHeader>
+                                <TableRow>
+                                    <TableHead>JUDGE</TableHead>
+                                    {groupedFinal?.final
+                                        ?.map((i) => i.criteria)
+                                        .filter((v, i, a) => a.indexOf(v) === i) // unique criteria
+                                        .map((criteria, index) => (
+                                            <TableHead className="uppercase" key={index}>
+                                                {criteria}
+                                            </TableHead>
+                                        ))}
+                                </TableRow>
+                            </TableHeader>
+                            <TableBody className="border-b">
+                                {Object.values(
+                                    groupedFinal?.final?.reduce<Record<number, JudgeData>>((acc, item) => {
+                                        const judgeId = item.judges.id;
+                                        if (!acc[judgeId]) {
+                                            acc[judgeId] = { judge: item.judges, scores: {} };
+                                        }
+                                        acc[judgeId].scores[item.criteria] = item.is_finished;
+                                        return acc;
+                                    }, {}) || {},
+                                ).map((judgeData) => (
+                                    <TableRow key={judgeData.judge.id}>
+                                        <TableCell className="uppercase">{judgeData.judge.name}</TableCell>
+                                        {groupedFinal?.final
+                                            ?.map((i) => i.criteria)
+                                            .filter((v, i, a) => a.indexOf(v) === i)
+                                            .map((criteria, index) => {
+                                                const buttonId = `${judgeData.judge.id}-${criteria}`;
+                                                const isThisButtonLoading = loadingButton === buttonId;
+
+                                                return (
+                                                    <TableCell key={index}>
+                                                        <div className="flex items-center justify-between uppercase">
+                                                            <p>{judgeData.scores[criteria] ? 'Submitted' : 'Pending'}</p>
+                                                            <Button
+                                                                className={`cursor-pointer ${
+                                                                    judgeData.scores[criteria] ? 'border-l bg-emerald-600' : 'border-l bg-rose-600'
+                                                                }`}
+                                                                onClick={() => handleEnabled(judgeData.judge.id, criteria)}
+                                                                disabled={!judgeData.scores[criteria]}
+                                                            >
+                                                                {isThisButtonLoading && <Loader2 className="animate-spin" />}
+                                                                ENABLED
+                                                            </Button>
+                                                        </div>
+                                                    </TableCell>
+                                                );
+                                            })}
+                                    </TableRow>
+                                ))}
+                            </TableBody>
+                        </Table>
+                        <Button disabled={loadingTabulateFinal} className="mt-2 w-full cursor-pointer" onClick={handleTabulateFinal}>
+                            {loadingTabulateFinal && <Loader2 className="mr-2 animate-spin" />}
+                            TABULATE
+                        </Button>
+                    </div>
+                )}
+            </Card>
+            {contestType === 'Individual' && <ScoreResult />}
+            {contestType === 'Team' && <ScoreResultTeam />}
+        </div>
+    );
+}
