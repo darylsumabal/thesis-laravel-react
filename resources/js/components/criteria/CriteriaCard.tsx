@@ -1,13 +1,12 @@
-// CriteriaCard.tsx
 import { FormControl, FormField, FormItem, FormMessage } from '@/components/ui/form';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { useContextUser } from '@/context/ContesxtProvider';
 import { pointBasedSchemaTest } from '@/schema/criteria';
-import { CriteriaTests } from '@/service/api/criteria';
 import { usePage } from '@inertiajs/react';
 import { useEffect, useState } from 'react';
 import { UseFormReturn } from 'react-hook-form';
 import InputWithEndButton from '../input-button';
+import { CriteriaTests } from './CriteriaGroupWrapper';
 
 export function CriteriaCard({
     criteriaGroup,

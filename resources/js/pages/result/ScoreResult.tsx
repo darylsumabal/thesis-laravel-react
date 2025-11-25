@@ -4,7 +4,6 @@ import { scoreMap, scoringTypeMap } from '@/lib/constant/contest';
 import { usePage } from '@inertiajs/react';
 import { useRef } from 'react';
 import { useReactToPrint } from 'react-to-print';
-
 import { Contests } from '@/api/contest';
 import { JudgesGroups } from '@/api/result';
 import CriteriaSection from '@/components/criteria/CriteriaSection';
@@ -99,7 +98,7 @@ export default function ScoreResult() {
 
     return (
         <Tabs defaultValue="" className="mt-4 w-full">
-            <ScrollArea>
+            <ScrollArea className="rounded-md">
                 <TabsList>
                     {scoringMr && (
                         <TabsTrigger value="preliminary" className="uppercase">
@@ -141,7 +140,7 @@ export default function ScoreResult() {
                         </>
                     )}
                 </TabsList>
-                <ScrollBar orientation="horizontal" />
+                <ScrollBar orientation="horizontal" className="bg-slate-100" />
             </ScrollArea>
             <TabsContent value="preliminary">
                 <Button className="mb-4 cursor-pointer" onClick={() => handlePrint()}>
@@ -217,7 +216,7 @@ export default function ScoreResult() {
                                         <div className="mb-4 flex w-full flex-col items-center justify-center rounded-md bg-[#45226b] p-4 text-center text-3xl font-bold text-white">
                                             <p>Final Score</p>
                                         </div>
-                                        <div className="flex w-full gap-4">
+                                        <div className="flex w-full flex-col gap-4 xl:flex-row">
                                             {maleParticipants.length > 0 && <ScoreTable data={maleParticipants} gender="Male" />}
                                             {femaleParticipants.length > 0 && <ScoreTable data={femaleParticipants} gender="Female" />}
                                         </div>
@@ -313,8 +312,8 @@ export default function ScoreResult() {
                                 </div>
 
                                 <div className="flex w-full">
-                                    {top?.map((i) => (
-                                        <div className="mt-4 flex w-full flex-col items-center justify-center gap-8">
+                                    {top?.map((i,index) => (
+                                        <div className="mt-4 flex w-full flex-col items-center justify-center gap-8" key={index}>
                                             {i.top_female?.participant?.participant_no.length > 0 && (
                                                 <>
                                                     <div className="flex w-full justify-evenly">

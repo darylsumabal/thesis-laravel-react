@@ -24,14 +24,14 @@ const JudgesResult = ({ judgeId, judgeName, judgeRole }: { judgeId: string; judg
     const { qualified, judgeData, auth } = usePage<PROPS>().props;
 
     // const filteredJudgeData = judgeData.filter((item) => item.id === judgeId);
-    console.log(judgeData);
+  
     const filteredJudgeData = judgeData.map((item) => {
         return {
             criteria: item.criteria,
             scores: item.scores.filter((score) => score.judgeId === judgeId),
         };
     });
-    console.log(judgeData);
+
     const computeTotalsAndRanks = (byParticipant: Record<string, JudgeScore[]>) => {
         // Step 1: Compute totals
         const totals = Object.entries(byParticipant).map(([participantNo, scores]) => {
@@ -110,7 +110,7 @@ const JudgesResult = ({ judgeId, judgeName, judgeRole }: { judgeId: string; judg
                                 {criteriaItem.criteria}
                             </h2>
 
-                            <div className="flex w-full gap-6">
+                            <div className="flex flex-col xl:flex-row w-full gap-6">
                                 {maleScores.length > 0 && (
                                     <div className="w-full">
                                         <h3 className="mb-4 text-center text-xl font-medium uppercase">Male Candidates</h3>

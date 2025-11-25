@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Result;
 
+use App\Events\TopParticipantsUpdated;
 use App\Http\Controllers\Controller;
 use App\Models\Contest;
 use App\Models\ContestJudges;
@@ -24,7 +25,6 @@ use Inertia\Inertia;
 
 class ResultController extends Controller
 {
-
 
 
     public function storeResultMultiple(Request $request, $contestId, $groupId, $resultType)
@@ -630,7 +630,7 @@ class ResultController extends Controller
             }
         }
 
-
+     broadcast(new TopParticipantsUpdated($contestId, $groupId))->toOthers();
 
         return redirect()->back()->with('success', 'Score tabulated');
     }
@@ -1095,7 +1095,7 @@ class ResultController extends Controller
             }
         }
 
-
+     broadcast(new TopParticipantsUpdated($contestId, $groupId))->toOthers();
 
         return redirect()->back()->with('success', 'Score Tabulated');
     }
@@ -1561,7 +1561,7 @@ class ResultController extends Controller
                 }
             }
         }
-
+     broadcast(new TopParticipantsUpdated($contestId, $groupId))->toOthers();
         return redirect()->back()->with('success', 'Score tabulated');
     }
 
@@ -2175,7 +2175,7 @@ class ResultController extends Controller
                 }
             }
         }
-
+     broadcast(new TopParticipantsUpdated($contestId, $groupId))->toOthers();
         return redirect()->back()->with('success', 'Score tabulated');
     }
 
@@ -2386,7 +2386,7 @@ class ResultController extends Controller
             }
         }
 
-
+     broadcast(new TopParticipantsUpdated($contestId, $groupId))->toOthers();
 
         return redirect()->back()->with('success', 'Score tabulated');
     }

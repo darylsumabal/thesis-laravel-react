@@ -158,6 +158,7 @@ export default function Team({ contest, participant, poster }: PROPS) {
                                 </div>
                             )}
                         </div>
+                  
                         <div className="flex w-full max-w-sm items-center gap-3">
                             <Dialog>
                                 <form>

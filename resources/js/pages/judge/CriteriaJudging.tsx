@@ -2,7 +2,6 @@ import { Contests } from '@/api/contest';
 import { Participant, Score } from '@/api/result';
 import { CriteriaItem } from '@/components/criteria/CriteriaGroupWrapper';
 import { CriteriaTabs } from '@/components/criteria/CriteriaTabs';
-import { Toaster } from '@/components/ui/sonner';
 
 import { format } from 'date-fns';
 
@@ -32,6 +31,7 @@ type CriteriaJudgingProps = {
 };
 
 const CriteriaJudging = ({ data }: CriteriaJudgingProps) => {
+    console.log(data.map((contestant) => contestant.contest.contest_poster));
     return (
         <div className="h-full gap-10">
             <div className="space-y-4">

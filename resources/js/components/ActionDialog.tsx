@@ -91,6 +91,7 @@ const ActionDialog = <TSchema extends ZodSchema>(props: DialogProps<TSchema>) =>
             setValue('contest_gender_category', '');
         }
     }, [contestType, setValue]);
+    
     useEffect(() => {
         if (nameValue) {
             const cleanedName = nameValue.replace(/\s+/g, '').toLowerCase();

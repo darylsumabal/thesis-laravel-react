@@ -2,6 +2,9 @@
 
 namespace App\Http\Controllers\Judging;
 
+use App\Events\JudgeEvent;
+use App\Events\JudgeSubmit;
+use App\Events\TopParticipantsUpdated;
 use App\Http\Controllers\Controller;
 use App\Models\ActivityLog;
 use App\Models\Contest;
@@ -69,6 +72,8 @@ class JudgingController extends Controller
             ->update([
                 'is_finished' => 0
             ]);
+
+        broadcast(new JudgeSubmit($contestId, $groupId))->toOthers();
 
         return redirect()->back()->with('success', 'Judge can now edit score');
     }
@@ -414,8 +419,6 @@ class JudgingController extends Controller
         ]);
     }
 
-
-
     public function storeJudging(Request $request, $judgeId, $contestId, $groupId, $roundType)
     {
         $criteria = $request->input('criteria');
@@ -468,6 +471,8 @@ class JudgingController extends Controller
                     ]
                 );
             }
+
+            broadcast(new JudgeSubmit($contestId, $groupId))->toOthers();
 
             return redirect()->back()->with('success', 'Score submitted successfully');
         } catch (\Exception $e) {

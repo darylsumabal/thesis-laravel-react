@@ -100,7 +100,7 @@ function TableRankedFinal({ scoringType, contest }: PROPS) {
                 <div className="mb-4 flex w-full flex-col items-center justify-center rounded-md bg-[#45226b] p-4 text-center text-3xl font-medium text-white">
                     <p className="uppercase">{data?.[0]?.criteria}</p>
                 </div>
-                <div className="flex gap-4">
+                <div className="flex flex-col xl:flex-row gap-4">
                     {genders.map((gender) => {
                         const filteredData = data.filter((item) => item.participant_gender === gender);
                         const groupedData = groupByParticipantTest(filteredData);

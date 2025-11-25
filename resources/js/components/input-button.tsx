@@ -4,7 +4,7 @@ import { Button, Group, Input, Label, NumberField } from 'react-aria-components'
 const InputWithEndButton = ({ field, item, hasMatch, pendingSubmitScore }) => {
     return (
         <NumberField
-            value={field.value === undefined ? null : field.value}
+            // value={field.value === undefined ? null : field.value}
             value={field.value ?? ''}
             onChange={(val) => {
                 const value = val ?? 0;

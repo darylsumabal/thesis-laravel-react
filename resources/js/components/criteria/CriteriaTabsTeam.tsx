@@ -1,15 +1,34 @@
 import { useContextUser } from '@/context/ContesxtProvider';
 import { CriteriaTestsTeam } from '@/pages/judge/CriteriaJudgingTeam';
-import { usePage } from '@inertiajs/react';
+import { router, usePage } from '@inertiajs/react';
 import { Card } from '../ui/card';
 import { ScrollArea, ScrollBar } from '../ui/scroll-area';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../ui/tabs';
 import { CriteriaGroupWrapperTeam } from './CriteriaGroupWrapperTeam';
+import { useEcho } from '@laravel/echo-react';
 
 export function CriteriaTabsTeam({ criteriaGroups }: { criteriaGroups: CriteriaTestsTeam[] }) {
-    const { teamParticipants, poster } = usePage().props;
+    const { teamParticipants, poster, rounds } = usePage().props;
 
     const { pendingSubmitScore } = useContextUser();
+    const isPreliminaryFinished = rounds?.preliminary?.is_finished || false;
+    useEcho('submit-score', 'JudgeSubmit', (event: { contestId: number; groupId: number }) => {
+        if (event.contestId == contestId && event.groupId == groupId) {
+            // toast.promise(
+            //     new Promise((resolve, reject) => {
+
+            //     }),
+            //     {
+            //         loading: 'Refreshing...',
+            //         success: 'You can now edit',
+            //         error: 'Failed to refresh results',
+            //     },
+            // );
+            router.reload({
+                only: ['rounds', 'criteriaGroups', 'teamParticipants'],
+            });
+        }
+    });
     return (
         <Tabs defaultValue={criteriaGroups[0]?.criteria} className="mt-4 w-full">
             <ScrollArea className="flex w-full items-center justify-center">
@@ -18,8 +37,14 @@ export function CriteriaTabsTeam({ criteriaGroups }: { criteriaGroups: CriteriaT
                         CANDIDATES
                     </TabsTrigger>
                     {criteriaGroups.map((group, index) => {
+                        const isFinalRound = group.items?.[0]?.round === 'Final';
+
+                        // Disable if:
+                        // 1. There's a pending submit
+                        // 2. It's Final Round AND preliminary is not finished
+                        const isDisabled = pendingSubmitScore || (isFinalRound && !isPreliminaryFinished);
                         return (
-                            <TabsTrigger key={index} value={group.criteria} className="uppercase" disabled={pendingSubmitScore}>
+                            <TabsTrigger key={index} value={group.criteria} className="uppercase" disabled={pendingSubmitScore || isDisabled}>
                                 {group.criteria}
                             </TabsTrigger>
                         );

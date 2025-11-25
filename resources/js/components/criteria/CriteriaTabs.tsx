@@ -1,24 +1,41 @@
-import { usePage } from '@inertiajs/react';
+import { router, usePage } from '@inertiajs/react';
 import { Card } from '../ui/card';
 
 import { useContextUser } from '@/context/ContesxtProvider';
+import { useEcho } from '@laravel/echo-react';
 import { ScrollArea, ScrollBar } from '../ui/scroll-area';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../ui/tabs';
 import { CriteriaGroupWrapper, CriteriaTests } from './CriteriaGroupWrapper';
 
 export function CriteriaTabs({ criteriaGroups }: { criteriaGroups: CriteriaTests[] }) {
-    const { participants, poster } = usePage().props;
+    const { participants, poster, rounds, contestId, groupId } = usePage().props;
     const maleParticipants = participants?.filter((p) => p.gender === 'Male');
     const femaleParticipants = participants?.filter((p) => p.gender === 'Female');
     const { pendingSubmitScore } = useContextUser();
+    const isPreliminaryFinished = rounds?.preliminary?.is_finished || false;
+
+    useEcho('submit-score', 'JudgeSubmit', (event: { contestId: number; groupId: number }) => {
+        if (event.contestId == contestId && event.groupId == groupId) {
+            // toast.promise(
+            //     new Promise((resolve, reject) => {
+
+            //     }),
+            //     {
+            //         loading: 'Refreshing...',
+            //         success: 'You can now edit',
+            //         error: 'Failed to refresh results',
+            //     },
+            // );
+            router.reload({
+                only: ['rounds', 'criteriaGroups', 'participants'],
+            });
+        }
+    });
     return (
         <Tabs defaultValue={criteriaGroups[0]?.criteria} className="mt-4 w-full">
             <ScrollArea className="flex w-full items-center justify-center">
                 <TabsList className="mx-auto flex w-fit items-center justify-center">
-                    <TabsTrigger
-                        value="candidates"
-                         disabled={pendingSubmitScore}
-                    >
+                    <TabsTrigger value="candidates" disabled={pendingSubmitScore}>
                         CANDIDATES
                     </TabsTrigger>
 
@@ -43,14 +60,15 @@ export function CriteriaTabs({ criteriaGroups }: { criteriaGroups: CriteriaTests
                         //     : index === firstUnfinishedIndex;
 
                         // const isDisabled = !isFinished && !isCurrent;
+                        const isFinalRound = group.items?.[0]?.round === 'Final';
+
+                        // Disable if:
+                        // 1. There's a pending submit
+                        // 2. It's Final Round AND preliminary is not finished
+                        const isDisabled = pendingSubmitScore || (isFinalRound && !isPreliminaryFinished);
 
                         return (
-                            <TabsTrigger
-                                key={index}
-                                value={group.criteria}
-                                className="uppercase"
-                                disabled={pendingSubmitScore}
-                            >
+                            <TabsTrigger key={index} value={group.criteria} className="uppercase" disabled={pendingSubmitScore || isDisabled}>
                                 {group.criteria}
                             </TabsTrigger>
                         );

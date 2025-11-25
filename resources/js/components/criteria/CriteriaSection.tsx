@@ -2,12 +2,13 @@ import TableResultTest from "../table/TableResultTest";
 
 
 const CriteriaSection = ({ criteriaName, genders }: { criteriaName: string; genders: string[] }) => {
+
     // 🧠 Decide what to render based on the gender category
     const renderTables = () => {
         if (genders.includes('maleFemale')) {
             // If genderCategory is maleFemale → render both Male & Female tables
             return (
-                <div className="flex flex-col gap-8 2xl:flex-row">
+                <div className="flex flex-col gap-8 xl:flex-row">
                     <TableResultTest criteriaName={criteriaName} gender="Male" />
                     <TableResultTest criteriaName={criteriaName} gender="Female" />
                 </div>

@@ -1,15 +1,14 @@
+import { Participant } from '@/api/result';
 import { Button } from '@/components/ui/button';
 import { Form } from '@/components/ui/form';
+import { useContextUser } from '@/context/ContesxtProvider';
 import { PointBasedSchemaTest, pointBasedSchemaTest } from '@/schema/criteria';
-
 import { zodResolver } from '@hookform/resolvers/zod';
+import { router, usePage } from '@inertiajs/react';
+import { useEcho } from '@laravel/echo-react';
+import { Loader2 } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
-
-import { Participant } from '@/api/result';
-import { useContextUser } from '@/context/ContesxtProvider';
-import { router, usePage } from '@inertiajs/react';
-import { Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { CriteriaCard } from './CriteriaCard';
 
@@ -35,7 +34,6 @@ export type CriteriaTests = {
 };
 
 export function CriteriaGroupWrapper({ group, criteriaGroup }: { group: CriteriaTests; criteriaGroup: CriteriaTests }) {
-    // const { contest_id, group_id } = useParams();
     const { judge, savedCriteria, auth, contestId, groupId } = usePage().props;
     const judgeId = auth?.user.id;
     const filteredParticipants = (criteriaGroup.participants || []).filter((p) => p.gender === p.gender);
@@ -43,6 +41,30 @@ export function CriteriaGroupWrapper({ group, criteriaGroup }: { group: Criteria
     const [, setIsSubmitted] = useState(false);
     const { setPendingSubmitScore } = useContextUser();
     const currentRounds = group.items.find((i) => ['Final', 'Preliminary'].includes(i.round))?.round ?? '';
+
+    useEcho('submit-score', 'JudgeSubmit', (event: { contestId: number; groupId: number }) => {
+        if (event.contestId == contestId && event.groupId == groupId) {
+            // toast.promise(
+            //     new Promise((resolve, reject) => {
+            //         router.reload({
+            //             only: ['judge'],
+            //             onFinish: () => resolve('success'),
+            //             onError: () => reject('error'),
+            //         });
+            //     }),
+            //     {
+            //         loading: 'Refreshing...',
+            //         success: 'You can now edit',
+            //         error: 'Failed to refresh results',
+            //     },
+            // );
+            router.reload({
+                only: ['judge'],
+                // onFinish: () => resolve('success'),
+                // onError: () => reject('error'),
+            });
+        }
+    });
 
     const getDefaultValues = () => {
         const criteria: Record<

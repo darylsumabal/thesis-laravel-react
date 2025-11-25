@@ -140,7 +140,7 @@ export default function Individual({ contest, participant, poster }: PROPS) {
             <div>
                 <div className="mb-8 space-y-2">
                     {poster ? (
-                        <img src={`/storage/${poster}`} className="h-96 w-full rounded-md object-cover object-center" alt="poster" />
+                        <img src={`/storage/${poster}`} className="aspect-auto h-96 w-full rounded-md object-cover object-center" alt="poster" />
                     ) : (
                         <div className="flex h-96 w-full items-center justify-center rounded-md bg-gray-200 text-black">No Poster Available</div>
                     )}

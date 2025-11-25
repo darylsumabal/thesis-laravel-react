@@ -8,13 +8,12 @@ import { useForm } from 'react-hook-form';
 import { useContextUser } from '@/context/ContesxtProvider';
 import { CriteriaTestsTeam } from '@/pages/judge/CriteriaJudgingTeam';
 import { router, usePage } from '@inertiajs/react';
+import { useEcho } from '@laravel/echo-react';
 import { Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { CriteriaCardTeam } from './CriteriaCardTeam';
 
 export function CriteriaGroupWrapperTeam({ group, criteriaGroup }: { group: CriteriaTestsTeam; criteriaGroup: CriteriaTestsTeam }) {
-    //   const { contest_id, group_id } = useParams();
-    //   const { user } = useContextUser();
     const { judge, savedCriteria, auth, contestId, groupId } = usePage().props;
     const judgeId = auth?.user.id;
 
@@ -24,8 +23,29 @@ export function CriteriaGroupWrapperTeam({ group, criteriaGroup }: { group: Crit
     const [loading, setLoading] = useState<boolean>(false);
     const currentRounds = group.items.find((i) => ['Final', 'Preliminary'].includes(i.round))?.round ?? '';
 
-    // const { criteria: savedCriteria, refetch } = useScoreJudges(group_id ?? '', contest_id ?? '');
-    // const { judge, refetch: refetchJudge } = useJudgeCheck(judgeId, group_id ?? '');
+    useEcho('submit-score', 'JudgeSubmit', (event: { contestId: number; groupId: number }) => {
+        if (event.contestId == contestId && event.groupId == groupId) {
+            // toast.promise(
+            //     new Promise((resolve, reject) => {
+            //         router.reload({
+            //             only: ['judge'],
+            //             onFinish: () => resolve('success'),
+            //             onError: () => reject('error'),
+            //         });
+            //     }),
+            //     {
+            //         loading: 'Refreshing...',
+            //         success: 'You can now edit',
+            //         error: 'Failed to refresh results',
+            //     },
+            // );
+            router.reload({
+                only: ['judge'],
+                // onFinish: () => resolve('success'),
+                // onError: () => reject('error'),
+            });
+        }
+    });
 
     const hasMatch = judge?.some((i) => i.judges_id === judgeId && criteriaGroup.criteria.includes(i.criteria) && i.is_finished === 1);
 
@@ -114,7 +134,7 @@ export function CriteriaGroupWrapperTeam({ group, criteriaGroup }: { group: Crit
 
     const onSubmit = (values: pointBasedSchemaTest) => {
         const flat: Array<pointBasedSchemaTest['criteria'][string][string]> = [];
-        setLoading(true)
+        setLoading(true);
         Object.values(values.criteria).forEach((itemsByParticipant) => {
             Object.values(itemsByParticipant).forEach((entry) => {
                 flat.push(entry);

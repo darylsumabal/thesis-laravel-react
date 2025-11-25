@@ -5,6 +5,7 @@ import { Card } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { scoreMap, scoringTypeMap } from '@/lib/constant/contest';
 import { router, usePage } from '@inertiajs/react';
+import { useEcho } from '@laravel/echo-react';
 import { Loader2 } from 'lucide-react';
 import { useState } from 'react';
 import { toast } from 'sonner';
@@ -37,9 +38,29 @@ export default function Judges() {
     const resultType = scoringTypeMap[contest.contest_scoring_type || ''];
     const [loadingTabulate, setLoadingTabulate] = useState(false);
     const [loadingTabulateFinal, setLoadingTabulateFinal] = useState(false);
-    const isJudgePreliminary = rounds?.preliminary?.is_finished;
-    const isJudgeFinal = rounds?.final?.is_finished;
-    
+
+    // const isJudgePreliminary = rounds?.preliminary?.is_finished;
+    // const isJudgeFinal = rounds?.final?.is_finished;
+
+    useEcho('submit-score', 'JudgeSubmit', (event: { contestId: number; groupId: number }) => {
+        if (event.contestId == contestId && event.groupId == groupId) {
+            toast.promise(
+                new Promise((resolve, reject) => {
+                    router.reload({
+                        only: ['rounds'],
+                        onFinish: () => resolve('success'),
+                        onError: () => reject('error'),
+                    });
+                }),
+                {
+                    loading: 'Refreshing...',
+                    success: 'Judge submitted a score!',
+                    error: 'Failed to refresh results',
+                },
+            );
+        }
+    });
+
     const judgesData = rounds?.preliminary?.judge_group.sort((a, b) => {
         const numA = parseInt(a.judges.name.replace(/\D/g, '')) || 0;
         const numB = parseInt(b.judges.name.replace(/\D/g, '')) || 0;

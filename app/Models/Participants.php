@@ -22,4 +22,14 @@ class Participants extends Model
     {
         return $this->belongsTo(Contest::class, 'contest_id');
     }
+
+    public function scoreJudgings()
+    {
+        return $this->hasMany(ScoreJudging::class, 'participant_id');
+    }
+
+    public function judges()
+    {
+        return $this->belongsTo(JudgingScore::class, 'judge_id');
+    }
 }
