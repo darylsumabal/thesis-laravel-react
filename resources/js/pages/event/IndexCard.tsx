@@ -9,7 +9,7 @@ import { type BreadcrumbItem } from '@/types';
 import { Head, router, usePage } from '@inertiajs/react';
 import { format } from 'date-fns';
 import { Plus } from 'lucide-react';
-import { useRef } from 'react';
+import { useRef, useState } from 'react';
 import { toast } from 'sonner';
 import IndexContestTable from '../contest/IndexTable';
 
@@ -25,8 +25,9 @@ type PROPS = { event: Event[]; eventId: number; contest: Contest; archiveContest
 export default function IndexCard() {
     const { event, eventId, contest, archiveContest } = usePage<PROPS>().props;
     const fileInputRef = useRef<HTMLInputElement | null>(null);
-
+    const [loading, setLoading] = useState<boolean>(false);
     const handleCreateContest = async ({ data }: { id: string | null; data: FormData }) => {
+        setLoading(true);
         // Format the date if needed
         if (data.date) {
             const formatDate = format(new Date(data.date), 'yyyy-MM-dd');
@@ -47,19 +48,30 @@ export default function IndexCard() {
                 }
             }
         }
+        const promise = new Promise((resolve, reject) => {
+            router.post(`/event/event-list/${eventId}`, data, {
+                preserveScroll: true,
+                onSuccess: (page) => {
+                    if (fileInputRef.current) {
+                        fileInputRef.current.value = '';
+                    }
+                    router.reload({ only: ['contest'] });
+                    resolve(page);
+                    setLoading(false);
+                },
+                onError: (error) => {
+                    console.log(error);
+                    toast.error('An error occurred');
+                    reject(error);
+                    setLoading(false);
+                },
+            });
+        });
 
-        router.post(`/event/event-list/${eventId}`, data, {
-            onSuccess: () => {
-                toast.success('Contest created successfully!');
-                if (fileInputRef.current) {
-                    fileInputRef.current.value = '';
-                }
-                router.reload({ only: ['contest'] });
-            },
-            onError: (error) => {
-                console.log(error);
-                toast.error('An error occurred');
-            },
+        toast.promise(promise, {
+            loading: 'Loading...',
+            success: 'Contest category created successfully!',
+            error: 'Failed to create.',
         });
     };
 
@@ -81,7 +93,7 @@ export default function IndexCard() {
                             eventEdit={true}
                         >
                             <ActionDialog
-                                // isPending={pendingCreate}
+                                isPending={loading}
                                 buttonTitle="Create Contest Category"
                                 buttonSaveTitle="Create"
                                 dialogTitle="Create Contest Category"

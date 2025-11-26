@@ -234,7 +234,7 @@ class ContestController extends Controller
                 'description' => 'string|nullable',
                 'age' => 'string|nullable',
                 'gender' => 'required|string|min:1',
-                'poster_url' => 'nullable|image|mimes:png,jpg,jpeg,svg,jfif|max:20480'
+                'poster_url' => 'nullable'
             ]);
 
             // Check if participant already exists
@@ -353,7 +353,7 @@ class ContestController extends Controller
                 'team_name' => 'required|string|min:1',
                 'team_description' => 'string|nullable',
                 'team_captain' => 'string|nullable',
-                'poster_url' => 'nullable|image|mimes:png,jpg,jpeg,svg,jfif|max:20480'
+                'poster_url' => 'nullable'
             ]);
 
             // ✅ Check if team_participant_no already exists in this contest

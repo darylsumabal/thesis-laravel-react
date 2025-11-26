@@ -109,13 +109,14 @@ class ResultViewController extends Controller
             ->first(['scoring_method', 'gender_category']);
         // $genderCategory = strtolower($scoring->gender_category ?? 'mixed');
         $scoringMethod = $scoring->scoring_method;
+        $genderCategory = $scoring->gender_category ?? 'mixed';
         return Inertia::render('result/Result', [
             'rounds' => $result,
             'contest' => $contest,
             'contestType' => $contest->contest_type,
             'final' => $this->indexFinal($groupId, $contestId, TeamParticipants::class),
             'qualified' => $qualified,
-            'result' => $this->indexResult($contestId, $groupId, TeamParticipants::class, $scoringMethod),
+            'result' => $this->indexResult($contestId, $groupId, TeamParticipants::class, $genderCategory),
             'award' => $this->indexMajorAward($groupId, $contestId),
             'top' => $this->indexTopResult($groupId, $contestId, $qualified),
             'finalTopResult' => $this->indexFinalResult($groupId, $contestId, $qualified),
@@ -153,7 +154,7 @@ class ResultViewController extends Controller
 
         $majorAwards = collect();
 
-        if ($genderCategory === 'malefemale') {
+        if ($genderCategory === 'maleFemale') {
             $grouped = $top->groupBy(fn($item) => $item->participant->gender)
                 ->map(fn($g) => $g->unique('participant_id') // ✅ keep one per participant
                     ->sortBy('final_rank')                  // ✅ then sort by final rank
@@ -360,12 +361,12 @@ class ResultViewController extends Controller
         // Group scores by criteria
         return $scores->groupBy('criteria')->map(function ($group) {
             // Top male per criteria
-            $topMale = $group->filter(fn($score) => $score->participant->gender === 'Male')
+            $topMale = $group->filter(fn($score) => $score->participant?->gender === 'Male')
                 ->sortBy('final_rank')
                 ->first();
 
             // Top female per criteria
-            $topFemale = $group->filter(fn($score) => $score->participant->gender === 'Female')
+            $topFemale = $group->filter(fn($score) => $score->participant?->gender === 'Female')
                 ->sortBy('final_rank')
                 ->first();
 
@@ -377,37 +378,84 @@ class ResultViewController extends Controller
         })->values();
     }
 
+    // private function indexResult($contestId, $groupId, $participantModel, $genderCategory)
+    // {
+    //     $participants = $participantModel::where('contest_id', $contestId)
+    //         ->with(['scoreJudgings.judges', 'scoreJudgings.participant','scoreJudgings.teamParticipant'])
+    //         ->get();
+
+    //     foreach ($participants as $participant) {
+    //         $judge = $participant->scoreJudgings->where('group_id', $groupId);
+
+    //         $results[] = [
+    //             // 'overall_scores' => $overall,
+    //             'judges_score' => $judge->map(function ($scoreJudge) use ($genderCategory) {
+    //                 return [
+    //                     'id' => $scoreJudge->id,
+    //                     'gender_category' => $genderCategory,
+    //                     'criteria' => $scoreJudge->criteria,
+    //                     'rank' => $scoreJudge->rank,
+    //                     'total' => $scoreJudge->total,
+    //                     'participant_no' => $scoreJudge->participant?->participant_no,
+    //                     'team_participant_no' => $scoreJudge->participant?->team_participant_no,
+    //                     'participant_gender' => $scoreJudge->participant->gender,
+    //                     'total_score' => $scoreJudge->total_score,
+    //                     'total_rank' => $scoreJudge->total_rank,
+    //                     'final_rank' => $scoreJudge->final_rank,
+    //                     'judge_name' => $scoreJudge->judges->name,
+    //                 ];
+    //             }),
+    //         ];
+    //     }
+
+    //     return $results ?? [];
+    // }
+
+
+
+
+
+
     private function indexResult($contestId, $groupId, $participantModel, $genderCategory)
     {
         $participants = $participantModel::where('contest_id', $contestId)
-            ->with(['scoreJudgings.judges', 'scoreJudgings.participant'])
+            ->with(['scoreJudgings.judges', 'scoreJudgings.participant', 'scoreJudgings.teamParticipant'])
             ->get();
 
-        foreach ($participants as $participant) {
-            $judge = $participant->scoreJudgings->where('group_id', $groupId);
+        $results = [];
 
-            $results[] = [
-                // 'overall_scores' => $overall,
-                'judges_score' => $judge->map(function ($scoreJudge) use ($genderCategory) {
+        foreach ($participants as $participant) {
+            $judgeScores = $participant->scoreJudgings
+                ->where('group_id', $groupId)
+                ->map(function ($scoreJudge) use ($genderCategory) {
+                    // Determine if it's a team participant
+                    $teamParticipant = $scoreJudge->teamParticipant;
+                    $individualParticipant = $scoreJudge->participant;
+
                     return [
                         'id' => $scoreJudge->id,
                         'gender_category' => $genderCategory,
                         'criteria' => $scoreJudge->criteria,
                         'rank' => $scoreJudge->rank,
                         'total' => $scoreJudge->total,
-                        'participant_no' => $scoreJudge->participant?->participant_no,
-                        'team_participant_no' => $scoreJudge->participant?->team_participant_no,
-                        'participant_gender' => $scoreJudge->participant->gender,
+                        'participant_no' => $individualParticipant?->participant_no,
+                        'team_participant_no' => $teamParticipant?->team_participant_no,
+                        'participant_gender' => $individualParticipant?->gender,
                         'total_score' => $scoreJudge->total_score,
                         'total_rank' => $scoreJudge->total_rank,
                         'final_rank' => $scoreJudge->final_rank,
-                        'judge_name' => $scoreJudge->judges->name,
+                        'judge_name' => $scoreJudge->judges?->name,
                     ];
-                }),
+                })
+                ->values() // Ensure it’s a plain indexed array
+                ->toArray();
+
+            $results[] = [
+                'judges_score' => $judgeScores,
             ];
         }
 
-        return $results ?? [];
+        return $results;
     }
 
 

@@ -8,7 +8,6 @@ import { useState } from 'react';
 import { Events } from '../../api/event';
 import { columns, columnsArchive } from './column';
 import Index from './Index';
-import { Toaster } from '@/components/ui/sonner';
 const breadcrumbs: BreadcrumbItem[] = [
     {
         title: 'Event List',

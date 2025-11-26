@@ -71,6 +71,7 @@ const ActionPopover = ({ tanstack, id, participantType, item }: PopoverProps) =>
     const handleOnSubmitParticipant = async (data: z.infer<typeof addParticipantSchema>) => {
         setLoading(true);
         router.post(`/contest/${contestId}/update/participant/${id}`, data, {
+            preserveScroll: true,
             onSuccess: () => {
                 setLoading(false);
                 setIsOpen(!open);
@@ -88,6 +89,7 @@ const ActionPopover = ({ tanstack, id, participantType, item }: PopoverProps) =>
     const handleOnSubmitTeamParticipant = async (data: z.infer<typeof addTeamParticipantSchema>) => {
         setLoading(true);
         router.post(`/contest/${contestId}/team/${id}`, data, {
+            preserveScroll: true,
             onSuccess: () => {
                 setLoading(false);
                 setIsOpen(!open);
@@ -107,6 +109,7 @@ const ActionPopover = ({ tanstack, id, participantType, item }: PopoverProps) =>
         setLoading(true);
         if (participantType === 'individual') {
             router.delete(`/contest/participant/${contestId}/${id}`, {
+                preserveScroll: true,
                 onSuccess: () => {
                     setLoading(false);
                     setIsOpen(!open);
@@ -121,6 +124,7 @@ const ActionPopover = ({ tanstack, id, participantType, item }: PopoverProps) =>
         }
         if (participantType === 'team') {
             router.delete(`/contest/team-participant/${contestId}/${id}`, {
+                preserveScroll: true,
                 onSuccess: () => {
                     setLoading(false);
                     toast.success('Participant deleted');

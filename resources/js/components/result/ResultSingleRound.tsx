@@ -1,11 +1,11 @@
 import { Contest } from '@/api/contest';
 import { JudgesGroup } from '@/api/result';
+import { usePage } from '@inertiajs/react';
 import { useRef } from 'react';
 import { useReactToPrint } from 'react-to-print';
 import { Button } from '../ui/button';
 import ResultFooter from './ResultFooter';
 import ResultHeader from './ResultHeader';
-import { usePage } from '@inertiajs/react';
 
 type ResultProps = {
     contest: Contest;
@@ -21,7 +21,9 @@ const ResultSingleRound = ({
     sortedUniqueJudges,
 }: ResultProps) => {
     const { resultSingleRound } = usePage().props;
-    const result = resultSingleRound.filter((item) => item.top_male.criteria === criteria);
+    // const result = resultSingleRound.filter((item) => item.top_male.criteria === criteria);
+    // const result = resultSingleRound.filter((item) => item.participant?.criteria === criteria);
+
     const sectionRef = useRef<HTMLDivElement>(null);
     const handlePrint = useReactToPrint({ contentRef: sectionRef });
 
@@ -38,7 +40,7 @@ const ResultSingleRound = ({
                     <div className="w-full border-2 border-b-black" />
 
                     <div className="flex w-full flex-col">
-                        {result?.map((i, index) => {
+                        {resultSingleRound?.map((i, index) => {
                             // const labels = contest?.contest.map((i) => {
                             //   const year = new Date(i.event.date).getFullYear();
                             //   return `${i.contest_name} ${year}`;
@@ -62,7 +64,8 @@ const ResultSingleRound = ({
                                 <div key={index} className="mt-4 flex w-full flex-col items-center justify-center gap-4">
                                     <div className="mt-4 mb-10">
                                         <p className="text-lg font-bold uppercase">
-                                            {criteria} {getPlacement(index, result.length)}
+                                            {criteria}{' '}
+                                            {getPlacement(index, resultSingleRound.length)}
                                         </p>
                                         <p className="text-center">Category</p>
                                     </div>

@@ -213,6 +213,7 @@ export function DialogAddCriteria({
 export function DialogEditQualified() {
     const [open, setOpen] = useState<boolean>(false);
     const { participant, contestId, groupId, qualified } = usePage<{ participant: Participant[] | TeamParticipant[] }>().props;
+    const [loading, setLoading] = useState<boolean>(false);
     const formSchema = z.object({
         qualified: z.coerce.number().min(1, {
             message: 'Qualified participant must be at least 1',
@@ -227,15 +228,27 @@ export function DialogEditQualified() {
     });
 
     const handleOnSubmit = (data: z.infer<typeof formSchema>) => {
-        router.post(`/criteria/update/qualified/${contestId}/${groupId}`, data, {
-            onSuccess: () => {
-                toast.success('Qualified edited successfully');
-                router.reload({ only: ['qualified'] });
-                setOpen(false);
-            },
-            onError: (error) => {
-                console.log(error);
-            },
+        setLoading(true);
+        const promise = new Promise((resolve, reject) => {
+            router.post(`/criteria/update/qualified/${contestId}/${groupId}`, data, {
+                preserveScroll: true,
+                onSuccess: (page) => {
+                    router.reload({ only: ['qualified'] });
+                    setOpen(false);
+                    setLoading(false);
+                    resolve(page);
+                },
+                onError: (error) => {
+                    console.log(error);
+                    reject(error);
+                    setLoading(false);
+                },
+            });
+        });
+        toast.promise(promise, {
+            loading: 'Loading...',
+            success: 'Qualified edited successfully!',
+            error: 'Failed to edit.',
         });
     };
 
@@ -284,7 +297,8 @@ export function DialogEditQualified() {
                             )}
                         />
                         <DialogFooter>
-                            <Button type="submit" className="w-fit">
+                            <Button type="submit" className="w-fit" disabled={loading}>
+                                {loading && <Loader2 className="animate-spin" />}
                                 Save
                             </Button>
                         </DialogFooter>
@@ -304,25 +318,39 @@ type DeleteCriteriaProps = {
 export function DeleteCriteria({ criteria, round }: DeleteCriteriaProps) {
     const [open, setOpen] = useState<boolean>(false);
     const { contestId, groupId } = usePage().props;
-
+    const [loading, setLoading] = useState<boolean>(false);
     const handleDelete = async () => {
-        router.delete(`/criteria/${contestId}/${groupId}`, {
-            data: {
-                criteria: [
-                    {
-                        criteria: criteria,
-                        round: round,
-                    },
-                ],
-            },
-            onSuccess: () => {
-                setOpen(false);
-                router.reload({ only: ['criteria'] });
-                toast.success('Criteria deleted!');
-            },
-            onError: (error) => {
-                console.log(error);
-            },
+        setLoading(true);
+        const promise = new Promise((resolve, reject) => {
+            router.delete(`/criteria/${contestId}/${groupId}`, {
+                data: {
+                    criteria: [
+                        {
+                            criteria: criteria,
+                            round: round,
+                        },
+                    ],
+                },
+                preserveScroll: true,
+                onSuccess: (page) => {
+                    setOpen(false);
+                    resolve(page);
+                    router.reload({ only: ['criteria'] });
+
+                    setLoading(false);
+                },
+                onError: (error) => {
+                    console.log(error);
+                    setLoading(false);
+                    reject(error);
+                },
+            });
+        });
+
+        toast.promise(promise, {
+            loading: 'Loading...',
+            success: 'Criteria deleted successfully!',
+            error: 'Failed to delete',
         });
     };
 
@@ -340,7 +368,7 @@ export function DeleteCriteria({ criteria, round }: DeleteCriteriaProps) {
                     <DialogClose asChild>
                         <Button variant="outline">Cancel</Button>
                     </DialogClose>
-                    <Button type="submit" onClick={() => handleDelete()} variant={'destructive'}>
+                    <Button type="submit" onClick={() => handleDelete()} variant={'destructive'} disabled={loading}>
                         Delete
                     </Button>
                 </DialogFooter>
@@ -355,7 +383,7 @@ type UpdatePercentageProps = {
 
 export function UpdatePercentage({ roundScore }: UpdatePercentageProps) {
     const [open, setOpen] = useState<boolean>(false);
-
+    const [loading, setLoading] = useState<boolean>(false);
     const { contestId, groupId } = usePage().props;
 
     const formSchema = z.object({
@@ -386,15 +414,28 @@ export function UpdatePercentage({ roundScore }: UpdatePercentageProps) {
     });
 
     const handleUpdate = (data: z.infer<typeof formSchema>) => {
-        router.post(`/criteria/update/percentage/${contestId}/${groupId}`, data, {
-            onSuccess: () => {
-                router.reload({ only: ['roundScore'] });
-                setOpen(false);
-                toast.success('Round Percentage edited successfully');
-            },
-            onError: (error) => {
-                console.log(error);
-            },
+        setLoading(true);
+        const promise = new Promise((resolve, reject) => {
+            router.post(`/criteria/update/percentage/${contestId}/${groupId}`, data, {
+                preserveScroll: true,
+                onSuccess: (page) => {
+                    setLoading(false);
+                    router.reload({ only: ['roundScore'] });
+                    setOpen(false);
+                    resolve(page);
+                },
+                onError: (error) => {
+                    setLoading(false);
+                    console.log(error);
+                    reject(error);
+                },
+            });
+        });
+
+        toast.promise(promise, {
+            loading: 'Loading...',
+            success: 'Updated successfully!',
+            error: 'Failed to update.',
         });
     };
 
@@ -475,7 +516,9 @@ export function UpdatePercentage({ roundScore }: UpdatePercentageProps) {
                         />
 
                         <DialogFooter>
-                            <Button type="submit">Save</Button>
+                            <Button type="submit" disabled={loading}>
+                                Save
+                            </Button>
                         </DialogFooter>
                     </form>
                 </Form>

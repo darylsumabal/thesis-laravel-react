@@ -20,15 +20,13 @@ const ResultsTeamSingleRound = ({
     criteria,
     sortedUniqueJudges,
 }: ResultProps) => {
-    // const { contest_id, group_id } = useParams();
-    // const contestId = Number(contest_id);
-    // const groupId = String(group_id);
+
     const { resultSingleRound } = usePage().props;
     const result = resultSingleRound.filter((item) => item.top_male.criteria === criteria);
-   
+
     const sectionRef = useRef<HTMLDivElement>(null);
     const handlePrint = useReactToPrint({ contentRef: sectionRef });
-    // const { finalTopSingleResult } = useFinalResultSingleRoundTeam(groupId, contestId, criteria);
+ 
     
     return (
         <>

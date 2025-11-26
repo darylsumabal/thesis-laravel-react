@@ -84,6 +84,7 @@ export default function ScoreResult() {
     const data: JudgeScore[] = result?.flatMap((r) => r.judges_score) ?? [];
 
     const criteria = [...new Set(data?.map((item) => item.criteria))];
+  
     const genders = [...new Set(data?.map((item) => item.gender_category))];
 
     const sectionRef = useRef<HTMLDivElement>(null);
@@ -91,7 +92,9 @@ export default function ScoreResult() {
 
     // const topResult = (pointCardSr || rankCardSr) && finalTopSingleResult;
     const scoringMr = scoreMap[contest.contest_scoring_type] === 'mr';
+
     const scoringSr = scoreMap[contest.contest_scoring_type] === 'sr';
+
     const isPointBasedFinal = scoringTypeMap[contest.contest_scoring_type] === 'point_based';
 
     const topResultMr = scoringMr && scoringMethod === 'Final' ? finalTopResult : finalResults;
@@ -184,7 +187,7 @@ export default function ScoreResult() {
                                         <p className="mt-4">{criteriaName}</p>
                                     </div>
                                 </div>
-                                <CriteriaSectionFinalResult key={idx} criteriaName={criteriaName} genders={genders} routeCardSr={scoringSr} />
+                                <CriteriaSectionFinalResult key={idx} criteriaName={criteriaName} genders={genders} routeCardSr={isPointBasedFinal} />
                                 <CriteriaSection key={criteriaName} criteriaName={criteriaName} genders={genders} />
                             </div>
                         </TabsContent>

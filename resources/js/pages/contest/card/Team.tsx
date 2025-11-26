@@ -85,6 +85,7 @@ export default function Team({ contest, participant, poster }: PROPS) {
         });
 
         router.post(`/event/${contestId}/team-participant`, formData, {
+            preserveScroll: true,
             onSuccess: () => {
                 setLoading(false);
                 toast.success('Team Participant added successfully.');
@@ -102,6 +103,7 @@ export default function Team({ contest, participant, poster }: PROPS) {
     const handleSubmitImportTeam = async (data: z.infer<typeof addImportTeamParticipantSchema>) => {
         setLoading(true);
         router.post(`/contest/${contestId}/team-participant/upload`, data, {
+            preserveScroll: true,
             onSuccess: () => {
                 setLoading(false);
                 setIsOpen(!open);
@@ -130,6 +132,7 @@ export default function Team({ contest, participant, poster }: PROPS) {
     async function onSubmit(values: z.infer<typeof posterSchema>) {
         setLoading(true);
         router.post(`/event/poster/${contestId}`, values, {
+            preserveScroll: true,
             onSuccess: () => {
                 setLoading(false);
                 toast.success('Poster updated successfully!');

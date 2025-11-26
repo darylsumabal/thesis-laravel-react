@@ -25,20 +25,30 @@ class ScoreJudging extends Model
         'total_rank',
     ];
 
-    public function participant(): MorphTo
+    // public function participant(): MorphTo
+    // {
+    //     return $this->morphTo();
+    // }
+    public function participant(): BelongsTo
     {
-        return $this->morphTo();
+        return $this->belongsTo(Participants::class, 'participant_id');
     }
+
 
     public function judges(): BelongsTo
     {
         return $this->belongsTo(User::class, 'judges_id', 'id');
     }
 
-    public function teamParticipant(): MorphTo
+    public function teamParticipant(): BelongsTo
     {
-        return $this->morphTo();
+        return $this->belongsTo(TeamParticipants::class, 'participant_id');
     }
+
+    // public function teamParticipant(): MorphTo
+    // {
+    //     return $this->morphTo();
+    // }
 
     public function criteriaTest(): HasMany
     {

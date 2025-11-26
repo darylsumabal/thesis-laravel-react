@@ -1,5 +1,4 @@
 import { formatRank, getRankBgClass } from '@/pages/utils/function/rank';
-import { useQualified } from '@/pages/utils/tanstack/scoring';
 import { usePage } from '@inertiajs/react';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../ui/table';
 
@@ -26,7 +25,7 @@ export type JudgeScoreTest = {
 };
 
 export default function TableResultType({ criteriaName, gender, routeCardSr }: { criteriaName: string; gender: string; routeCardSr: boolean }) {
-    const { result,qualified } = usePage().props;
+    const { result, qualified } = usePage().props;
     const data = result?.flatMap((r) => r.judges_score) ?? [];
     // const filteredData = data.filter((item) => item.criteria === criteriaName);
     const filteredData = data.filter((item) => item.criteria === criteriaName && item.participant_gender.toLowerCase() === gender.toLowerCase());
@@ -126,6 +125,7 @@ export default function TableResultType({ criteriaName, gender, routeCardSr }: {
                     <TableBody>
                         {participants.map((participantNo, index) => {
                             const participant = participantData[participantNo];
+                            console.log(participant);
                             return (
                                 <TableRow key={index}>
                                     <TableCell className="text-center font-medium whitespace-nowrap">{participantNo}</TableCell>
@@ -148,7 +148,7 @@ export default function TableResultType({ criteriaName, gender, routeCardSr }: {
                                         );
                                     })}
                                     <TableCell className="text-center font-medium whitespace-nowrap">
-                                        {routeCardSr ? participant.score || '0' : participant.total_rank || '0'}
+                                        {routeCardSr ? participant.total_score || '0' : participant.total_rank || '0'}
                                     </TableCell>
                                     <TableCell
                                         className={`text-center font-medium whitespace-nowrap ${getRankBgClass(

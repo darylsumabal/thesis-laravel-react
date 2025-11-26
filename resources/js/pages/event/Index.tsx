@@ -41,23 +41,32 @@ export default function Index() {
                 }
             }
         }
-
-        router.post(`/event`, formData, {
-            forceFormData: true,
-            onSuccess: () => {
-                setLoading(false);
-                router.reload({ only: ['event'] });
-                toast.success('Event created successfully');
-                form.reset();
-                if (fileInputRef.current) {
-                    fileInputRef.current.value = '';
-                }
-            },
-            onError: (error) => {
-                setLoading(false);
-                toast.error('An error occurred');
-                console.log(error);
-            },
+        const promise = new Promise((resolve, reject) => {
+            router.post(`/event`, formData, {
+                forceFormData: true,
+                preserveScroll:true,
+                onSuccess: (page) => {
+                    setLoading(false);
+                    resolve(page);
+                    router.reload({ only: ['event'] });
+                    toast.success('Event created successfully');
+                    form.reset();
+                    if (fileInputRef.current) {
+                        fileInputRef.current.value = '';
+                    }
+                },
+                onError: (error) => {
+                    setLoading(false);
+                    toast.error('An error occurred');
+                    console.log(error);
+                    reject(error);
+                },
+            });
+        });
+        toast.promise(promise, {
+            loading: 'Loading...',
+            success: 'Event created successfully!',
+            error: 'Failed to create.',
         });
     };
 

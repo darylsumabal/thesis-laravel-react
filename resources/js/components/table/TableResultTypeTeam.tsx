@@ -1,7 +1,7 @@
+import { formatRank, getRankBgClass } from '@/pages/utils/function/rank';
 import { usePage } from '@inertiajs/react';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../ui/table';
 import { JudgeScoreTest } from './TableResultType';
-import { formatRank, getRankBgClass } from '@/pages/utils/function/rank';
 
 export type JudgeScoreTypeTeam = {
     id: number;
@@ -24,11 +24,11 @@ export type JudgeScoreTypeTeam = {
 
 export default function TableResultTypeTeam({ criteriaName, routeCardSr }: { criteriaName: string; routeCardSr: boolean }) {
     const { tableResultTypeMultiple, qualified } = usePage().props;
-    
+
     const data = tableResultTypeMultiple?.flatMap((r) => r.judges_score) ?? [];
 
     const filteredData = data.filter((item) => item.criteria === criteriaName);
-
+    console.log(tableResultTypeMultiple);
     const getUniqueJudges = () => [...new Set(data?.map((item) => item.judge_name))];
 
     const getUniqueParticipants = () => {
@@ -149,7 +149,7 @@ export default function TableResultTypeTeam({ criteriaName, routeCardSr }: { cri
                                         );
                                     })}
                                     <TableCell className="text-center font-medium whitespace-nowrap">
-                                        {routeCardSr ? participant.score || '0' : participant.total_rank || '0'}
+                                        {routeCardSr ? participant.total_points || '0' : participant.total_rank || '0'}
                                     </TableCell>
 
                                     <TableCell

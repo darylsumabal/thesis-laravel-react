@@ -68,6 +68,7 @@ export default function Individual({ contest, participant, poster }: PROPS) {
         });
 
         router.post(`/event/${contestId}/participant`, formData, {
+            preserveScroll: true,
             onSuccess: () => {
                 setLoading(false);
                 toast.success('Team Participant added successfully.');
@@ -85,6 +86,7 @@ export default function Individual({ contest, participant, poster }: PROPS) {
     const handleOnSubmitImportParticipant = async (data: z.infer<typeof addImportParticipantSchema>) => {
         setLoading(true);
         router.post(`/contest/${contestId}/participant/upload`, data, {
+            preserveScroll: true,
             onSuccess: () => {
                 setLoading(false);
                 setIsOpen(!open);
@@ -109,17 +111,20 @@ export default function Individual({ contest, participant, poster }: PROPS) {
             poster: '',
         },
     });
-
+    const [openPoster, setOpenPoser] = useState<boolean>(false);
     async function onSubmit(values: z.infer<typeof posterSchema>) {
         setLoading(true);
         router.post(`/event/poster/${contestId}`, values, {
+            preserveScroll: true,
             onSuccess: () => {
                 toast.success('Poster updated successfully!');
                 setLoading(false);
+                setOpenPoser(false);
             },
             onError: (error) => {
                 console.log(error);
                 setLoading(false);
+                setOpenPoser(false);
             },
         });
     }
@@ -146,7 +151,7 @@ export default function Individual({ contest, participant, poster }: PROPS) {
                     )}
                 </div>
                 <div className="flex w-full max-w-sm items-center gap-3">
-                    <Dialog>
+                    <Dialog open={openPoster} onOpenChange={(open) => setOpenPoser(open)}>
                         <DialogTrigger asChild>
                             <Button variant="default" className="hover:cursor-pointer">
                                 <ImagePlus /> {poster ? 'Edit' : 'Add'} Poster
@@ -189,6 +194,7 @@ export default function Individual({ contest, participant, poster }: PROPS) {
                             </Form>
                         </DialogContent>
                     </Dialog>
+
                     <div className="flex justify-between gap-2">
                         <Dialog onOpenChange={handleResetCloseDialog} open={isOpen}>
                             <DialogTrigger asChild>

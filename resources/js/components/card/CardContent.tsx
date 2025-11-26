@@ -68,6 +68,7 @@ const CardContent = <T extends { id: string; poster: string }, U>({
 
     const handleUpdateEvent = async ({ id, data }) => {
         router.post(`/event/update/${id}`, data, {
+            preserveScroll: true,
             onSuccess: () => {
                 toast.success('Event updated successfully!');
                 console.log('Event updated!');
@@ -82,6 +83,7 @@ const CardContent = <T extends { id: string; poster: string }, U>({
 
     const handleUpdateContest = async ({ id, data }) => {
         router.post(`/contest/update/${id}`, data, {
+            preserveScroll: true,
             onSuccess: () => {
                 console.log('Contest updated!');
                 router.reload({ only: ['contest'] });

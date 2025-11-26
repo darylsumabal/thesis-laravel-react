@@ -62,7 +62,7 @@ export default function CreateCriteria() {
     const [open, setOpen] = useState(false);
     const [value, setValue] = useState('');
     const [selectedOptions, setSelectedOptions] = useState<Option[]>([]);
-
+    
     const defaultValues: CriteriaRound | CriteriaRoundSr = {
         judges: [],
         qualified: 0,
@@ -107,19 +107,28 @@ export default function CreateCriteria() {
             return;
         }
 
-        router.post(`/criteria/create/${contestId}`, data, {
-            onSuccess: () => {
-                setLoading(false);
-                form.reset();
-                setSelectedOptions([]);
-                setSelectedJudges([]);
-                setValue('');
-                toast.success('Criteria created!');
-            },
-            onError: (error) => {
-                setLoading(false);
-                console.log(error);
-            },
+        const promise = new Promise((resolve, reject) => {
+            router.post(`/criteria/create/${contestId}`, data, {
+                onSuccess: (page) => {
+                    setLoading(false);
+                    form.reset();
+                    resolve(page);
+                    setSelectedOptions([]);
+                    setSelectedJudges([]);
+                    setValue('');
+                },
+                onError: (error) => {
+                    setLoading(false);
+                    console.log(error);
+                    reject(error);
+                },
+            });
+        });
+
+        toast.promise(promise, {
+            loading: 'Loading...',
+            success: 'Criteria created successfully!',
+            error: 'Failed to create.',
         });
     };
 

@@ -145,6 +145,7 @@ export function CriteriaGroupWrapperTeam({ group, criteriaGroup }: { group: Crit
                 `/judging/score/${judgeId}/${contestId}/${groupId}/${currentRounds}`,
                 { criteria: flat },
                 {
+                    preserveScroll: true,
                     onSuccess: (page) => {
                         form.reset(values);
                         resolve(page);

@@ -14,7 +14,7 @@ import { JudgeScoreTeam, MajorAward } from '@/components/table/TableResultTestTe
 import { Button } from '@/components/ui/button';
 import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { scoreMap } from '@/lib/constant/contest';
+import { scoreMap, scoringTypeMap } from '@/lib/constant/contest';
 import { usePage } from '@inertiajs/react';
 import { useRef } from 'react';
 import { useReactToPrint } from 'react-to-print';
@@ -35,10 +35,9 @@ export type PROPS = {
 export default function ScoreResultTeam() {
     const { rounds, contest, final, qualified, result, award, top, finalTopResult, finalResults, scoringMethod } = usePage<PROPS>().props;
 
-    // const { contest } = useContest(String(contestId), Number(user.id));
-    // const { final } = useResultFinalTeam(groupId, contestId);
     const finalResult = final?.flatMap((r) => r.judges_score) ?? [];
-    // const { qualified } = useQualified(contest_id ?? '', groupId);
+
+    console.log(finalResult);
 
     const grouped = finalResult.reduce<Record<number, TeamParticipantScore>>((acc, item) => {
         const { participant_id } = item;
@@ -88,7 +87,8 @@ export default function ScoreResultTeam() {
     const topResultMr = scoringMr && scoringMethod === 'Final' ? finalResults : finalTopResult;
 
     const scoringSr = scoreMap[contest.contest_scoring_type] === 'sr';
-
+    
+    const isPointBasedFinal = scoringTypeMap[contest.contest_scoring_type] === 'point_based';
     return (
         <Tabs defaultValue={''} className="mt-4 w-full">
             <ScrollArea>
@@ -181,7 +181,7 @@ export default function ScoreResultTeam() {
                                         <p className="mt-4">{criteriaName}</p>
                                     </div>
                                 </div>
-                                <CriteriaSectionFinalResultTeam key={idx} criteriaName={criteriaName} routeCardSr={scoringSr} />
+                                <CriteriaSectionFinalResultTeam key={idx} criteriaName={criteriaName} routeCardSr={isPointBasedFinal} />
                                 <CriteriaSectionTeam key={criteriaName} criteriaName={criteriaName} />
                             </div>
                         </TabsContent>

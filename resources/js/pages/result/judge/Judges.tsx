@@ -70,6 +70,7 @@ export default function Judges() {
     const inertiaPost = (url, data = {}) =>
         new Promise((resolve, reject) => {
             router.post(url, data, {
+                preserveScroll: true,
                 onSuccess: resolve,
                 onError: reject,
             });
@@ -302,6 +303,7 @@ export default function Judges() {
                 `/judging/edit-score/${contestId}/${groupId}/${judgeId}`,
                 { criteria },
                 {
+                    preserveScroll: true,
                     onSuccess: (page) => {
                         resolve(page);
                         setLoadingButton(null);
@@ -320,7 +322,9 @@ export default function Judges() {
             error: 'Judge enabled failed',
         });
     };
+    
     const [loadingButton, setLoadingButton] = useState<string | null>(null);
+
     return (
         <div className="w-full">
             <Card className="p-4">
