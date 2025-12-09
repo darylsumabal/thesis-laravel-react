@@ -4,7 +4,7 @@ import { Head, Link, usePage } from '@inertiajs/react';
 
 export default function Welcome() {
     const { auth } = usePage<SharedData>().props;
-
+    const userRole = auth.user.role;
     return (
         <>
             <Head title="Welcome">
@@ -16,7 +16,7 @@ export default function Welcome() {
                     <nav className="flex items-center justify-end gap-4 py-4">
                         {auth.user ? (
                             <Link
-                                href={route('dashboard')}
+                                href={`${userRole == 'Admin' ? route('account.index') : route('judgesTable')}`}
                                 className="inline-block rounded-sm border border-[#19140035] px-5 py-1.5 text-sm leading-normal text-[#1b1b18] hover:border-[#1915014a] dark:border-[#3E3E3A] dark:text-[#EDEDEC] dark:hover:border-[#62605b]"
                             >
                                 Dashboard

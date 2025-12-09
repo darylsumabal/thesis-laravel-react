@@ -1,8 +1,7 @@
-import { Contest } from '@/services/api/contest';
-
+import { Contest } from '@/api/contest';
 import ResultHeader from '@/components/result/ResultHeader';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { formatRank, getRankBgClass } from '@/utils/function/rank';
+import { formatRank, getRankBgClass } from '@/pages/utils/function/rank';
 import { usePage } from '@inertiajs/react';
 
 export type JudgeScoreTest = {
@@ -118,7 +117,7 @@ function TableResultTypeMultiple({ scoringType, contest, genderCategory }: { sco
         if (groupedData.length === 0) {
             return (
                 <div key={gender} className="p-8 text-center">
-                    <p>No data available for {gender}</p>
+                    <p>No data available</p>
                 </div>
             );
         }
@@ -220,7 +219,7 @@ function TableResultTypeMultiple({ scoringType, contest, genderCategory }: { sco
                                             <TableCell className="text-center font-medium">{participant.total}</TableCell>
                                         </>
                                     )}
-                                    <TableCell className={`text-center font-medium ${getRankBgClass(participant.final_rank, qualified)}`}>
+                                    <TableCell className={`text-center font-medium ${getRankBgClass(participant.final_rank, Number(qualified))}`}>
                                         {formatRank(participant.final_rank)}
                                     </TableCell>
                                 </TableRow>
@@ -240,7 +239,7 @@ function TableResultTypeMultiple({ scoringType, contest, genderCategory }: { sco
                 <p>CONSOLIDATED RESULT</p>
             </div>
             <div className="mb-4 flex w-full flex-col items-center justify-center rounded-md bg-[#45226b] p-4 text-center text-3xl font-medium text-white">
-                <p>Top {qualified} Finalists</p>
+                <p>Top {Number(qualified)} Finalists</p>
                 <p className="text-base font-normal capitalize">({scoringType})</p>
             </div>
             {renderTables()}

@@ -91,7 +91,7 @@ const ActionDialog = <TSchema extends ZodSchema>(props: DialogProps<TSchema>) =>
             setValue('contest_gender_category', '');
         }
     }, [contestType, setValue]);
-    
+
     useEffect(() => {
         if (nameValue) {
             const cleanedName = nameValue.replace(/\s+/g, '').toLowerCase();
@@ -126,9 +126,6 @@ const ActionDialog = <TSchema extends ZodSchema>(props: DialogProps<TSchema>) =>
                 }
 
                 await mutate?.({ id: id || null, data: formData });
-                setIsOpen(false);
-                setIsSubmit(false);
-                form.reset();
             } else {
                 await mutate?.({ id: id || null, data });
             }
@@ -136,6 +133,10 @@ const ActionDialog = <TSchema extends ZodSchema>(props: DialogProps<TSchema>) =>
             if (handleClose) handleClose();
         } catch (error) {
             console.log(error);
+        } finally {
+            setIsOpen(false);
+            setIsSubmit(false);
+            form.reset();
         }
     };
 

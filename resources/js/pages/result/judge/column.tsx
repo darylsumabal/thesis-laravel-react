@@ -19,7 +19,7 @@ export const column: ColumnDef<JudgesGroup>[] = [
 
       return (
         <div
-          className={`uppercase p-1 rounded-xs ${a ? "bg-rose-600" : "bg-emerald-600"}`}
+          className={`uppercase p-1 rounded-xs ${a ? "bg-destructive" : "bg-emerald-600"}`}
         >
           {row.getValue("score")}
         </div>
@@ -45,7 +45,7 @@ export const columnMultiple: ColumnDef<JudgesGroup>[] = [
       const a = row.original.isJudgeFinished;
       return (
         <div
-          className={`uppercase p-1 rounded-xs ${a ? "bg-emerald-600" : "bg-rose-600"}`}
+          className={`uppercase p-1 rounded-xs ${a ? "bg-emerald-600" : "bg-destructive"}`}
         >
           {row.getValue("score")}
         </div>

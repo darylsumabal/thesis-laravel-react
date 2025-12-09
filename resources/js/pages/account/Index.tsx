@@ -5,7 +5,7 @@ import AppLayout from '@/layouts/app-layout';
 import { ADD_ACCOUNT, COMBOBOX_INPUT_PANEL, FIELD_NAME_ADD_ACCOUNT } from '@/lib/constant/account';
 import { addAccountSchema, defaultValues } from '@/schema/account';
 import { type BreadcrumbItem } from '@/types';
-import { Head, router } from '@inertiajs/react';
+import { Head, router, usePage } from '@inertiajs/react';
 import { UserPlus } from 'lucide-react';
 import { useState } from 'react';
 import { toast } from 'sonner';
@@ -18,20 +18,20 @@ const breadcrumbs: BreadcrumbItem[] = [
     },
 ];
 
-export default function Index({ account }: { account: AccountType }) {
+export default function Index() {
+    const { account, flash } = usePage<AccountType>().props;
     const [isPending, setIsPending] = useState(false);
 
     const handleCreateJudge = async ({ data }: { id: string | null; data: FormData }) => {
         setIsPending(true);
-
         router.post('/accounts', data, {
             onSuccess: () => {
                 setIsPending(false);
-                toast.success('Account created');
+                toast.success(flash.success);
                 router.reload({ only: ['account'] });
             },
             onError: (error) => {
-                console.log(error);
+                toast.error(error[0]);
             },
         });
     };

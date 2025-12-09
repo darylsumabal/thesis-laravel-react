@@ -1,7 +1,7 @@
 import { COMBOBOX_INPUT_CRITERIA_TYPE } from '@/lib/constant/contest';
 import { CriteriaRound } from '@/schema/scoring';
 import { Loader2 } from 'lucide-react';
-import { ReactNode } from 'react';
+import { ReactNode, useEffect } from 'react';
 import { FieldArrayWithId, useFieldArray, UseFormReturn } from 'react-hook-form';
 import ActionCombobox from '../ActionCombobox';
 import { Button } from '../ui/button';
@@ -26,6 +26,7 @@ type TableProps = {
     multipleRound: boolean;
     edit?: boolean;
     buttonTitle?: string;
+    isWeighted?: boolean;
 };
 
 const TableCardCriteria = ({
@@ -41,18 +42,24 @@ const TableCardCriteria = ({
     multipleRound,
     edit = false,
     buttonTitle = 'Create Criteria',
+    isWeighted,
 }: TableProps) => {
     const { fields, append, remove } = useFieldArray({
         control: form.control,
         name: `criteria.criteria.${idx}.criterion`,
     });
-
+    const roundValue = form.watch(`criteria.criteria.${idx}.round`);
     const handleAddRow = () => {
         append({
             evaluationCriterion: '',
             score: 0,
         });
     };
+    useEffect(() => {
+        if (roundValue === 'Final') {
+            form.setValue(`criteria.criteria.${idx}.weighted`, 0);
+        }
+    }, [roundValue, idx, form]);
 
     return (
         <Card className="border-2 p-2" key={id}>
@@ -81,10 +88,45 @@ const TableCardCriteria = ({
                                 )}
                             />
                         </div>
-
-                        {multipleRound && edit && (
-                            <div className="w-full">
-                                <div className="space-y-2">
+                        <div className="flex w-full gap-2">
+                            {isWeighted && roundValue !== 'Final' && (
+                                <div className="w-full space-y-2">
+                                    <FormField
+                                        control={form.control}
+                                        name={`criteria.criteria.${idx}.weighted`}
+                                        render={({ field }) => (
+                                            <FormItem>
+                                                <FormControl>
+                                                    <div className="space-y-2">
+                                                        <FormLabel>Contest Weight</FormLabel>
+                                                        <Input
+                                                            {...field}
+                                                            value={field.value || ''}
+                                                            onChange={(e) => {
+                                                                const val = e.target.value; // ensures number type
+                                                                if (val === '') {
+                                                                    // allow clearing the input
+                                                                    field.onChange('');
+                                                                    return;
+                                                                }
+                                                                const num = Number(val);
+                                                                if (num >= 0) {
+                                                                    field.onChange(num);
+                                                                }
+                                                            }}
+                                                            placeholder="Contest Weight"
+                                                            type="number"
+                                                        />
+                                                    </div>
+                                                </FormControl>
+                                                <FormMessage />
+                                            </FormItem>
+                                        )}
+                                    />
+                                </div>
+                            )}
+                            {multipleRound && edit && (
+                                <div className="w-full space-y-2">
                                     <FormField
                                         control={form.control}
                                         name={`criteria.criteria.${idx}.round`}
@@ -105,8 +147,8 @@ const TableCardCriteria = ({
                                         )}
                                     />
                                 </div>
-                            </div>
-                        )}
+                            )}
+                        </div>
                     </div>
                     <div className="rounded-md border">
                         <Table>

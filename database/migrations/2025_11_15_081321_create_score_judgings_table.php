@@ -36,6 +36,8 @@ return new class extends Migration
             $table->decimal('final_rank', 10, 2)->nullable();
 
             $table->timestamps();
+
+
         });
     }
 

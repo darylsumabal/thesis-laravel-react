@@ -15,12 +15,12 @@ export default function CreateJudge({ contest }: PROPS) {
     const handleCreateJudge = async ({ data }: { data: FormData }) => {
         setIsPending(true);
         router.post('/judging', data, {
-            onSuccess: () => {
-                toast.success('Account created');
+            onSuccess: (page) => {
+                toast.success(page.props.flash?.success);
                 setIsPending(false);
             },
-            onError: () => {
-                toast.success('Judge already exists');
+            onError: (error) => {
+                toast.error(error[0]);
             },
         });
     };

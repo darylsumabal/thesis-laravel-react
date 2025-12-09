@@ -1,12 +1,13 @@
 import { Contests } from '@/api/contest';
 import { JudgesGroups } from '@/api/result';
+import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { scoreMap, scoringTypeMap } from '@/lib/constant/contest';
 import { router, usePage } from '@inertiajs/react';
 import { useEcho } from '@laravel/echo-react';
-import { Loader2 } from 'lucide-react';
+import { Loader2, NotebookPen } from 'lucide-react';
 import { useState } from 'react';
 import { toast } from 'sonner';
 import ScoreResult from '../ScoreResult';
@@ -42,7 +43,7 @@ export default function Judges() {
     // const isJudgePreliminary = rounds?.preliminary?.is_finished;
     // const isJudgeFinal = rounds?.final?.is_finished;
 
-    useEcho('submit-score', 'JudgeSubmit', (event: { contestId: number; groupId: number }) => {
+    useEcho('submit-score', 'JudgeSubmit', (event: { contestId: number; groupId: number; judgeName: string }) => {
         if (event.contestId == contestId && event.groupId == groupId) {
             toast.promise(
                 new Promise((resolve, reject) => {
@@ -54,10 +55,22 @@ export default function Judges() {
                 }),
                 {
                     loading: 'Refreshing...',
-                    success: 'Judge submitted a score!',
+                    success: `Judge ${event.judgeName} submitted a score!`,
                     error: 'Failed to refresh results',
                 },
             );
+        }
+    });
+
+    useEcho('request-edit', 'RequestEdit', (event: { contestId: number; groupId: number; judgeId: number; judgeName: string; action: string }) => {
+        if (event.contestId == contestId && event.groupId == groupId) {
+            if (event.action === 'request') {
+                toast.success(`Judge ${event.judgeName} requested to edit scores`);
+            }
+
+            router.reload({
+                only: ['judge', 'rounds'],
+            });
         }
     });
 
@@ -81,152 +94,6 @@ export default function Judges() {
         const numB = parseInt(b.judges.name.replace(/\D/g, '')) || 0;
         return numA - numB;
     });
-
-    // const handleTabulate = async () => {
-    //     const roundType = 'Preliminary';
-    //     setLoading(true);
-    //     if (scoringType === 'mr' && contestType === 'Individual') {
-    //         router.post(
-    //             `/result/multiple-round/individual/${contestId}/${groupId}/${resultType}`,
-    //             { roundType },
-    //             {
-    //                 onSuccess: () => {
-    //                     toast.success('Score Tabulated');
-    //                     setLoading(false);
-    //                 },
-    //                 onError: () => {
-    //                     setLoading(false);
-    //                 },
-    //             },
-    //         );
-    //     }
-
-    //     if (scoringType === 'sr' && contestType === 'Individual') {
-    //         router.post(
-    //             `/result/single-round/individual/${contestId}/${groupId}/${resultType}`,
-    //             { roundType },
-    //             {
-    //                 onSuccess: () => {
-    //                     toast.success('Score Tabulated');
-    //                     setLoading(false);
-    //                 },
-    //                 onError: () => {
-    //                     setLoading(false);
-    //                 },
-    //             },
-    //         );
-    //     }
-
-    //     if (scoringType === 'mr' && contestType === 'Team') {
-    //         router.post(
-    //             `/result/multiple-round/team/${contestId}/${groupId}/${resultType}`,
-    //             { roundType },
-    //             {
-    //                 onSuccess: () => {
-    //                     toast.success('Score Tabulated');
-    //                     setLoading(false);
-    //                 },
-    //                 onError: () => {
-    //                     setLoading(false);
-    //                 },
-    //             },
-    //         );
-    //     }
-
-    //     if (scoringType === 'sr' && contestType === 'Team') {
-    //         router.post(
-    //             `/result/single-round/team/${contestId}/${groupId}/${resultType}`,
-    //             { roundType },
-    //             {
-    //                 onSuccess: () => {
-    //                     toast.success('Score Tabulated');
-    //                     setLoading(false);
-    //                 },
-    //                 onError: () => {
-    //                     setLoading(false);
-    //                 },
-    //             },
-    //         );
-    //     }
-    // };
-
-    // const handleTabulateFinal = async () => {
-    //     const roundType = 'Final';
-    //     setLoading(true);
-    //     const promise = new Promise((resolve, reject) => {
-    //         if (scoringType === 'mr' && contestType === 'Individual') {
-    //             router.post(
-    //                 `/result/multiple-round/individual/${contestId}/${groupId}/${resultType}`,
-    //                 { roundType },
-    //                 {
-    //                     onSuccess: (page) => {
-    //                         setLoading(false);
-    //                         resolve(page);
-    //                     },
-    //                     onError: (errors) => {
-    //                         setLoading(false);
-    //                         reject(errors);
-    //                     },
-    //                 },
-    //             );
-    //         }
-
-    //         if (scoringType === 'mr' && contestType === 'Individual') {
-    //             router.post(
-    //                 `/result/multiple-round/individual/${contestId}/${groupId}/${resultType}`,
-    //                 { roundType },
-    //                 {
-    //                     onSuccess: (page) => {
-    //                         setLoading(false);
-    //                         resolve(page);
-    //                     },
-    //                     onError: (errors) => {
-    //                         setLoading(false);
-    //                         reject(errors);
-    //                     },
-    //                 },
-    //             );
-    //         }
-
-    //         if (scoringType === 'mr' && contestType === 'Team') {
-    //             router.post(
-    //                 `/result/multiple-round/team/${contestId}/${groupId}/${resultType}`,
-    //                 { roundType },
-    //                 {
-    //                     onSuccess: (page) => {
-    //                         setLoading(false);
-    //                         resolve(page);
-    //                     },
-    //                     onError: (errors) => {
-    //                         setLoading(false);
-    //                         reject(errors);
-    //                     },
-    //                 },
-    //             );
-    //         }
-
-    //         router.post(
-    //             `/result/final/${contestId}/${groupId}/${resultType}`,
-    //             {},
-    //             {
-    //                 onSuccess: (page) => {
-    //                     resolve(page);
-    //                     setLoading(false);
-    //                 },
-    //                 onError: (errors) => {
-    //                     setLoading(false);
-    //                     reject(errors);
-    //                 },
-    //             },
-    //         );
-    //     });
-
-    //     toast.promise(promise, {
-    //         loading: 'Score is being tabulated...',
-    //         success: 'Score Tabulated successfully!',
-    //         error: 'Failed to tabulate score.',
-    //     });
-    // };
 
     const handleTabulate = () => {
         const roundType = 'Preliminary';
@@ -293,6 +160,7 @@ export default function Judges() {
         },
         { final: [] },
     );
+    const [loadingButton, setLoadingButton] = useState<string | null>(null);
 
     const handleEnabled = (judgeId: number, criteria: string) => {
         const id = `${judgeId}-${criteria}`;
@@ -301,7 +169,7 @@ export default function Judges() {
         const promise = new Promise((resolve, reject) => {
             router.post(
                 `/judging/edit-score/${contestId}/${groupId}/${judgeId}`,
-                { criteria },
+                { criteria, approved: 0 },
                 {
                     preserveScroll: true,
                     onSuccess: (page) => {
@@ -322,8 +190,6 @@ export default function Judges() {
             error: 'Judge enabled failed',
         });
     };
-    
-    const [loadingButton, setLoadingButton] = useState<string | null>(null);
 
     return (
         <div className="w-full">
@@ -349,10 +215,14 @@ export default function Judges() {
                             {Object.values(
                                 grouped?.preliminary?.reduce<Record<number, JudgeData>>((acc, item) => {
                                     const judgeId = item.judges.id;
+
                                     if (!acc[judgeId]) {
                                         acc[judgeId] = { judge: item.judges, scores: {} };
                                     }
-                                    acc[judgeId].scores[item.criteria] = item.is_finished;
+                                    acc[judgeId].scores[item.criteria] = {
+                                        is_finished: item.is_finished,
+                                        can_edit: item.can_edit, // ✅ store can_edit here
+                                    };
                                     return acc;
                                 }, {}) || {},
                             ).map((judgeData) => (
@@ -364,18 +234,28 @@ export default function Judges() {
                                         .map((criteria, index) => {
                                             const buttonId = `${judgeData.judge.id}-${criteria}`;
                                             const isThisButtonLoading = loadingButton === buttonId;
+                                            const scoreData = judgeData.scores[criteria];
                                             return (
                                                 <TableCell key={index}>
                                                     <div className="flex items-center justify-between uppercase">
-                                                        <p>{judgeData.scores[criteria] ? 'Submitted' : 'Pending'}</p>
+                                                        <p>{scoreData?.is_finished ? 'Submitted' : 'Pending'}</p>
+
                                                         <Button
-                                                            className={`cursor-pointer ${
-                                                                judgeData.scores[criteria] ? 'border-l bg-emerald-600' : 'border-l bg-rose-600'
+                                                            className={`relative cursor-pointer ${
+                                                                scoreData?.is_finished ? 'border-l bg-emerald-600' : 'bg-destructive border-l'
                                                             }`}
                                                             onClick={() => handleEnabled(judgeData.judge.id, criteria)}
-                                                            disabled={!judgeData.scores[criteria]}
+                                                            disabled={!scoreData?.is_finished}
                                                         >
                                                             {isThisButtonLoading && <Loader2 className="animate-spin" />}
+                                                            {/* <Badge className="absolute -top-2.5 -right-2.5 min-w-5 px-1" variant="default">
+                                                                <NotebookPen />
+                                                            </Badge> */}
+                                                            {scoreData?.can_edit === 1 && (
+                                                                <Badge className="absolute -top-2.5 -right-2.5 min-w-5 px-1 bg-[#45226b]" >
+                                                                    <NotebookPen color="white" />
+                                                                </Badge>
+                                                            )}
                                                             ENABLED
                                                         </Button>
                                                     </div>
@@ -416,7 +296,11 @@ export default function Judges() {
                                         if (!acc[judgeId]) {
                                             acc[judgeId] = { judge: item.judges, scores: {} };
                                         }
-                                        acc[judgeId].scores[item.criteria] = item.is_finished;
+                                        // acc[judgeId].scores[item.criteria] = item.is_finished;
+                                        acc[judgeId].scores[item.criteria] = {
+                                            is_finished: item.is_finished,
+                                            can_edit: item.can_edit, // ✅ store can_edit here
+                                        };
                                         return acc;
                                     }, {}) || {},
                                 ).map((judgeData) => (
@@ -428,19 +312,29 @@ export default function Judges() {
                                             .map((criteria, index) => {
                                                 const buttonId = `${judgeData.judge.id}-${criteria}`;
                                                 const isThisButtonLoading = loadingButton === buttonId;
-
+                                                const scoreData = judgeData.scores[criteria];
                                                 return (
                                                     <TableCell key={index}>
                                                         <div className="flex items-center justify-between uppercase">
-                                                            <p>{judgeData.scores[criteria] ? 'Submitted' : 'Pending'}</p>
+                                                            <p>{scoreData?.is_finished ? 'Submitted' : 'Pending'}</p>
                                                             <Button
-                                                                className={`cursor-pointer ${
-                                                                    judgeData.scores[criteria] ? 'border-l bg-emerald-600' : 'border-l bg-rose-600'
+                                                                className={`relative cursor-pointer ${
+                                                                    scoreData?.is_finished ? 'border-l bg-emerald-600' : 'bg-destructive border-l'
                                                                 }`}
                                                                 onClick={() => handleEnabled(judgeData.judge.id, criteria)}
-                                                                disabled={!judgeData.scores[criteria]}
+                                                                disabled={!scoreData?.is_finished}
                                                             >
                                                                 {isThisButtonLoading && <Loader2 className="animate-spin" />}
+                                                                {scoreData?.can_edit === 1 && (
+                                                                    <Badge className="absolute -top-2.5 -right-2.5 min-w-5 px-1" variant="default">
+                                                                        <Badge
+                                                                            className="absolute -top-2.5 -right-2.5 min-w-5 px-1 bg-[#45226b]"
+
+                                                                        >
+                                                                            <NotebookPen color="white" />
+                                                                        </Badge>
+                                                                    </Badge>
+                                                                )}
                                                                 ENABLED
                                                             </Button>
                                                         </div>
@@ -463,3 +357,7 @@ export default function Judges() {
         </div>
     );
 }
+// "dev": [
+//     "Composer\\Config::disableProcessTimeout",
+//     "npx concurrently -c \"#93c5fd,#c4b5fd,#fdba74\" \"php artisan serve\" \"php artisan queue:listen --tries=1\" \"npm run dev\" --names='server,queue,vite'"
+// ],

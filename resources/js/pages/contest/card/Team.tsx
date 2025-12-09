@@ -147,21 +147,21 @@ export default function Team({ contest, participant, poster }: PROPS) {
     return (
         <div className="flex flex-col gap-6 xl:flex-row">
             {/* <div>
-             
+
             </div> */}
             <Card className="h-fit w-full p-6">
                 <div className="h-full space-y-7">
                     <div>
                         <div className="mb-8 space-y-2">
                             {poster ? (
-                                <img src={`/storage/${poster}`} className="h-96 w-full rounded-md object-cover object-center" alt="poster" />
+                                <img src={`/storage/${poster}`} className="h-96 w-full rounded-md" alt="poster" />
                             ) : (
                                 <div className="flex h-96 w-full items-center justify-center rounded-md bg-gray-200 text-black">
                                     No Poster Available
                                 </div>
                             )}
                         </div>
-                  
+
                         <div className="flex w-full max-w-sm items-center gap-3">
                             <Dialog>
                                 <form>

@@ -33,7 +33,16 @@ class AuthenticatedSessionController extends Controller
 
         $request->session()->regenerate();
 
-        return redirect()->intended(route('dashboard', absolute: false));
+        $user = auth()->user();
+
+        if ($user->accountType === 'ADMIN') {
+            return redirect()->route('account.index');
+        }
+
+        if ($user->accountType === 'JUDGE') {
+            return redirect()->route('judgesTable');
+        }
+
     }
 
     /**

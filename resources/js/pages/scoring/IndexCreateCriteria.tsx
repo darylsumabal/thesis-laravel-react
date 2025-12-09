@@ -36,6 +36,21 @@ const scoringMethod = [
     },
 ];
 
+const preliminaryMethod = [
+    {
+        value: '',
+        label: 'Select',
+    },
+    {
+        value: 'default',
+        label: 'Default',
+    },
+    {
+        value: 'weighted',
+        label: 'Weighted',
+    },
+];
+
 const breadcrumbs: BreadcrumbItem[] = [
     {
         title: 'Create Criteria',
@@ -60,9 +75,12 @@ export default function CreateCriteria() {
     const [loading, setLoading] = useState<boolean>(false);
     const [, setSelectedJudges] = useState<string[]>([]);
     const [open, setOpen] = useState(false);
+    const [openPreliminary, setOpenPreliminary] = useState(false);
     const [value, setValue] = useState('');
+    const [valuePreliminary, setValuePreliminary] = useState('');
     const [selectedOptions, setSelectedOptions] = useState<Option[]>([]);
-    
+    const weighted = valuePreliminary !== 'default' && valuePreliminary !== '';
+
     const defaultValues: CriteriaRound | CriteriaRoundSr = {
         judges: [],
         qualified: 0,
@@ -72,6 +90,7 @@ export default function CreateCriteria() {
         criteria: {
             criteria: [
                 {
+                    weighted: 0,
                     criteria: '',
                     round: isSingleRound ? 'Preliminary' : '',
                     category: 'Mixed',
@@ -86,6 +105,12 @@ export default function CreateCriteria() {
         defaultValues,
     });
 
+    const allCriteria = form.watch('criteria.criteria');
+
+    const totalWeight = allCriteria?.reduce((sum, round) => {
+        return sum + (Number(round.weighted ?? 0) || 0);
+    }, 0);
+
     const onSubmit = async (data: CriteriaRound | CriteriaRoundSr) => {
         const judge = data.judges.length === 0;
         setLoading(true);
@@ -96,14 +121,28 @@ export default function CreateCriteria() {
 
         if (isMultipleRound && data.criteria.criteria.every((round) => round.round !== 'Final')) {
             toast.error('You must add at least one Final round!');
+            setLoading(false);
+            return;
+        }
+        if (totalWeight != 100 && valuePreliminary != 'default' && isMultipleRound) {
+            toast.error('Total weight across in the contest must be not exceed to 100');
+            setLoading(false);
+            return;
+        }
+
+        if (!weighted && valuePreliminary != 'default' && isMultipleRound) {
+            toast.error('You must select a Preliminary Round Type');
+            setLoading(false);
             return;
         }
 
         if (invalidRounds) {
             toast.error("Each round's max score is 100!");
+            setLoading(false);
             return;
         } else if (judge) {
             toast.error('Please add a judges!');
+            setLoading(false);
             return;
         }
 
@@ -116,6 +155,7 @@ export default function CreateCriteria() {
                     setSelectedOptions([]);
                     setSelectedJudges([]);
                     setValue('');
+                    setValuePreliminary('');
                 },
                 onError: (error) => {
                     setLoading(false);
@@ -186,6 +226,7 @@ export default function CreateCriteria() {
 
     const handleAddRound = () => {
         appendCriteria({
+            weighted: 0,
             criteria: '',
             category: 'mixed',
             round: isSingleRound ? 'Preliminary' : '',
@@ -203,7 +244,6 @@ export default function CreateCriteria() {
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Create Criteria" />
-            <Toaster richColors closeButton position="top-center" />
             <div className="h-full">
                 <Card className="50 h-fit rounded-xl p-6">
                     {participants.length === 0 ? (
@@ -223,7 +263,7 @@ export default function CreateCriteria() {
                                         <div className="mb-2 font-medium">Add Judges</div>
                                         <div className="">
                                             <Tabs defaultValue="judges">
-                                                <TabsList className="border border-black">
+                                                <TabsList>
                                                     <TabsTrigger value="judges">Judges</TabsTrigger>
                                                     <TabsTrigger value="all-judges">All Judges</TabsTrigger>
                                                 </TabsList>
@@ -312,7 +352,7 @@ export default function CreateCriteria() {
                                             />
 
                                             {isMultipleRound && (
-                                                <div className="space-y-2">
+                                                <div className="flex gap-2">
                                                     <FormField
                                                         control={form.control}
                                                         name={`scoringMethod`}
@@ -359,6 +399,71 @@ export default function CreateCriteria() {
                                                                                                         className={cn(
                                                                                                             'ml-auto',
                                                                                                             value === framework.value
+                                                                                                                ? 'opacity-100'
+                                                                                                                : 'opacity-0',
+                                                                                                        )}
+                                                                                                    />
+                                                                                                </CommandItem>
+                                                                                            ))}
+                                                                                        </CommandGroup>
+                                                                                    </CommandList>
+                                                                                </Command>
+                                                                            </PopoverContent>
+                                                                        </Popover>
+                                                                    </div>
+                                                                </FormControl>
+                                                                <FormMessage />
+                                                            </FormItem>
+                                                        )}
+                                                    />
+
+                                                    <FormField
+                                                        control={form.control}
+                                                        name={`preliminaryScoringMethod`}
+                                                        render={({ field }) => (
+                                                            <FormItem>
+                                                                <FormControl>
+                                                                    <div className="flex flex-col space-y-2">
+                                                                        <FormLabel>Select a Preliminary Scoring Method</FormLabel>
+                                                                        <Popover open={openPreliminary} onOpenChange={setOpenPreliminary}>
+                                                                            <PopoverTrigger asChild>
+                                                                                <Button
+                                                                                    variant="outline"
+                                                                                    role="combobox"
+                                                                                    aria-expanded={openPreliminary}
+                                                                                    className="w-96 justify-between"
+                                                                                >
+                                                                                    {valuePreliminary
+                                                                                        ? preliminaryMethod.find(
+                                                                                              (framework) => framework.value === valuePreliminary,
+                                                                                          )?.label
+                                                                                        : 'Select scoring method'}
+                                                                                    <ChevronsUpDown className="opacity-50" />
+                                                                                </Button>
+                                                                            </PopoverTrigger>
+                                                                            <PopoverContent className="w-96 p-0">
+                                                                                <Command>
+                                                                                    <CommandList>
+                                                                                        <CommandGroup>
+                                                                                            {preliminaryMethod.map((framework) => (
+                                                                                                <CommandItem
+                                                                                                    key={framework.value}
+                                                                                                    value={framework.value}
+                                                                                                    onSelect={(currentValue) => {
+                                                                                                        setValuePreliminary(
+                                                                                                            currentValue === value
+                                                                                                                ? ''
+                                                                                                                : currentValue,
+                                                                                                        );
+                                                                                                        field.onChange(framework.value);
+                                                                                                        setOpenPreliminary(false);
+                                                                                                    }}
+                                                                                                >
+                                                                                                    {framework.label}
+                                                                                                    <Check
+                                                                                                        className={cn(
+                                                                                                            'ml-auto',
+                                                                                                            valuePreliminary === framework.value
                                                                                                                 ? 'opacity-100'
                                                                                                                 : 'opacity-0',
                                                                                                         )}
@@ -486,6 +591,7 @@ export default function CreateCriteria() {
                                                     roundScoring={true}
                                                     multipleRound={true}
                                                     edit={true}
+                                                    isWeighted={weighted}
                                                 />
                                             </div>
                                         ))}

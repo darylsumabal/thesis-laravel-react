@@ -41,11 +41,11 @@ type GroupedParticipant = {
 };
 
 function TableResultTypeTeamMultiple({ scoringType, contest }: { scoringType: string; contest: Contest }) {
-    const { result, qualified } = usePage().props;
+    const { tableResultTypeMultiple, qualified, prelimScoringType, preliminaryScore } = usePage().props;
 
-    const flattened: JudgeScoreTest[] = result?.flatMap((r) => r.judges_score) ?? [];
+    const flattened: JudgeScoreTest[] = tableResultTypeMultiple?.flatMap((r) => r.judges_score) ?? [];
 
-    const data: JudgeScoreTest[] = Array.from(new Map(flattened.map((item) => [`${item.criteria}-${item.participant_id}`, item])).values());
+    const data: JudgeScoreTest[] = Array.from(new Map(flattened.map((item) => [`${item.criteria}-${item.participant_no}`, item])).values());
 
     const criteria = [...new Set(data?.map((item) => item.criteria))];
     const genders = [...new Set(data?.map((item) => item.participant_gender))];
@@ -81,7 +81,12 @@ function TableResultTypeTeamMultiple({ scoringType, contest }: { scoringType: st
 
         return Object.values(grouped).sort((a, b) => parseFloat(a.participant_no) - parseFloat(b.participant_no));
     };
+    const criteriaWeightsMap: Record<string, number> = {};
+    preliminaryScore.forEach((item) => {
+        criteriaWeightsMap[item.contest_name.trim()] = Number(item.weight); // convert string to number
+    });
 
+    console.log(prelimScoringType);
     return (
         <div className="flex flex-col">
             <ResultHeader contest={contest ?? { contest: [], message: '' }} />
@@ -91,11 +96,13 @@ function TableResultTypeTeamMultiple({ scoringType, contest }: { scoringType: st
 
             <div className="mb-4 flex w-full flex-col items-center justify-center rounded-md bg-[#45226b] p-4 text-center text-3xl font-medium text-white">
                 <p className="">Top {qualified} Finalists</p>
-                <p className="text-base font-normal capitalize">({scoringType})</p>
+                <p className="text-base font-normal uppercase">({scoringType})</p>
+                <p className="text-base font-normal uppercase">({prelimScoringType} ROUND)</p>
             </div>
             <div className="flex gap-4">
                 {genders.map((gender, index) => {
                     // Filter once per gender
+
                     const filteredData = data.filter((item) => item.participant_gender === gender);
                     const groupedData = groupByParticipantTest(filteredData);
                     const judges = getUniqueJudgesTest();
@@ -103,7 +110,7 @@ function TableResultTypeTeamMultiple({ scoringType, contest }: { scoringType: st
                     if (groupedData.length === 0) {
                         return (
                             <div key={index} className="rounded-lg bg-gray-50 p-8 text-center text-gray-500">
-                                <p>No data available for {gender}</p>
+                                <p>No data available</p>
                             </div>
                         );
                     }
@@ -111,7 +118,7 @@ function TableResultTypeTeamMultiple({ scoringType, contest }: { scoringType: st
                     return (
                         <div key={index} className="mb-12 w-full">
                             <div className="mb-6 rounded-lg p-4 text-center">
-                                <h2 className="text-2xl font-medium">{gender} Candidates</h2>
+                                <h2 className="text-2xl font-medium"> Candidates</h2>
                             </div>
                             <div className="overflow-x-auto rounded-md border">
                                 <Table>
@@ -120,33 +127,37 @@ function TableResultTypeTeamMultiple({ scoringType, contest }: { scoringType: st
                                             <TableHead className="text-center text-xs font-medium uppercase">Contestant No.</TableHead>
 
                                             {criteria.map((crit) =>
-                                                judges.map((judge) => (
-                                                    <TableHead
-                                                        key={`${crit}-${judge}`}
-                                                        className="space-y-2 p-2 text-center text-xs font-medium uppercase"
-                                                    >
-                                                        <div className="break-words whitespace-normal">{crit}</div>
-                                                        <div className="flex justify-around normal-case">
-                                                            {scoringType == 'point based' && (
-                                                                <>
-                                                                    <p>%</p>
-                                                                    <p>Rank</p>
-                                                                </>
-                                                            )}
-                                                            {scoringType == 'rank based' && (
-                                                                <>
-                                                                    <p className="break-words whitespace-normal">Total Points</p>
-                                                                    <p className="break-words whitespace-normal">Total Rank</p>
-                                                                    <p className="break-words whitespace-normal">Final Rank</p>
+                                                judges.map((judge) => {
+                                                    const weight = criteriaWeightsMap[crit.trim()] ?? 0;
 
-                                                                    {/* <p>{100 / criteria.length}%</p> */}
-                                                                </>
-                                                            )}
-                                                        </div>
-                                                    </TableHead>
-                                                )),
+                                                    return (
+                                                        <TableHead
+                                                            key={`${crit}-${judge}`}
+                                                            className="space-y-2 p-2 text-center text-xs font-medium uppercase"
+                                                        >
+                                                            {prelimScoringType === 'weighted' && <p>{weight}%</p>}
+                                                            <div className="break-words whitespace-normal">{crit}</div>
+                                                            <div className="flex justify-around uppercase">
+                                                                {scoringType == 'Point Based Multiple Round' && (
+                                                                    <>
+                                                                        <p>Total Points</p>
+                                                                        <p>Final Rank</p>
+                                                                    </>
+                                                                )}
+
+                                                                {scoringType == 'Rank Based Multiple Round' && (
+                                                                    <>
+                                                                        <p>Total Points</p>
+                                                                        <p>Total Rank</p>
+                                                                        <p>Final Rank</p>
+                                                                    </>
+                                                                )}
+                                                            </div>
+                                                        </TableHead>
+                                                    );
+                                                }),
                                             )}
-                                            {scoringType == 'point based' && (
+                                            {scoringType == 'Point Based Multiple Round' && (
                                                 <>
                                                     <TableHead className="text-center text-xs font-medium uppercase">Total %</TableHead>
                                                     <TableHead className="text-center text-xs font-medium break-words whitespace-normal uppercase">
@@ -154,11 +165,13 @@ function TableResultTypeTeamMultiple({ scoringType, contest }: { scoringType: st
                                                     </TableHead>
                                                 </>
                                             )}
-                                            {scoringType == 'rank based' && (
+                                            {scoringType == 'Rank Based Multiple Round' && (
                                                 <>
-                                                    <TableHead className="text-center text-xs font-medium break-words whitespace-normal uppercase">
-                                                        Total Points
-                                                    </TableHead>
+                                                    {prelimScoringType == 'weighted' ? (
+                                                        <TableHead className="text-center text-xs font-medium uppercase">Total Rank</TableHead>
+                                                    ) : (
+                                                        <TableHead className="text-center text-xs font-medium uppercase">Total Points</TableHead>
+                                                    )}
                                                     <TableHead className="text-center text-xs font-medium break-words whitespace-normal uppercase">
                                                         Total %
                                                     </TableHead>
@@ -169,108 +182,87 @@ function TableResultTypeTeamMultiple({ scoringType, contest }: { scoringType: st
                                             </TableHead>
                                         </TableRow>
                                     </TableHeader>
-
                                     <TableBody>
-                                        {scoringType == 'point based' && (
-                                            <>
-                                                {groupedData.map((participant) => (
-                                                    <TableRow key={participant.participant_no}>
-                                                        <TableCell className="text-center font-medium whitespace-nowrap">
-                                                            {participant.participant_no}
-                                                        </TableCell>
+                                        {groupedData.map((participant) => (
+                                            <TableRow key={participant.participant_no}>
+                                                <TableCell className="text-center font-medium whitespace-nowrap">
+                                                    {participant.participant_no}
+                                                </TableCell>
 
-                                                        {criteria.map((crit) =>
-                                                            judges.map((judge) => {
-                                                                const judgeScore = participant.judges_scores[crit]?.[judge];
-                                                                return (
-                                                                    <TableCell
-                                                                        key={`${participant.participant_no}-${crit}-${judge}`}
-                                                                        className="text-center whitespace-nowrap"
-                                                                    >
-                                                                        {judgeScore ? (
-                                                                            <div className="flex justify-around">
-                                                                                <div className="font-medium">{judgeScore.score}%</div>
+                                                {criteria.map((crit) =>
+                                                    judges.map((judge) => {
+                                                        const judgeScore = participant.judges_scores[crit]?.[judge];
+                                                        return (
+                                                            <TableCell
+                                                                key={`${participant.participant_no}-${crit}-${judge}`}
+                                                                className="text-center whitespace-nowrap"
+                                                            >
+                                                                {judgeScore ? (
+                                                                    <div className="flex justify-around">
+                                                                        {scoringType == 'Point Based Multiple Round' ? (
+                                                                            <>
+                                                                                {prelimScoringType == 'weighted' ? (
+                                                                                    <>
+                                                                                        <div className="font-medium">{judgeScore.total_points}%</div>
+                                                                                    </>
+                                                                                ) : (
+                                                                                    <>
+                                                                                        <div className="font-medium">{judgeScore.score}%</div>
+                                                                                    </>
+                                                                                )}
+
                                                                                 <div className="font-medium">{formatRank(judgeScore.rank)}</div>
-                                                                            </div>
+                                                                            </>
                                                                         ) : (
-                                                                            <div className="text-gray-400">-</div>
-                                                                        )}
-                                                                    </TableCell>
-                                                                );
-                                                            }),
-                                                        )}
-
-                                                        <TableCell className="text-center font-medium whitespace-nowrap">
-                                                            {participant.total}
-                                                        </TableCell>
-                                                        <TableCell className="text-center font-medium whitespace-nowrap">
-                                                            {participant.total_rank}
-                                                        </TableCell>
-                                                        <TableCell
-                                                            className={`text-center font-medium whitespace-nowrap ${getRankBgClass(
-                                                                participant.final_rank,
-                                                                qualified,
-                                                            )}`}
-                                                        >
-                                                            {formatRank(participant.final_rank)}
-                                                        </TableCell>
-                                                    </TableRow>
-                                                ))}
-                                            </>
-                                        )}
-                                        {scoringType == 'rank based' && (
-                                            <>
-                                                {groupedData.map((participant) => (
-                                                    <TableRow key={participant.participant_no}>
-                                                        <TableCell className="text-center font-medium whitespace-nowrap">
-                                                            {participant.participant_no}
-                                                        </TableCell>
-
-                                                        {criteria.map((crit) =>
-                                                            judges.map((judge) => {
-                                                                const judgeScore = participant.judges_scores[crit]?.[judge];
-                                                                console.log();
-                                                                return (
-                                                                    <TableCell
-                                                                        key={`${participant.participant_no}-${crit}-${judge}`}
-                                                                        className="text-center whitespace-nowrap"
-                                                                    >
-                                                                        {judgeScore ? (
-                                                                            <div className="flex justify-around">
+                                                                            <>
                                                                                 <div className="font-medium">
                                                                                     {parseFloat(judgeScore.score).toFixed(2)}
                                                                                 </div>
-                                                                                <div className="font-medium">{judgeScore.total_rank}</div>
-                                                                                <div className="font-medium">
-                                                                                    {parseFloat(judgeScore.rank).toFixed(2)}
-                                                                                </div>
-                                                                            </div>
-                                                                        ) : (
-                                                                            <div className="text-gray-400">-</div>
-                                                                        )}
-                                                                    </TableCell>
-                                                                );
-                                                            }),
-                                                        )}
+                                                                                {prelimScoringType == 'weighted' ? (
+                                                                                    <>
+                                                                                        <div className="font-medium">
+                                                                                            {parseFloat(judgeScore.rank).toFixed(2)}
+                                                                                        </div>
+                                                                                        <div className="font-medium">{judgeScore.total_rank}</div>
+                                                                                    </>
+                                                                                ) : (
+                                                                                    <>
+                                                                                        <div className="font-medium">{judgeScore.total_rank}</div>
+                                                                                        <div className="font-medium">
+                                                                                            {parseFloat(judgeScore.rank).toFixed(2)}
+                                                                                        </div>
+                                                                                    </>
+                                                                                )}
 
-                                                        <TableCell className="text-center font-medium whitespace-nowrap">
-                                                            {participant.total_points}
-                                                        </TableCell>
-                                                        <TableCell className="text-center font-medium whitespace-nowrap">
-                                                            {participant.total}
-                                                        </TableCell>
-                                                        <TableCell
-                                                            className={`text-center font-medium whitespace-nowrap ${getRankBgClass(
-                                                                participant.final_rank,
-                                                                qualified,
-                                                            )} `}
-                                                        >
-                                                            {formatRank(participant.final_rank)}
-                                                        </TableCell>
-                                                    </TableRow>
-                                                ))}
-                                            </>
-                                        )}
+                                                                                {/* </>
+                                                                    )} */}
+                                                                            </>
+                                                                        )}
+                                                                    </div>
+                                                                ) : (
+                                                                    <div className="text-gray-400">-</div>
+                                                                )}
+                                                            </TableCell>
+                                                        );
+                                                    }),
+                                                )}
+
+                                                {scoringType == 'Point Based Multiple Round' ? (
+                                                    <>
+                                                        <TableCell className="text-center font-medium">{participant.total}</TableCell>
+                                                        <TableCell className="text-center font-medium">{participant.total_rank}</TableCell>
+                                                    </>
+                                                ) : (
+                                                    <>
+                                                        <TableCell className="text-center font-medium">{participant.total_points}</TableCell>
+                                                        <TableCell className="text-center font-medium">{participant.total}</TableCell>
+                                                    </>
+                                                )}
+                                                <TableCell className={`text-center font-medium ${getRankBgClass(participant.final_rank, qualified)}`}>
+                                                    {formatRank(participant.final_rank)}
+                                                </TableCell>
+                                            </TableRow>
+                                        ))}
                                     </TableBody>
                                 </Table>
                             </div>

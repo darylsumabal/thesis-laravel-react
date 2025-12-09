@@ -330,7 +330,6 @@ const ViewMultipleRound = ({ contest, criteria, judgesCriteria, prelimFinal, qua
     };
     return (
         <Card className="h-fit rounded-xl p-6">
-            <Toaster richColors closeButton position="top-center" />
             <div className="w-full space-y-4">
                 <div className="flex w-full gap-4">
                     <div className="flex w-full flex-col">

@@ -23,7 +23,6 @@ export default function IndexContestCard({ contestType, contest, participants, p
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Contest" />
-            <Toaster richColors closeButton position="top-center" />
 
             <Tabs defaultValue="contest">
                 <TabsList>

@@ -23,3 +23,12 @@ Broadcast::channel('submit-score', function ($user) {
     ]);
     return true;
 });
+
+
+Broadcast::channel('request-edit', function ($user) {
+
+    logger()->info('Broadcast auth check', [
+        'user_id' => $user->id,
+    ]);
+    return true;
+});

@@ -2,9 +2,9 @@
 
 namespace App\Http\Controllers\Judging;
 
-use App\Events\JudgeEvent;
+
 use App\Events\JudgeSubmit;
-use App\Events\TopParticipantsUpdated;
+use App\Events\RequestEdit;
 use App\Http\Controllers\Controller;
 use App\Models\ActivityLog;
 use App\Models\Contest;
@@ -64,16 +64,48 @@ class JudgingController extends Controller
     public function updateFinishedUpdate(Request $request, $contestId, $groupId, $judgeId)
     {
         $criteria = $request->input('criteria');
+        $approved = $request->input('approved');
+
         JudgesGroup::with('Judges')
             ->where('contest_id', $contestId)
             ->where('group_id', $groupId)
             ->where('judges_id', $judgeId)
             ->where('criteria', $criteria)
             ->update([
-                'is_finished' => 0
+                'can_edit' => $approved
             ]);
+        $judge = JudgesGroup::with('Judges')
+            ->where('contest_id', $contestId)
+            ->where('group_id', $groupId)
+            ->where('judges_id', $judgeId)
+            ->first();
 
-        broadcast(new JudgeSubmit($contestId, $groupId))->toOthers();
+        $judgeName = $judge?->Judges->name ?? 'Unknown';
+
+        if ($approved == 0) {
+            JudgesGroup::with('Judges')
+                ->where('contest_id', $contestId)
+                ->where('group_id', $groupId)
+                ->where('judges_id', $judgeId)
+                ->where('criteria', $criteria)
+                ->update([
+                    'is_finished' => 0,
+
+                ]);
+        }
+
+        if ($approved == 0) {
+            $action = 'grant'; // admin granted permission
+        } else {
+            $action = 'request'; // judge requested
+        }
+
+        if ($approved === 0 || $approved === 1) {
+
+            broadcast(new RequestEdit($contestId, $groupId, $judgeId, $judgeName, $action))->toOthers();
+        } else {
+            broadcast(new JudgeSubmit($contestId, $groupId, $$judgeName))->toOthers();
+        }
 
         return redirect()->back()->with('success', 'Judge can now edit score');
     }
@@ -193,7 +225,9 @@ class JudgingController extends Controller
         $judgeExist = User::where('email', $validate['email'])->exists();
 
         if ($judgeExist) {
-            return redirect()->back()->with('error', 'Judge already exists');
+            return back()->withErrors(
+                'Account already exist!',
+            );
         }
 
         User::create([
@@ -423,7 +457,11 @@ class JudgingController extends Controller
     {
         $criteria = $request->input('criteria');
         $criteriaNames = collect($criteria)->pluck('criteria')->unique()->toArray();
-
+        $judge = JudgesGroup::with('Judges')
+            ->where('contest_id', $contestId)
+            ->where('group_id', $groupId)
+            ->where('judges_id', $judgeId)
+            ->first();
         try {
             JudgesGroup::where('judges_id', $judgeId)->where('contest_id', $contestId)->where('group_id', $groupId)->where('round', $roundType)->where('criteria', $criteriaNames)->update(['is_finished' => 1]);
 
@@ -471,8 +509,8 @@ class JudgingController extends Controller
                     ]
                 );
             }
-
-            broadcast(new JudgeSubmit($contestId, $groupId))->toOthers();
+            $judgeName = $judge?->Judges->name ?? 'Unknown';
+            broadcast(new JudgeSubmit($contestId, $groupId, $judgeName))->toOthers();
 
             return redirect()->back()->with('success', 'Score submitted successfully');
         } catch (\Exception $e) {

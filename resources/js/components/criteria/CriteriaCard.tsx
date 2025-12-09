@@ -7,6 +7,7 @@ import { useEffect, useState } from 'react';
 import { UseFormReturn } from 'react-hook-form';
 import InputWithEndButton from '../input-button';
 import { CriteriaTests } from './CriteriaGroupWrapper';
+import { getRankBgClass } from '../../pages/utils/function/rank';
 
 export function CriteriaCard({
     criteriaGroup,
@@ -95,7 +96,7 @@ export function CriteriaCard({
     const totalScore = criteriaGroup.items.reduce((sum, item) => sum + Number(item.score || 0), 0);
 
     return (
-        <div className="w-full">
+        <div className="w-full uppercase">
             <div className="p-2 text-center">
                 <p className="text-3xl">{gender} Candidates</p>
             </div>
@@ -112,7 +113,7 @@ export function CriteriaCard({
                             {criteriaGroup.items.map((item) => (
                                 <TableHead key={item.id} className="py-4 capitalize">
                                     <div className="text-center font-extrabold">
-                                        <p className="break-words whitespace-normal">{item.evaluation_criteria}</p>
+                                        <p className="break-words whitespace-normal uppercase">{item.evaluation_criteria}</p>
                                         <p>{item.score}%</p>
                                     </div>
                                 </TableHead>
@@ -170,7 +171,8 @@ export function CriteriaCard({
                                     })}
                                     <TableCell className="text-center">{totalPoints}%</TableCell>
                                     <TableCell
-                                        className={`text-center text-lg font-bold ${isQualified ? 'rounded bg-black text-white dark:bg-white dark:text-black' : ''}`}
+                                        className={`text-center font-bold ${isQualified ? 'rounded bg-[#45226b] text-white' : ''} `}
+
                                         // className="text-center text-lg font-bold"
                                     >
                                         {rank}

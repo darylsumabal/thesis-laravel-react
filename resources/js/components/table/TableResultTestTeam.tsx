@@ -45,10 +45,8 @@ export type GroupedParticipant = {
 };
 
 export default function TableResultTestTeam({ criteriaName }: { criteriaName: string }) {
-    // const { contest_id, group_id } = useParams();
-    // const { result } = useResultTestTeam(Number(contest_id), group_id ?? '');
     const { result, qualified } = usePage().props;
-;
+
     const data = result?.flatMap((r) => r.judges_score) ?? [];
     // const { qualified } = useQualified(contest_id ?? '', group_id ?? '');
     const getUniqueJudges = () => {
@@ -63,7 +61,7 @@ export default function TableResultTestTeam({ criteriaName }: { criteriaName: st
     // Get unique participants for this criteria
     const getUniqueParticipants = (criteriaName: string) => {
         const participantsSet = new Set(data?.filter((item) => item.criteria === criteriaName)?.map((item) => item.team_participant_no));
-        
+
         return Array.from(participantsSet).sort((a, b) => parseFloat(a) - parseFloat(b));
     };
 
@@ -72,7 +70,7 @@ export default function TableResultTestTeam({ criteriaName }: { criteriaName: st
         const filteredData = data?.filter((item) => item.criteria === criteriaName) ?? [];
         const participants = getUniqueParticipants(criteriaName);
         const judges = getUniqueJudges();
-       
+
         const participantData: Record<
             string,
             {
@@ -114,7 +112,7 @@ export default function TableResultTestTeam({ criteriaName }: { criteriaName: st
     if (participants.length === 0) {
         return (
             <div className="rounded-lg bg-gray-50 p-8 text-center text-gray-500">
-                <p>No data available for {criteriaName}</p>
+                <p>No data available</p>
             </div>
         );
     }

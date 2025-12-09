@@ -9,6 +9,7 @@ use App\Models\Criteria;
 use App\Models\CriteriaRoundScore;
 use App\Models\FinalScoringMethod;
 use App\Models\JudgesGroup;
+use App\Models\PrelimScoringMethod;
 use App\Models\Qualified;
 use App\Models\Score;
 use App\Models\User;
@@ -189,6 +190,10 @@ class CriteriaController extends Controller
 
         $scoringMethod = $request->input('scoringMethod');
 
+        $preliminaryScoringMethod = $request->input('preliminaryScoringMethod');
+
+
+
         // $category = $request->input('genderCategory');
 
         $contestJudges = collect($judgeId)->map(function ($judge) use ($groupId, $contest) {
@@ -220,12 +225,29 @@ class CriteriaController extends Controller
             });
         })->flatten(1)->toArray();
 
+        foreach ($criteria as $item) {
+
+            // Only process preliminary round
+            if (strtolower($item['round']) !== 'preliminary') {
+                continue;
+            }
+
+            PrelimScoringMethod::create([
+                'group_id'           => $groupId,
+                'contest_id'         => $contestId,
+                'preliminary_method' => $preliminaryScoringMethod,
+                'contest_name'           => $item['criteria'],   // e.g. "Production Number"
+                'weight'             => $item['weighted'],   // e.g. 100
+            ]);
+        }
+
 
         Qualified::create([
             'qualified' => $qualified,
             'group_id' => $groupId,
             'contest_id' => $contestId
         ]);
+
 
         FinalScoringMethod::create([
             'group_id' => $groupId,
@@ -481,7 +503,7 @@ class CriteriaController extends Controller
         foreach ($judgeId as $judge) {
             $judgeIdVal = $judge['id'];
 
-            /** 
+            /**
              * --- Handle ContestJudges table ---
              */
             $existingJudge = ContestJudges::withTrashed()
@@ -502,7 +524,7 @@ class CriteriaController extends Controller
                 ]);
             }
 
-            /** 
+            /**
              * --- Handle JudgesGroup table ---
              */
             foreach ($contestCriteria as $criterion) {

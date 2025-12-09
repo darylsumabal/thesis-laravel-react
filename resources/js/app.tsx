@@ -38,7 +38,7 @@ createInertiaApp({
         const root = createRoot(el);
         root.render(
             <QueryClientProvider client={queryClient}>
-                <Toaster richColors position="top-center" />
+                <Toaster richColors closeButton position="top-center" />
                 <ContextProvider>
                     <App {...props} />
                 </ContextProvider>
@@ -46,9 +46,15 @@ createInertiaApp({
         );
     },
     progress: {
-        color: '#4B5563',
+        color: '#45226b',
     },
 });
 
 // This will set light / dark mode on load...
 initializeTheme();
+
+// "dev": "npx concurrently -c \"#93c5fd,#c4b5fd,#fdba74\" \"php artisan serve --host=192.168.1.38 --port=8000\" \"php artisan queue:listen --tries=1\" \"npm run dev\" --names='server,queue,vite'"
+// }
+
+// "Composer\\Config::disableProcessTimeout",
+//             "npx concurrently -c \"#93c5fd,#c4b5fd,#fdba74\" \"php artisan serve\" \"php artisan queue:listen --tries=1\" \"npm run dev\" --names='server,queue,vite'"

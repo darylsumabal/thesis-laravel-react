@@ -8,7 +8,6 @@ use Illuminate\Support\Facades\Route;
 Route::prefix('judging')->group(function () {
     Route::get('/', [AccountController::class, 'indexUser']);
 
-
     Route::post('/', [JudgingController::class, 'storeJudge']);
 
     Route::post('/edit-score/{contestId}/{groupId}/{judgeId}', [JudgingController::class, 'updateFinishedUpdate']);

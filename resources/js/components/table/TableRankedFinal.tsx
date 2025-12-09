@@ -109,7 +109,7 @@ function TableRankedFinal({ scoringType, contest }: PROPS) {
                         if (groupedData.length === 0) {
                             return (
                                 <div key={gender} className="rounded-lg bg-gray-50 p-8 text-center text-gray-500">
-                                    <p>No data available for {gender}</p>
+                                    <p>No data available</p>
                                 </div>
                             );
                         }

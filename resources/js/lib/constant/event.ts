@@ -233,10 +233,10 @@ export const COMBOBOX_INPUT_EVENT_TYPE: ComboboxField[] = [
                 label: 'Male & Female',
                 value: 'Male & Female',
             },
-            {
-                label: 'Mixed',
-                value: 'Mixed',
-            },
+            // {
+            //     label: 'Mixed',
+            //     value: 'Mixed',
+            // },
         ],
     },
 ];

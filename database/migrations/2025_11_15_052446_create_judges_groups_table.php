@@ -11,7 +11,9 @@ return new class extends Migration
      */
     public function up(): void
     {
+
         Schema::create('judges_groups', function (Blueprint $table) {
+
             $table->id();
 
             $table->unsignedBigInteger('contest_id');
@@ -27,6 +29,8 @@ return new class extends Migration
             $table->string('criteria')->nullable();
 
             $table->tinyInteger('is_finished')->default(0);
+            
+            $table->boolean('can_edit')->default(false);
 
             $table->timestamps();
         });

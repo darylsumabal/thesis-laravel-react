@@ -188,7 +188,7 @@ export function CriteriaGroupWrapperTeam({ group, criteriaGroup }: { group: Crit
             <form onSubmit={form.handleSubmit(onSubmit)} className="w-full">
                 <div className="flex flex-col">
                     <div>
-                        <p className="mb-4 rounded-md bg-zinc-800 p-3 text-center text-5xl font-medium text-white uppercase">{group.criteria}</p>
+                        <p className="mb-4 rounded-md bg-[#45226b] p-3 text-center text-5xl font-medium text-white uppercase">{group.criteria}</p>
                     </div>
                     <div className="flex gap-6">
                         <CriteriaCardTeam criteriaGroup={group} form={form} />

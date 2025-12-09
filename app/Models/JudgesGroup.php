@@ -17,6 +17,7 @@ class JudgesGroup extends Model
         'round',
         'criteria',
         'is_finished',
+        'can_edit'
     ];
 
     protected $dates = ['deleted_at'];

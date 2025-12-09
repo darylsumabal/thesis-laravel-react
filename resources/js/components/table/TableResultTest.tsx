@@ -147,7 +147,8 @@ export default function TableResultTest({
         return (
             <div className="rounded-lg bg-gray-50 p-8 text-center text-gray-500">
                 <p>
-                    No data available for {criteriaName} - {getGenderTitle(gender)}
+                    {/* No data available for {criteriaName} - {getGenderTitle(gender)} */}
+                    No data available
                 </p>
             </div>
         );

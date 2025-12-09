@@ -1,12 +1,11 @@
-
-import { useRef } from 'react';
-import { useReactToPrint } from 'react-to-print';
-import ResultFooter from './ResultFooter';
-import ResultHeader from './ResultHeader';
-import { Button } from '../ui/button';
-import { MajorAward } from '../table/TableResultTest';
 import { Contest } from '@/api/contest';
 import { JudgesGroup } from '@/api/result';
+import { useRef } from 'react';
+import { useReactToPrint } from 'react-to-print';
+import { MajorAward } from '../table/TableResultTest';
+import { Button } from '../ui/button';
+import ResultFooter from './ResultFooter';
+import ResultHeader from './ResultHeader';
 
 type ResultProps = {
     contest: Contest;
@@ -31,10 +30,12 @@ const ResultsTeam = ({ contest, topResult, sortedUniqueJudges }: ResultProps) =>
                     <div className="w-full border-2 border-b-black" />
                     <div className="flex w-full flex-col">
                         {topResult?.map((i, index) => {
-                            const labels = contest?.contest.map((i) => {
-                                const year = new Date(i.event.date).getFullYear();
-                                return `${i.contest_name} ${year}`;
-                            });
+                            // const labels = contest?.contest.map((i) => {
+                            //     const year = new Date(i.event.date).getFullYear();
+                            //     return `${i.contest_name} ${year}`;
+                            // });
+                            const year = new Date(contest.event.date).getFullYear();
+                            const labels = `${contest.contest_name} ${year}`;
                             const getPlacement = (index: number, length: number) => {
                                 const position = length - index - 1;
 

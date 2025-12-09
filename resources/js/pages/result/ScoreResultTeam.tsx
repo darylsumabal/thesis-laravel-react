@@ -15,7 +15,7 @@ import { Button } from '@/components/ui/button';
 import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { scoreMap, scoringTypeMap } from '@/lib/constant/contest';
-import { usePage } from '@inertiajs/react';
+import { router, usePage } from '@inertiajs/react';
 import { useRef } from 'react';
 import { useReactToPrint } from 'react-to-print';
 
@@ -33,11 +33,10 @@ export type PROPS = {
 };
 
 export default function ScoreResultTeam() {
-    const { rounds, contest, final, qualified, result, award, top, finalTopResult, finalResults, scoringMethod } = usePage<PROPS>().props;
+    const { rounds, contest, final, qualified, result, award, top, finalTopResult, finalResults, scoringMethod, contestId, groupId } =
+        usePage<PROPS>().props;
 
     const finalResult = final?.flatMap((r) => r.judges_score) ?? [];
-
-    console.log(finalResult);
 
     const grouped = finalResult.reduce<Record<number, TeamParticipantScore>>((acc, item) => {
         const { participant_id } = item;
@@ -84,10 +83,10 @@ export default function ScoreResultTeam() {
     // const topResult = (pointCardSr || rankCardSr) && finalTopSingleResult;
     const scoringMr = scoreMap[contest.contest_scoring_type] === 'mr';
 
-    const topResultMr = scoringMr && scoringMethod === 'Final' ? finalResults : finalTopResult;
-
     const scoringSr = scoreMap[contest.contest_scoring_type] === 'sr';
-    
+
+    const topResultMr = scoringMr && scoringMethod === 'Final' ? finalTopResult : finalResults;
+
     const isPointBasedFinal = scoringTypeMap[contest.contest_scoring_type] === 'point_based';
     return (
         <Tabs defaultValue={''} className="mt-4 w-full">
@@ -120,7 +119,22 @@ export default function ScoreResultTeam() {
                     {scoringMr && (
                         <>
                             <TabsTrigger value="final">FINAL</TabsTrigger>
-                            <TabsTrigger value="major_awards">MAJOR AWARDS</TabsTrigger>
+                            <TabsTrigger
+                                value="major_awards"
+                                onClick={() => {
+                                    router.get(
+                                        `/result/${contestId}/${groupId}/team`,
+                                        { award: 1 },
+                                        {
+                                            preserveScroll: true,
+                                            preserveState: true,
+                                            replace: false,
+                                        },
+                                    );
+                                }}
+                            >
+                                MAJOR AWARDS
+                            </TabsTrigger>
                             <TabsTrigger value="top_results">TOP {qualified} RESULTS</TabsTrigger>
                             <TabsTrigger value="final_results">FINAL RESULTS</TabsTrigger>
                             {sortedUniqueJudges?.map((i) => (
@@ -140,16 +154,13 @@ export default function ScoreResultTeam() {
                 <Button className="mb-4 cursor-pointer" onClick={() => handlePrint()}>
                     PRINT
                 </Button>
-                <TableResultTypeTeamMultiple
-                    contest={contest ?? { contest: [], message: '' }}
-                    scoringType={`${contest.contest_scoring_type} based`}
-                />
-
                 <div ref={sectionRef}>
-                    {scoringMr &&
-                        criteria.map((criteriaName) => (
-                            <CriteriaSectionFinalResultTeam key={criteriaName} criteriaName={criteriaName} routeCardSr={scoringSr} />
-                        ))}
+                    {scoringMr && (
+                        <TableResultTypeTeamMultiple
+                            contest={contest ?? { contest: [], message: '' }}
+                            scoringType={`${contest.contest_scoring_type}`}
+                        />
+                    )}
 
                     {criteria.map((criteriaName) => (
                         <CriteriaSectionTeam key={criteriaName} criteriaName={criteriaName} />
@@ -157,45 +168,62 @@ export default function ScoreResultTeam() {
                 </div>
             </TabsContent>
 
-            {criteria.map((criteriaName, idx) => (
-                <TabsContent value={criteriaName} key={idx}>
-                    <Tabs defaultValue="result-contest">
-                        <TabsList>
-                            <TabsTrigger value="result-contest">RESULT</TabsTrigger>
-                            <TabsTrigger value="final-contest">FINAL RESULT</TabsTrigger>
-                        </TabsList>
-                        <TabsContent value="result-contest">
-                            <Button className="mb-4 cursor-pointer" onClick={() => handlePrint()}>
-                                PRINT
-                            </Button>
+            {criteria.map((criteriaName, idx) => {
+                const refreshByCriteria = () => {
+                    router.get(
+                        `/result/${contestId}/${groupId}/team`,
+                        {
+                            criteria: criteriaName, // ✅ PASSED TO BACKEND
+                        },
+                        {
+                            preserveScroll: true,
+                            preserveState: true,
+                        },
+                    );
+                };
 
-                            <div ref={sectionRef}>
-                                <div className="flex flex-col">
-                                    <ResultHeader contest={contest ?? { contest: [], message: '' }} />
-                                    <div className="mt-14 mb-10 text-center text-3xl font-medium">
-                                        <p>CONSOLIDATED RESULT</p>
+                return (
+                    <TabsContent value={criteriaName} key={idx}>
+                        <Tabs defaultValue="result-contest">
+                            <TabsList>
+                                <TabsTrigger value="result-contest">RESULT</TabsTrigger>
+                                <TabsTrigger value="final-contest" onClick={refreshByCriteria}>
+                                    FINAL RESULT
+                                </TabsTrigger>
+                            </TabsList>
+                            <TabsContent value="result-contest">
+                                <Button className="mb-4 cursor-pointer" onClick={() => handlePrint()}>
+                                    PRINT
+                                </Button>
+
+                                <div ref={sectionRef}>
+                                    <div className="flex flex-col">
+                                        <ResultHeader contest={contest ?? { contest: [], message: '' }} />
+                                        <div className="mt-14 mb-10 text-center text-3xl font-medium">
+                                            <p>CONSOLIDATED RESULT</p>
+                                        </div>
+                                        <div className="mb-4 flex w-full flex-col items-center justify-center rounded-md bg-[#45226b] p-4 text-center text-3xl font-medium text-white">
+                                            <p>TOP {qualified} Finalists</p>
+                                            <p className="text-base font-normal uppercase">({contest.contest_scoring_type})</p>
+                                            <p className="mt-4">{criteriaName}</p>
+                                        </div>
                                     </div>
-                                    <div className="mb-4 flex w-full flex-col items-center justify-center rounded-md bg-[#45226b] p-4 text-center text-3xl font-medium text-white">
-                                        <p>TOP {qualified} Finalists</p>
-                                        <p className="text-base font-normal uppercase">({contest.contest_scoring_type})</p>
-                                        <p className="mt-4">{criteriaName}</p>
-                                    </div>
+                                    <CriteriaSectionFinalResultTeam key={idx} criteriaName={criteriaName} routeCardSr={isPointBasedFinal} />
+                                    <CriteriaSectionTeam key={criteriaName} criteriaName={criteriaName} />
                                 </div>
-                                <CriteriaSectionFinalResultTeam key={idx} criteriaName={criteriaName} routeCardSr={isPointBasedFinal} />
-                                <CriteriaSectionTeam key={criteriaName} criteriaName={criteriaName} />
-                            </div>
-                        </TabsContent>
-                        <TabsContent value="final-contest">
-                            <ResultsTeamSingleRound
-                                contest={contest ?? { contest: [], message: '' }}
-                                // topResult={topResult ?? []}
-                                criteria={criteriaName}
-                                sortedUniqueJudges={sortedUniqueJudges ?? []}
-                            />
-                        </TabsContent>
-                    </Tabs>
-                </TabsContent>
-            ))}
+                            </TabsContent>
+                            <TabsContent value="final-contest">
+                                <ResultsTeamSingleRound
+                                    contest={contest ?? { contest: [], message: '' }}
+                                    // topResult={topResult ?? []}
+                                    criteria={criteriaName}
+                                    sortedUniqueJudges={sortedUniqueJudges ?? []}
+                                />
+                            </TabsContent>
+                        </Tabs>
+                    </TabsContent>
+                );
+            })}
 
             <TabsContent value="final">
                 {groupedArray.length > 0 ? (
@@ -254,7 +282,7 @@ export default function ScoreResultTeam() {
 
                                         <div className="flex w-full justify-evenly">
                                             <div>
-                                                <p className="font-bold uppercase">Team No. {i.top_male?.participant?.team_participant_no}</p>
+                                                <p className="font-bold uppercase">Team No. {i.top_male?.participant?.participant_no}</p>
                                                 <p className="text-center">Team</p>
                                             </div>
                                         </div>
@@ -291,12 +319,12 @@ export default function ScoreResultTeam() {
                                 <div className="flex w-full">
                                     {top?.map((i, idx) => (
                                         <div key={idx} className="mt-4 flex w-full flex-col items-center justify-center gap-8">
-                                            {i.top_male?.participant?.team_participant_no.length > 0 && (
+                                            {i.top_team?.participant?.team_participant_no.length > 0 && (
                                                 <>
                                                     <div className="flex w-full justify-evenly">
                                                         <div>
                                                             <p className="font-bold uppercase">
-                                                                Team No. {i.top_male?.participant?.team_participant_no}
+                                                                Team No. {i.top_team?.participant?.team_participant_no}
                                                             </p>
                                                             <p className="text-center">Team</p>
                                                         </div>

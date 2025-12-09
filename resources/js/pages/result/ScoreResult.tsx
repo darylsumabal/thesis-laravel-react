@@ -1,9 +1,3 @@
-import { JudgeScore, MajorAward } from '@/components/table/TableResultTest';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { scoreMap, scoringTypeMap } from '@/lib/constant/contest';
-import { usePage } from '@inertiajs/react';
-import { useRef } from 'react';
-import { useReactToPrint } from 'react-to-print';
 import { Contests } from '@/api/contest';
 import { JudgesGroups } from '@/api/result';
 import CriteriaSection from '@/components/criteria/CriteriaSection';
@@ -15,10 +9,16 @@ import Results from '@/components/result/Results';
 import ResultSingleRound from '@/components/result/ResultSingleRound';
 import ScoreTable, { ParticipantScore } from '@/components/score/ScoreTable';
 import TableRankedFinal from '@/components/table/TableRankedFinal';
+import { JudgeScore, MajorAward } from '@/components/table/TableResultTest';
 import { JudgeScoreTest } from '@/components/table/TableResultType';
 import TableResultTypeMultiple from '@/components/table/TableResultTypeMultiple';
 import { Button } from '@/components/ui/button';
 import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { scoreMap, scoringTypeMap } from '@/lib/constant/contest';
+import { router, usePage } from '@inertiajs/react';
+import { useRef } from 'react';
+import { useReactToPrint } from 'react-to-print';
 
 export type PROPS = {
     rounds: JudgesGroups;
@@ -34,7 +34,8 @@ export type PROPS = {
 };
 
 export default function ScoreResult() {
-    const { rounds, contest, final, qualified, result, award, top, finalTopResult, finalResults, scoringMethod } = usePage<PROPS>().props;
+    const { rounds, contest, final, qualified, result, award, top, finalTopResult, finalResults, scoringMethod, groupId, contestId } =
+        usePage<PROPS>().props;
 
     const finalResult = final?.flatMap((r) => r.judges_score) ?? [];
 
@@ -84,7 +85,7 @@ export default function ScoreResult() {
     const data: JudgeScore[] = result?.flatMap((r) => r.judges_score) ?? [];
 
     const criteria = [...new Set(data?.map((item) => item.criteria))];
-  
+
     const genders = [...new Set(data?.map((item) => item.gender_category))];
 
     const sectionRef = useRef<HTMLDivElement>(null);
@@ -117,29 +118,74 @@ export default function ScoreResult() {
                                 </TabsTrigger>
                             ))}
 
-                            {sortedUniqueJudges?.map((i) => (
-                                <TabsTrigger key={i.id} value={i.judges.name}>
-                                    <p className="uppercase" key={i.id}>
-                                        {i.judges.name}
-                                    </p>
-                                </TabsTrigger>
-                            ))}
+                            {sortedUniqueJudges?.map((i) => {
+                                const refreshByJudge = () => {
+                                    router.get(
+                                        `/result/${contestId}/${groupId}/individual`,
+                                        {
+                                            judgeId: i.judges.id, // ✅ PASSED TO BACKEND
+                                        },
+                                        {
+                                            preserveScroll: true,
+                                            preserveState: true,
+                                            replace: false,
+                                        },
+                                    );
+                                };
+                                return (
+                                    <TabsTrigger onClick={refreshByJudge} key={i.id} value={i.judges.name}>
+                                        <p className="uppercase" key={i.id}>
+                                            {i.judges.name}
+                                        </p>
+                                    </TabsTrigger>
+                                );
+                            })}
                         </>
                     )}
 
                     {scoringMr && (
                         <>
                             <TabsTrigger value="final">FINAL</TabsTrigger>
-                            <TabsTrigger value="major_awards">MAJOR AWARDS</TabsTrigger>
+                            <TabsTrigger
+                                value="major_awards"
+                                onClick={() => {
+                                    router.get(
+                                        `/result/${contestId}/${groupId}/individual`,
+                                        { award: 1 },
+                                        {
+                                            preserveScroll: true,
+                                            preserveState: true,
+                                            replace: false,
+                                        },
+                                    );
+                                }}
+                            >
+                                MAJOR AWARDS
+                            </TabsTrigger>
                             <TabsTrigger value="top_results">Top {qualified} RESULTS</TabsTrigger>
                             <TabsTrigger value="final_results">FINAL RESULTS</TabsTrigger>
-                            {sortedUniqueJudges?.map((i) => (
-                                <TabsTrigger key={i.id} value={i.judges.name}>
-                                    <p className="uppercase" key={i.id}>
-                                        {i.judges.name}
-                                    </p>
-                                </TabsTrigger>
-                            ))}
+                            {sortedUniqueJudges?.map((i) => {
+                                const refreshByJudge = () => {
+                                    router.get(
+                                        `/result/${contestId}/${groupId}/individual`,
+                                        {
+                                            judgeId: i.judges.id, // ✅ PASSED TO BACKEND
+                                        },
+                                        {
+                                            preserveScroll: true,
+                                            preserveState: true,
+                                            replace: false,
+                                        },
+                                    );
+                                };
+                                return (
+                                    <TabsTrigger onClick={refreshByJudge} key={i.id} value={i.judges.name}>
+                                        <p className="uppercase" key={i.id}>
+                                            {i.judges.name}
+                                        </p>
+                                    </TabsTrigger>
+                                );
+                            })}
                         </>
                     )}
                 </TabsList>
@@ -163,45 +209,68 @@ export default function ScoreResult() {
                     ))}
                 </div>
             </TabsContent>
-            {criteria.map((criteriaName, idx) => (
-                <TabsContent value={criteriaName} key={idx}>
-                    <Tabs defaultValue="result-contest">
-                        <TabsList className="border-1 border-black">
-                            <TabsTrigger value="result-contest">RESULT</TabsTrigger>
-                            <TabsTrigger value="final-contest">FINAL RESULT</TabsTrigger>
-                        </TabsList>
-                        <TabsContent value="result-contest">
-                            <Button className="mb-4 cursor-pointer" onClick={() => handlePrint()}>
-                                PRINT
-                            </Button>
 
-                            <div ref={sectionRef}>
-                                <div className="flex flex-col">
-                                    <ResultHeader contest={contest ?? []} />
-                                    <div className="mt-14 mb-10 text-center text-3xl font-medium">
-                                        <p>CONSOLIDATED RESULT</p>
+            {criteria.map((criteriaName, idx) => {
+                const refreshByCriteria = () => {
+                    router.get(
+                        `/result/${contestId}/${groupId}/individual`,
+                        {
+                            criteria: criteriaName, // ✅ PASSED TO BACKEND
+                        },
+                        {
+                            preserveScroll: true,
+                            preserveState: true,
+                        },
+                    );
+                };
+
+                return (
+                    <TabsContent value={criteriaName} key={idx}>
+                        <Tabs defaultValue="result-contest">
+                            <TabsList>
+                                <TabsTrigger value="result-contest">RESULT</TabsTrigger>
+                                <TabsTrigger value="final-contest" onClick={refreshByCriteria}>
+                                    FINAL RESULT
+                                </TabsTrigger>
+                            </TabsList>
+                            <TabsContent value="result-contest">
+                                <Button className="mb-4 cursor-pointer" onClick={() => handlePrint()}>
+                                    PRINT
+                                </Button>
+
+                                <div ref={sectionRef}>
+                                    <div className="flex flex-col">
+                                        <ResultHeader contest={contest ?? []} />
+                                        <div className="mt-14 mb-10 text-center text-3xl font-medium">
+                                            <p>CONSOLIDATED RESULT</p>
+                                        </div>
+                                        <div className="mb-4 flex w-full flex-col items-center justify-center rounded-md bg-[#45226b] p-4 text-center text-3xl font-medium text-white">
+                                            <p className="uppercase">Top {qualified} Finalists</p>
+                                            <p className="text-base font-normal uppercase">({contest.contest_scoring_type})</p>
+                                            <p className="mt-4">{criteriaName}</p>
+                                        </div>
                                     </div>
-                                    <div className="mb-4 flex w-full flex-col items-center justify-center rounded-md bg-[#45226b] p-4 text-center text-3xl font-medium text-white">
-                                        <p className="uppercase">Top {qualified} Finalists</p>
-                                        <p className="text-base font-normal uppercase">({contest.contest_scoring_type})</p>
-                                        <p className="mt-4">{criteriaName}</p>
-                                    </div>
+                                    <CriteriaSectionFinalResult
+                                        key={idx}
+                                        criteriaName={criteriaName}
+                                        genders={genders}
+                                        routeCardSr={isPointBasedFinal}
+                                    />
+                                    <CriteriaSection key={criteriaName} criteriaName={criteriaName} genders={genders} />
                                 </div>
-                                <CriteriaSectionFinalResult key={idx} criteriaName={criteriaName} genders={genders} routeCardSr={isPointBasedFinal} />
-                                <CriteriaSection key={criteriaName} criteriaName={criteriaName} genders={genders} />
-                            </div>
-                        </TabsContent>
-                        <TabsContent value="final-contest">
-                            <ResultSingleRound
-                                contest={contest ?? { contest: [], message: '' }}
-                                // topResult={topResult ?? []}
-                                criteria={criteriaName}
-                                sortedUniqueJudges={sortedUniqueJudges ?? []}
-                            />
-                        </TabsContent>
-                    </Tabs>
-                </TabsContent>
-            ))}
+                            </TabsContent>
+                            <TabsContent value="final-contest">
+                                <ResultSingleRound
+                                    contest={contest ?? { contest: [], message: '' }}
+                                    // topResult={topResult ?? []}
+                                    criteria={criteriaName}
+                                    sortedUniqueJudges={sortedUniqueJudges ?? []}
+                                />
+                            </TabsContent>
+                        </Tabs>
+                    </TabsContent>
+                );
+            })}
             <TabsContent value="final">
                 {maleParticipants.length > 0 || femaleParticipants.length > 0 ? (
                     <>
@@ -315,7 +384,7 @@ export default function ScoreResult() {
                                 </div>
 
                                 <div className="flex w-full">
-                                    {top?.map((i,index) => (
+                                    {top?.map((i, index) => (
                                         <div className="mt-4 flex w-full flex-col items-center justify-center gap-8" key={index}>
                                             {i.top_female?.participant?.participant_no.length > 0 && (
                                                 <>

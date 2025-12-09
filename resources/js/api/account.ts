@@ -1,5 +1,4 @@
-import axios from "axios";
-
+import axios from 'axios';
 
 export type Account = {
     id: string;
@@ -19,6 +18,9 @@ export type Account = {
 
 export type AccountType = {
     account: Account[];
+    flash: {
+        success: string;
+    };
 };
 
 export const createJudge = async (data: FormData) => {

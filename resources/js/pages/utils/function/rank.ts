@@ -4,28 +4,10 @@ export const getRankBgClass = (rank: string, qualified: number | undefined) => {
     if (qualified !== undefined && r <= qualified) {
         // Top 3
         // if (r === 1) ; // 🥇 Gold
-        return 'dark:bg-white dark:text-black text-white bg-black font-medium';
+        return 'bg-[#45226b] text-white font-medium';
     }
+    return '';
 
-    // Handle ties (like 3.5, 5.5, etc.)
-    // if (!Number.isInteger(r)) {
-    //   return "bg-black text-white font-medium"; // tie highlight
-    // }
-    return ''; // default
-
-    //   const r = parseFloat(rank);
-
-    //     if (qualified !== undefined && r <= qualified) {
-    //       // Top 3
-    //       if (r >= 1) return "bg-black text-white font-bold";
-    //     }
-
-    //     // Handle ties (like 3.5, 5.5, etc.)
-    //     if (!Number.isInteger(r)) {
-    //       return "bg-black text-white font-semibold"; // tie highlight
-    //     }
-
-    //     return ""; // default
 };
 
 export const formatRank = (rank: string) => {

@@ -28,7 +28,7 @@ export default function TableResultTypeTeam({ criteriaName, routeCardSr }: { cri
     const data = tableResultTypeMultiple?.flatMap((r) => r.judges_score) ?? [];
 
     const filteredData = data.filter((item) => item.criteria === criteriaName);
-    console.log(tableResultTypeMultiple);
+
     const getUniqueJudges = () => [...new Set(data?.map((item) => item.judge_name))];
 
     const getUniqueParticipants = () => {
@@ -93,7 +93,7 @@ export default function TableResultTypeTeam({ criteriaName, routeCardSr }: { cri
     if (participants.length === 0) {
         return (
             <div className="rounded-lg bg-gray-50 p-8 text-center text-gray-500">
-                <p>No data available for {criteriaName}</p>
+                <p>No data available</p>
             </div>
         );
     }

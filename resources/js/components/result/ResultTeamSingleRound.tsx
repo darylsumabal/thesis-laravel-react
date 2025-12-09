@@ -26,8 +26,8 @@ const ResultsTeamSingleRound = ({
 
     const sectionRef = useRef<HTMLDivElement>(null);
     const handlePrint = useReactToPrint({ contentRef: sectionRef });
- 
-    
+
+
     return (
         <>
             <Button className="mb-4 cursor-pointer" onClick={() => handlePrint()}>

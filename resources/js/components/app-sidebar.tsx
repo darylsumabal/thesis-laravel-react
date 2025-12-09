@@ -51,7 +51,7 @@ const mainNavItems: NavItem[] = [
 const footerNavItems: NavItem[] = [
     {
         title: 'Repository',
-        href: 'https://github.com/darylsumabal/Thesis/tree/version_26',
+        href: 'https://github.com/darylsumabal/thesis-laravel-react',
         icon: Folder,
     },
     {
@@ -59,21 +59,21 @@ const footerNavItems: NavItem[] = [
         href: 'https://portfolio-daryl.vercel.app/home',
         icon: BookOpen,
     },
-    {
-        title: 'Github',
-        href: 'https://github.com/darylsumabal',
-        icon: Github,
-    },
-    {
-        title: 'Facebook',
-        href: 'https://web.facebook.com/legndaryl',
-        icon: Facebook,
-    },
-    {
-        title: 'Instagram',
-        href: 'https://www.instagram.com/legndaryl',
-        icon: Instagram,
-    },
+    // {
+    //     title: 'Github',
+    //     href: 'https://github.com/darylsumabal',
+    //     icon: Github,
+    // },
+    // {
+    //     title: 'Facebook',
+    //     href: 'https://web.facebook.com/legndaryl',
+    //     icon: Facebook,
+    // },
+    // {
+    //     title: 'Instagram',
+    //     href: 'https://www.instagram.com/legndaryl',
+    //     icon: Instagram,
+    // },
 ];
 
 export function AppSidebar() {

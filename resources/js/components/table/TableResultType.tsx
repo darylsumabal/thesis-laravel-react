@@ -91,7 +91,7 @@ export default function TableResultType({ criteriaName, gender, routeCardSr }: {
     if (participants.length === 0) {
         return (
             <div className="rounded-lg bg-gray-50 p-8 text-center text-gray-500">
-                <p>No data available for {criteriaName}</p>
+                <p>No data available</p>
             </div>
         );
     }
@@ -125,7 +125,7 @@ export default function TableResultType({ criteriaName, gender, routeCardSr }: {
                     <TableBody>
                         {participants.map((participantNo, index) => {
                             const participant = participantData[participantNo];
-                            console.log(participant);
+                     
                             return (
                                 <TableRow key={index}>
                                     <TableCell className="text-center font-medium whitespace-nowrap">{participantNo}</TableCell>

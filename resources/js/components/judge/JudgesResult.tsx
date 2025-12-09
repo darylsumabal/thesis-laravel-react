@@ -24,7 +24,8 @@ const JudgesResult = ({ judgeId, judgeName, judgeRole }: { judgeId: string; judg
     const { qualified, judgeData, auth } = usePage<PROPS>().props;
 
     // const filteredJudgeData = judgeData.filter((item) => item.id === judgeId);
-  
+    console.log(judgeData);
+    
     const filteredJudgeData = judgeData.map((item) => {
         return {
             criteria: item.criteria,
@@ -110,7 +111,7 @@ const JudgesResult = ({ judgeId, judgeName, judgeRole }: { judgeId: string; judg
                                 {criteriaItem.criteria}
                             </h2>
 
-                            <div className="flex flex-col xl:flex-row w-full gap-6">
+                            <div className="flex w-full flex-col gap-6 xl:flex-row">
                                 {maleScores.length > 0 && (
                                     <div className="w-full">
                                         <h3 className="mb-4 text-center text-xl font-medium uppercase">Male Candidates</h3>

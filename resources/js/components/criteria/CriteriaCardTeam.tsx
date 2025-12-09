@@ -11,7 +11,7 @@ import { UseFormReturn } from 'react-hook-form';
 import InputWithEndButton from '../input-button';
 
 export function CriteriaCardTeam({ criteriaGroup, form }: { criteriaGroup: CriteriaTestsTeam; form: UseFormReturn<pointBasedSchemaTest> }) {
-    const { judge, savedCriteria, auth, groupId } = usePage().props;
+    const { judge, savedCriteria, auth, groupId, qualified } = usePage().props;
     const judgeId = auth?.user.id;
     const [, setIsSubmitted] = useState(false);
 
@@ -80,7 +80,7 @@ export function CriteriaCardTeam({ criteriaGroup, form }: { criteriaGroup: Crite
     const totalScore = criteriaGroup.items.reduce((sum, item) => sum + Number(item.score || 0), 0);
 
     return (
-        <div className="w-full rounded-md border">
+        <div className="w-full rounded-md border uppercase">
             <Table>
                 <TableHeader className="border-b">
                     <TableRow>
@@ -93,7 +93,7 @@ export function CriteriaCardTeam({ criteriaGroup, form }: { criteriaGroup: Crite
                         {criteriaGroup.items.map((item) => (
                             <TableHead key={item.id} className="capitalize">
                                 <div className="py-4 text-center font-extrabold">
-                                    <p className="break-words whitespace-normal">{item.evaluation_criteria}</p>
+                                    <p className="break-words whitespace-normal uppercase">{item.evaluation_criteria}</p>
                                     <p>{item.score}%</p>
                                 </div>
                             </TableHead>
@@ -122,8 +122,7 @@ export function CriteriaCardTeam({ criteriaGroup, form }: { criteriaGroup: Crite
                         const rank = totalPoints > 0 ? getParticipantRank(p.id) : '-';
                         // const topHalfCount = Math.ceil(filteredParticipants.length / 2);
 
-                        // const isQualified =
-                        //   typeof rank === "number" && Math.floor(rank) <= Number(qualified);
+                        const isQualified = typeof rank === 'number' && Math.floor(rank) <= Number(qualified);
 
                         return (
                             <TableRow key={p.id}>
@@ -156,7 +155,8 @@ export function CriteriaCardTeam({ criteriaGroup, form }: { criteriaGroup: Crite
                                     // className={`text-center font-bold ${
                                     //   isQualified ? "bg-slate-950 text-white rounded" : ""
                                     // }`}
-                                    className="text-center text-lg font-bold"
+                                    // className="text-center font-bold"
+                                    className={`text-center font-bold ${isQualified ? 'rounded bg-[#45226b] text-white' : ''}`}
                                 >
                                     {rank}
                                 </TableCell>

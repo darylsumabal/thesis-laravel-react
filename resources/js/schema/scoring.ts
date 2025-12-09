@@ -49,12 +49,15 @@ export const CriteriaSchema = z
         qualified: z.coerce.number().min(1, {
             message: 'Qualified participant must be at least 1',
         }),
+        preliminaryScoringMethod: z.string().optional(),
         scoringMethod: z.string().optional(),
         preliminary: z.coerce.number().optional(),
         final: z.coerce.number().optional(),
         criteria: z.object({
             criteria: z.array(
                 z.object({
+                    // weighted: z.number().optional(),weighted: z.preprocess((v) => (v === '' ? 0 : Number(v)), z.number())
+                    weighted: z.preprocess((v) => (v === '' ? 0 : Number(v)), z.number().optional()),
                     criteria: z.string().min(1, {
                         message: 'Please enter a criteria name!',
                     }),
@@ -66,12 +69,43 @@ export const CriteriaSchema = z
                     }),
                     criterion: z.array(multipleRoundSchema),
                 }),
+                // .superRefine((item, ctx) => {
+                //     // If round is "Preliminary" → weighted is required
+                //     if (item.round === 'Preliminary') {
+                //         if (item.weighted === undefined || item.weighted < 1) {
+                //             ctx.addIssue({
+                //                 code: 'custom',
+                //                 message: 'Weight is required for preliminary round',
+                //                 path: ['weighted'],
+                //             });
+                //         }
+                //     }
+                // }),
             ),
         }),
     })
+    .superRefine((data, ctx) => {
+        if (data.preliminaryScoringMethod === 'weighted') {
+            data.criteria.criteria.forEach((item, index) => {
+                if (item.round === 'Preliminary') {
+                    if (!item.weighted || item.weighted < 1) {
+                        ctx.addIssue({
+                            code: 'custom',
+                            path: ['criteria', 'criteria', index, 'weighted'],
+                            message: 'Weight is required when preliminary scoring is weighted',
+                        });
+                    }
+                }
+            });
+        }
+    })
     .refine((data) => !!data.scoringMethod && data.scoringMethod.trim() !== '', {
-        message: 'Scoring method is required',
+        message: 'Final scoring method is required',
         path: ['scoringMethod'],
+    })
+    .refine((data) => !!data.preliminaryScoringMethod && data.preliminaryScoringMethod.trim() !== '', {
+        message: 'Preliminary scoring method is required',
+        path: ['preliminaryScoringMethod'],
     })
     .refine((data) => data.scoringMethod !== 'PrelimFinal' || (data.preliminary !== undefined && data.preliminary >= 1 && data.preliminary <= 100), {
         message: 'Preliminary scoring must be between 1 and 100',
@@ -92,6 +126,7 @@ export const CriteriaSchemaSr = z.object({
     criteria: z.object({
         criteria: z.array(
             z.object({
+                weighted: z.preprocess((v) => (v === '' ? 0 : Number(v)), z.number().optional()),
                 criteria: z.string().min(1, {
                     message: 'Please enter a criteria name!',
                 }),

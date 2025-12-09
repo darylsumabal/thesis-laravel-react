@@ -36,12 +36,12 @@ import { useParams } from 'react-router-dom';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../ui/table';
 import { Contest } from '@/api/contest';
 import { formatRank, getRankBgClass } from '@/pages/utils/function/rank';
+import ResultHeader from '../result/ResultHeader';
+import { usePage } from '@inertiajs/react';
 function TableRankedFinalTeam({ scoringType, contest }: { scoringType: string; contest: Contest }) {
-    const { contest_id, group_id } = useParams();
-    const { qualified } = useQualified(contest_id ?? '', group_id ?? '');
-    const { result } = useResultTestSystemFinalTeam(Number(contest_id), group_id ?? '');
+      const { tableRankedFinalTeam, qualified } = usePage().props;
 
-    const data: JudgeScoreTest[] = result?.flatMap((r) => r.judges_score) ?? [];
+    const data: JudgeScoreTest[] = tableRankedFinalTeam?.flatMap((r) => r.judges_score) ?? [];
 
     const criteria = [...new Set(data?.map((item) => item.criteria))];
     const genders = [...new Set(data?.map((item) => item.participant_gender))];

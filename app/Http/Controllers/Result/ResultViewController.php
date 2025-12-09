@@ -13,6 +13,7 @@ use App\Models\JudgingScore;
 use App\Models\OverallFinalScore;
 use App\Models\OverallScoring;
 use App\Models\Participants;
+use App\Models\PrelimScoringMethod;
 use App\Models\Qualified;
 use App\Models\Score;
 use App\Models\ScoreJudging;
@@ -32,10 +33,11 @@ class ResultViewController extends Controller
             ->where('group_id', $groupId)
             ->get()
             ->groupBy('round');
-
+        $prelimScoringType = PrelimScoringMethod::where('group_id', $groupId)->value('preliminary_method');
+        $preliminaryScore =  PrelimScoringMethod::where('group_id', operator: $groupId)->get();
         $result = $judgesGroup->mapWithKeys(function ($judges, $round) {
             $unfinished = $judges->where('is_finished', 0)->count();
-
+          
             return [
                 strtolower($round) => [
                     'is_finished' => $unfinished === 0,
@@ -63,19 +65,21 @@ class ResultViewController extends Controller
             'final' => $this->indexFinal($groupId, $contestId, Participants::class),
             'qualified' => $qualified,
             'result' => $this->indexResult($contestId, $groupId, Participants::class, $genderCategory),
-            'award' => $this->indexMajorAward($groupId, $contestId),
+            'award' => $this->indexMajorAward($groupId, $contestId, request('award')),
             'top' => $this->indexTopResult($groupId, $contestId, $qualified),
             'finalTopResult' => $this->indexFinalResult($groupId, $contestId, $qualified),
             'finalResults' => $this->indexFinalResultsSingleRound($groupId, $contestId, $qualified),
             'scoringMethod' => $this->scoringMethod($contestId, $groupId),
-            'judgeData' => $this->indexResultJudge($contestId, $groupId, Participants::class),
+            'prelimScoringType' => $prelimScoringType,
+            'preliminaryScore' => $preliminaryScore,
+            'judgeData' => $this->indexResultJudge($contestId, $groupId, Participants::class, request('judgeId')),
             'contestId' => $contestId,
             'groupId' => $groupId,
             'tableResultTypeMultiple' => $this->indexResultTestSystem($contestId, $groupId, Participants::class),
             'tableRankedFinal' => $this->indexResultTestSystemFinalRanked($contestId, $groupId, Participants::class),
             'percentage' => $this->indexRoundScore($contestId, $groupId),
             'activity' => $this->indexActivityLog($groupId),
-            'resultSingleRound' => $this->indexFinalResultSingleRound($groupId, $contestId, $qualified, $genderCategory)
+            'resultSingleRound' => $this->indexFinalResultSingleRound($groupId, $contestId, $qualified, $genderCategory, request('criteria'))
         ]);
     }
 
@@ -88,7 +92,8 @@ class ResultViewController extends Controller
             ->where('group_id', $groupId)
             ->get()
             ->groupBy('round');
-
+        $prelimScoringType = PrelimScoringMethod::where('group_id', $groupId)->value('preliminary_method');
+        $preliminaryScore =  PrelimScoringMethod::where('group_id', operator: $groupId)->get();
         $result = $judgesGroup->mapWithKeys(function ($judges, $round) {
             $unfinished = $judges->where('is_finished', 0)->count();
 
@@ -117,29 +122,31 @@ class ResultViewController extends Controller
             'final' => $this->indexFinal($groupId, $contestId, TeamParticipants::class),
             'qualified' => $qualified,
             'result' => $this->indexResult($contestId, $groupId, TeamParticipants::class, $genderCategory),
-            'award' => $this->indexMajorAward($groupId, $contestId),
+            'award' => $this->indexMajorAward($groupId, $contestId, request('award')),
             'top' => $this->indexTopResult($groupId, $contestId, $qualified),
             'finalTopResult' => $this->indexFinalResult($groupId, $contestId, $qualified),
             'finalResults' => $this->indexFinalResultsSingleRound($groupId, $contestId, $qualified),
+            'preliminaryScore' => $preliminaryScore,
             'scoringMethod' => $this->scoringMethod($contestId, $groupId),
+            'prelimScoringType' => $prelimScoringType,
             'judgeData' => $this->indexResultJudgeTeam($contestId, $groupId),
             'contestId' => $contestId,
             'groupId' => $groupId,
             'tableResultTypeMultiple' => $this->indexResultTestSystem($contestId, $groupId, TeamParticipants::class),
             'tableRankedFinal' => $this->indexResultTestSystemFinalRanked($contestId, $groupId, TeamParticipants::class),
-            'resultSingleRound' => $this->indexFinalResultSingleRoundTeam($groupId, $contestId, $qualified),
+            'resultSingleRound' => $this->indexFinalResultSingleRoundTeam($groupId, $contestId, $qualified, request('criteria')),
             'percentage' => $this->indexRoundScore($contestId, $groupId),
             'activity' => $this->indexActivityLog($groupId)
         ]);
     }
 
-    public function indexFinalResultSingleRound($groupId, $contestId, $qualified, $genderCategory)
+    public function indexFinalResultSingleRound($groupId, $contestId, $qualified, $genderCategory, $criteria)
     {
 
         $query = OverallScoring::with('participant')
             ->where('contest_id', $contestId)
             ->where('group_id', $groupId)
-            // ->where('criteria', $criteria)
+            ->where('criteria', $criteria)
             ->where('round', 'Preliminary')
             ->orderBy('final_rank', 'asc');
 
@@ -233,7 +240,7 @@ class ResultViewController extends Controller
         return FinalScoringMethod::where('contest_id', $contestId)->where('group_id', $groupId)->value('scoring_method');
     }
 
-    public function indexFinalResultSingleRoundTeam($groupId, $contestId, $qualified)
+    public function indexFinalResultSingleRoundTeam($groupId, $contestId, $qualified, $criteria)
     {
 
         // Get all top participants grouped by criteria
@@ -241,6 +248,7 @@ class ResultViewController extends Controller
             ->where('contest_id', $contestId)
             ->where('group_id', $groupId)
             ->where('round', 'Preliminary')
+            ->where('criteria', $criteria)
             ->orderBy('final_rank', 'asc')
             ->get()
             ->groupBy('criteria');
@@ -326,6 +334,7 @@ class ResultViewController extends Controller
 
     private function indexTopResult($groupId, $contestId, $qualified)
     {
+
         $top = OverallScoring::with('participant')
             ->where('contest_id', $contestId)
             ->where('group_id', $groupId)
@@ -343,6 +352,7 @@ class ResultViewController extends Controller
                     'criteria'   => 'Top ' . ($i + 1),
                     'top_male'   => $top['Male'][$i]   ?? null,
                     'top_female' => $top['Female'][$i] ?? null,
+                    'top_team' => $top[''][$i] ?? null,
                 ]);
             }
         }
@@ -350,8 +360,13 @@ class ResultViewController extends Controller
         return $majorAwards->values();
     }
 
-    private function indexMajorAward($groupId, $contestId)
+    private function indexMajorAward($groupId, $contestId, $majorAward)
     {
+
+        if (!$majorAward) {
+            return collect();
+        }
+
         // Get all final scores for this group and contest
         $scores = ScoreJudging::with('participant')
             ->where('group_id', $groupId)
@@ -410,9 +425,6 @@ class ResultViewController extends Controller
 
     //     return $results ?? [];
     // }
-
-
-
 
 
 
@@ -546,7 +558,7 @@ class ResultViewController extends Controller
         return $results;
     }
 
-    public function indexResultJudge($contestId, $groupId, $modelParticipant)
+    public function indexResultJudge($contestId, $groupId, $modelParticipant, $judgeId)
     {
 
         $participants = $modelParticipant::where('contest_id', $contestId)->get();
@@ -557,6 +569,7 @@ class ResultViewController extends Controller
             $judgeScores = JudgingScore::where('contest_id', $contestId)
                 ->where('group_id', $groupId)
                 ->where('participant_id', $participant->id)
+                ->where('judges_id', $judgeId)
                 ->with(['judges', 'participant'])
                 ->get();
 

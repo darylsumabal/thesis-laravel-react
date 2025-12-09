@@ -14,14 +14,12 @@ use App\Models\JudgingScore;
 use App\Models\OverallFinalScore;
 use App\Models\OverallScoring;
 use App\Models\Participants;
+use App\Models\PrelimScoringMethod;
 use App\Models\Qualified;
-use App\Models\Score;
 use App\Models\ScoreJudging;
 use App\Models\TeamParticipants;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use Inertia\Inertia;
 
 class ResultController extends Controller
 {
@@ -31,19 +29,20 @@ class ResultController extends Controller
     {
         // Check finished judges group
         $roundType = $request->input('roundType');
+        $prelimScoringType = PrelimScoringMethod::where('group_id', $groupId)->value('preliminary_method');
 
-        $judgesGroup = JudgesGroup::where('contest_id', $contestId)
-            ->where('group_id', $groupId)
-            ->whereNotExists(function ($query) use ($contestId, $groupId, $roundType) {
-                $query->select(DB::raw(1))
-                    ->from('judges_groups')
-                    ->where('contest_id', $contestId)
-                    ->where('group_id', $groupId)
-                    ->where('round', $roundType)
-                    ->where('is_finished', 0)
-                    ->whereNull('deleted_at');
-            })
-            ->get();
+        // $judgesGroup = JudgesGroup::where('contest_id', $contestId)
+        //     ->where('group_id', $groupId)
+        //     ->whereNotExists(function ($query) use ($contestId, $groupId, $roundType) {
+        //         $query->select(DB::raw(1))
+        //             ->from('judges_groups')
+        //             ->where('contest_id', $contestId)
+        //             ->where('group_id', $groupId)
+        //             ->where('round', $roundType)
+        //             ->where('is_finished', 0)
+        //             ->whereNull('deleted_at');
+        //     })
+        //     ->get();
 
         // if ($judgesGroup->isEmpty()) {
         //     return response()->json(['message' => 'No finished judges group'], 400);
@@ -377,18 +376,20 @@ class ResultController extends Controller
                 }
 
 
-                // STEP 2: Update participant-level totals once
                 $totalRankSum = ScoreJudging::where('contest_id', $contestId)
                     ->where('group_id', $groupId)
                     ->where('round', $roundType)
                     ->where('participant_id', $participant->id)
                     ->sum('total_rank');
 
+                // STEP 2: Update participant-level totals once
+
                 $totalScoreSum = ScoreJudging::where('contest_id', $contestId)
                     ->where('group_id', $groupId)
                     ->where('round', $roundType)
                     ->where('participant_id', $participant->id)
                     ->sum('total_score');
+
 
                 OverallScoring::where('group_id', $groupId)
                     ->where('contest_id', $contestId)
@@ -398,6 +399,83 @@ class ResultController extends Controller
                         'total' => round($totalRankSum / $judgeCounts->count(), 2),
                         'total_points' => round($totalScoreSum / ($criteriaCount->count() * $judgeCounts->count()), 2),
                     ]);
+            }
+
+            if ($prelimScoringType == 'weighted' && $roundType == 'Preliminary') {
+
+                $criteriaWeights = PrelimScoringMethod::where('group_id', $groupId)
+                    ->where('contest_id', $contestId)
+                    ->get()
+                    ->pluck('weight', 'contest_name')
+                    ->mapWithKeys(fn($value, $key) => [trim($key) => $value])
+                    ->toArray();
+
+                $participantsScores = OverallScoring::where('group_id', $groupId)
+                    ->where('contest_id', $contestId)
+                    ->where('round', $roundType)
+                    ->get()
+                    ->groupBy('participant_id');
+
+                foreach ($participantsScores as $participantId => $scores) {
+
+                    $byCriteria = $scores->groupBy('criteria');
+
+                    foreach ($byCriteria as $criteriaName => $criteriaScores) {
+                        $criteriaName = trim($criteriaName);
+
+                        // use rank column
+                        $rank = (float) ($criteriaScores->first()->rank ?? 0);
+
+                        $weight = (float) ($criteriaWeights[$criteriaName] ?? 0);
+
+                        $totalWeightedRank = 0;
+
+                        if ($weight > 0 && $rank > 0) {
+                            $totalWeightedRank = $rank * ($weight / 100.0);
+                        }
+
+
+
+                        OverallScoring::where('group_id', $groupId)
+                            ->where('contest_id', $contestId)
+                            ->where('round', $roundType)
+                            ->where('participant_id', $participantId)
+                            ->where('criteria', $criteriaName)   // IMPORTANT FIX
+                            ->update([
+                                'total_rank' => $totalWeightedRank,
+                            ]);
+                    }
+
+                    // Step 2: After all criteria updated, compute the total
+                    $totalRankSumWeight = OverallScoring::where('contest_id', $contestId)
+                        ->where('group_id', $groupId)
+                        ->where('round', $roundType)
+                        ->where('participant_id', $participantId)
+                        ->sum('total_rank');
+
+                    $totalRankSum = OverallScoring::where('contest_id', $contestId)
+                        ->where('group_id', $groupId)
+                        ->where('round', $roundType)
+                        ->where('participant_id', $participantId)
+                        ->sum('rank');
+
+                    // $criteriaCount = OverallScoring::where('contest_id', $contestId)
+                    //     ->where('group_id', $groupId)
+                    //     ->where('round', $roundType)
+                    //     ->where('participant_id', $participantId)
+                    //     ->distinct('criteria')
+                    //     ->count('criteria');
+
+                    // Step 3: Update total_points for ALL rows of the participant
+                    OverallScoring::where('contest_id', $contestId)
+                        ->where('group_id', $groupId)
+                        ->where('round', $roundType)
+                        ->where('participant_id', $participantId)
+                        ->update([
+                            'total_points' => $totalRankSum /  $judgeCounts->count(),
+                            'total' => $totalRankSumWeight /  $judgeCounts->count()
+                        ]);
+                }
             }
 
             foreach ($participantsByGender as $gender => $participantsGroup) {
@@ -439,7 +517,10 @@ class ResultController extends Controller
                         $groupSize = count($tiedParticipants);
                         $middleRank = ($currentRank + ($currentRank + $groupSize - 1)) / 2;
 
+
                         foreach ($tiedParticipants as $participantId) {
+
+
                             OverallScoring::where('contest_id', $contestId)
                                 ->where('group_id', $groupId)
                                 ->where('round', $roundType)
@@ -478,12 +559,13 @@ class ResultController extends Controller
                                 'round' => $roundType,
                                 'type' => 'point based',
                                 'judges_id' => $judgeId,
+                                'total_points' => $scoreRecord->total_score,
                             ],
                             [
                                 'participant_type' => get_class($participant),
                                 'rank' => null,
                                 'total' => null,
-                                'total_points' => null,
+                                // 'total_points' => null,
                                 'score' => round($scoreRecord->total_score / max($judgeCounts->count(), 1), 1, PHP_ROUND_HALF_UP),
                                 'total_rank' => null,
                                 'final_rank' => null,
@@ -492,6 +574,79 @@ class ResultController extends Controller
                     }
                 }
             }
+
+            if ($prelimScoringType == 'weighted' && $roundType == 'Preliminary') {
+
+                $criteriaWeights = PrelimScoringMethod::where('group_id', $groupId)
+                    ->where('contest_id', $contestId)
+                    ->get()
+                    ->pluck('weight', 'contest_name')
+                    ->mapWithKeys(fn($value, $key) => [trim($key) => $value])
+                    ->toArray();
+
+                $participantsScores = OverallScoring::where('group_id', $groupId)
+                    ->where('contest_id', $contestId)
+                    ->where('round', $roundType)
+                    ->get()
+                    ->groupBy('participant_id');
+
+                foreach ($participantsScores as $participantId => $scores) {
+
+                    $byCriteria = $scores->groupBy('criteria');
+
+                    foreach ($byCriteria as $criteriaName => $criteriaScores) {
+
+                        $criteriaName = trim($criteriaName);
+
+                        // ✅ Get weight (example: 25)
+                        $weight = (float) ($criteriaWeights[$criteriaName] ?? 0);
+
+                        // ✅ Get participant total points for THIS criteria (example: 89.70)
+                        $totalPoints = (float) ($criteriaScores->first()->total_points ?? 0);
+
+                        // ✅ Final weighted computation
+                        $totalWeighted = 0;
+                        if ($weight > 0 && $totalPoints > 0) {
+                            $totalWeighted = $totalPoints * ($weight / 100);
+                        }
+
+                        // ✅ Save weighted result
+                        OverallScoring::where('group_id', $groupId)
+                            ->where('contest_id', $contestId)
+                            ->where('round', $roundType)
+                            ->where('participant_id', $participantId)
+                            ->where('criteria', $criteriaName)
+                            ->update([
+                                'total_points' => round($totalWeighted, 3), // ✅ precision safe
+                            ]);
+                    }
+                    // Step 2: After all criteria updated, compute the total
+                    $totalRankSumWeight = OverallScoring::where('contest_id', $contestId)
+                        ->where('group_id', $groupId)
+                        ->where('round', $roundType)
+                        ->where('participant_id', $participantId)
+                        ->sum('total_rank');
+
+                    $totalSum = OverallScoring::where('contest_id', $contestId)
+                        ->where('group_id', $groupId)
+                        ->where('round', $roundType)
+                        ->where('participant_id', $participantId)
+                        ->sum('total_points');
+
+                    // Step 3: Update total_points for ALL rows of the participant
+                    OverallScoring::where('contest_id', $contestId)
+                        ->where('group_id', $groupId)
+                        ->where('round', $roundType)
+                        ->where('participant_id', $participantId)
+                        ->update([
+                            // 'total_points' => $totalRankSum,
+                            'total' => $totalSum / $judgeCounts->count()
+                        ]);
+                }
+            }
+
+
+
             foreach ($participantsByGender as $gender => $participantsGroup) {
                 $participantIds = $participantsGroup->pluck('id');
 
@@ -547,24 +702,26 @@ class ResultController extends Controller
                     }
                 }
 
-
                 $participantIds = $participantsGroup->pluck('id');
 
-                foreach ($participantIds as $participantId) {
-                    // compute total across ALL criteria for this participant
-                    $grandTotal = OverallScoring::where('contest_id', $contestId)
-                        ->where('group_id', $groupId)->where('round', $roundType)
-                        ->where('participant_id', $participantId)
-                        ->sum('score');
+                if ($prelimScoringType != 'weighted') {
 
-                    // update all rows of this participant with the same grand total
-                    OverallScoring::where('contest_id', $contestId)
-                        ->where('group_id', $groupId)->where('round', $roundType)
-                        ->where('participant_id', $participantId)
+                    foreach ($participantIds as $participantId) {
+                        // compute total across ALL criteria for this participant
+                        $grandTotal = OverallScoring::where('contest_id', $contestId)
+                            ->where('group_id', $groupId)->where('round', $roundType)
+                            ->where('participant_id', $participantId)
+                            ->sum('score');
 
-                        ->update([
-                            'total' => round($grandTotal / $judgeCounts->count(), 1),
-                        ]);
+                        // update all rows of this participant with the same grand total
+                        OverallScoring::where('contest_id', $contestId)
+                            ->where('group_id', $groupId)->where('round', $roundType)
+                            ->where('participant_id', $participantId)
+
+                            ->update([
+                                'total' => round($grandTotal / $judgeCounts->count(), 1),
+                            ]);
+                    }
                 }
 
                 $allParticipants = OverallScoring::where('contest_id', $contestId)
@@ -589,9 +746,10 @@ class ResultController extends Controller
                     ->whereIn('participant_id', $participantIds)
                     ->select('participant_id', 'total', 'total_rank')
                     ->groupBy('participant_id', 'total', 'total_rank')
-                    ->orderBy('total_rank', 'asc')
+
                     ->orderBy('total', 'desc')
                     ->get();
+
 
                 $rank = 1;
                 $i = 0;
@@ -630,12 +788,10 @@ class ResultController extends Controller
             }
         }
 
-     broadcast(new TopParticipantsUpdated($contestId, $groupId))->toOthers();
+        broadcast(new TopParticipantsUpdated($contestId, $groupId))->toOthers();
 
         return redirect()->back()->with('success', 'Score tabulated');
     }
-
-
 
 
     public function storeResultSingleRound(Request $request, $contestId, $groupId, $resultType)
@@ -1095,7 +1251,7 @@ class ResultController extends Controller
             }
         }
 
-     broadcast(new TopParticipantsUpdated($contestId, $groupId))->toOthers();
+        broadcast(new TopParticipantsUpdated($contestId, $groupId))->toOthers();
 
         return redirect()->back()->with('success', 'Score Tabulated');
     }
@@ -1561,27 +1717,25 @@ class ResultController extends Controller
                 }
             }
         }
-     broadcast(new TopParticipantsUpdated($contestId, $groupId))->toOthers();
+        broadcast(new TopParticipantsUpdated($contestId, $groupId))->toOthers();
         return redirect()->back()->with('success', 'Score tabulated');
     }
-
-
-
     public function storeResultMultipleTeam(Request $request, $contestId, $groupId, $resultType)
     {
         $roundType = $request->input('roundType');
-        $judgesGroup = JudgesGroup::where('contest_id', $contestId)
-            ->where('group_id', $groupId)
-            ->whereNotExists(function ($query) use ($contestId, $groupId, $roundType) {
-                $query->select(DB::raw(1))
-                    ->from('judges_groups')
-                    ->where('contest_id', $contestId)
-                    ->where('group_id', $groupId)
-                    ->where('round', $roundType)
-                    ->where('is_finished', 0)
-                    ->whereNull('deleted_at');
-            })
-            ->get();
+        $prelimScoringType = PrelimScoringMethod::where('group_id', $groupId)->value('preliminary_method');
+        // $judgesGroup = JudgesGroup::where('contest_id', $contestId)
+        //     ->where('group_id', $groupId)
+        //     ->whereNotExists(function ($query) use ($contestId, $groupId, $roundType) {
+        //         $query->select(DB::raw(1))
+        //             ->from('judges_groups')
+        //             ->where('contest_id', $contestId)
+        //             ->where('group_id', $groupId)
+        //             ->where('round', $roundType)
+        //             ->where('is_finished', 0)
+        //             ->whereNull('deleted_at');
+        //     })
+        //     ->get();
 
         // if ($judgesGroup->isEmpty()) {
         //     return response()->json(['message' => 'No finished judges group'], 400);
@@ -1881,121 +2035,198 @@ class ResultController extends Controller
             ->distinct()
             ->pluck('judge_id');
 
+      
+
         if ($resultType == 'rank_based') {
-
             foreach ($participants as $participant) {
-
-                // Get ScoreJudgingTest rows for this participant, grouped by judge
-                $scoreRecords = ScoreJudging::where('participant_id', $participant->id)
+                $scoresByJudge = ScoreJudging::where('participant_id', $participant->id)
                     ->where('contest_id', $contestId)
-                    ->where('group_id', $groupId)->where('round', $roundType)
+                    ->where('group_id', $groupId)
+                    ->where('round', $roundType)
                     ->get()
-                    ->groupBy('judges_id');
+                    ->groupBy('judges_id'); // group by judge
 
-                foreach ($scoreRecords as $judgeId => $scoresByJudge) {
-                    $judgeId = (int) $judgeId;
-                    // Use sum or average if needed
-                    // or avg
-                    foreach ($scoresByJudge as $scoreRecord) {
-
-                        $criteria = 1 / $criteriaCount->count(); // 0.25 if count=4
-
-                        $overall =   OverallScoring::updateOrCreate(
+                foreach ($scoresByJudge as $judgeId => $scoresForJudge) {
+                    foreach ($scoresForJudge as $scoreRecord) {
+                        OverallScoring::updateOrCreate(
                             [
                                 'group_id' => $groupId,
                                 'contest_id' => $contestId,
                                 'participant_id' => $participant->id,
                                 'criteria' => $scoreRecord->criteria,
-                                'judges_id' => $judgeId,
                                 'round' => $roundType,
                                 'type' => 'rank based',
+                                'judges_id' => $judgeId,
                             ],
                             [
+                                'rank' => $scoreRecord->final_rank,
                                 'participant_type' => get_class($participant),
-                                'rank' => $scoreRecord->rank,
+                                'score' => $scoreRecord->total_score,
+                                'total_rank' => $scoreRecord->total_rank,
                                 'total' => null,
                                 'total_points' => null,
-                                'score' => round($scoreRecord->total_score / max($judgeCounts->count(), 1), 1),
-                                'total_rank' => $scoreRecord->total_rank,
                                 'final_rank' => null,
                             ]
                         );
-
-                        $totalRankSum = ScoreJudging::where('contest_id', $contestId)
-                            ->where('group_id', $groupId)->where('round', $roundType)
-                            ->where('participant_id', $participant->id)->where('round', $scoreRecord->round)
-                            ->sum('total_rank');
-
-                        $overall->update([
-                            'total' => round($totalRankSum, 2) / $judgeCounts->count(),
-                        ]);
-                        // }
                     }
                 }
 
-                foreach ($participantsByGender as $gender => $participantsGroup) {
-                    $participantIds = $participantsGroup->pluck('id');
 
-                    $totalPointSum = ScoreJudging::where('contest_id', $contestId)
-                        ->where('group_id', $groupId)->where('round', $roundType)
-                        ->where('participant_id', $participant->id)
-                        ->sum('total_score');
+                $totalRankSum = ScoreJudging::where('contest_id', $contestId)
+                    ->where('group_id', $groupId)
+                    ->where('round', $roundType)
+                    ->where('participant_id', $participant->id)
+                    ->sum('total_rank');
 
-                    OverallScoring::where('contest_id', $contestId)
-                        ->where('group_id', $groupId)->where('round', $roundType)
-                        ->where('participant_id', $participant->id)
-                        ->update([
-                            'total_points' => $totalPointSum / ($criteriaCount->count() * $judgeCounts->count()),
-                        ]);
+                // STEP 2: Update participant-level totals once
 
-                    // Get all overall scores for these participants
-                    $participantsScores = OverallScoring::where('contest_id', $contestId)
-                        ->where('group_id', $groupId)->where('round', $roundType)
-                        ->whereIn('participant_id', $participantIds)
-                        ->get()
-                        ->groupBy('criteria'); // ✅ rank separately per criteria
+                $totalScoreSum = ScoreJudging::where('contest_id', $contestId)
+                    ->where('group_id', $groupId)
+                    ->where('round', $roundType)
+                    ->where('participant_id', $participant->id)
+                    ->sum('total_score');
 
-                    foreach ($participantsScores as $criteriaName => $scoresForCriteria) {
-                        $participantTotals = $scoresForCriteria
-                            ->groupBy('participant_id')
-                            ->map(fn($scores) => [
-                                'participant_id' => $scores->first()->participant_id,
-                                'total' => (float)$scores->first()->total,
-                                'tieBreaker' => (float)$scores->first()->total_rank,
-                            ])
-                            ->values();
 
-                        $sorted = $participantTotals->sort(fn($a, $b) => $a['total'] <=> $b['total'])->values();
+                OverallScoring::where('group_id', $groupId)
+                    ->where('contest_id', $contestId)
+                    ->where('round', $roundType)
+                    ->where('participant_id', $participant->id)
+                    ->update([
+                        'total' => round($totalRankSum / $judgeCounts->count(), 2),
+                        'total_points' => round($totalScoreSum / ($criteriaCount->count() * $judgeCounts->count()), 2),
+                    ]);
+            }
 
-                        $currentRank = 1;
-                        $i = 0;
-                        $totalCount = $sorted->count();
+            if ($prelimScoringType == 'weighted' && $roundType == 'Preliminary') {
 
-                        while ($i < $totalCount) {
-                            $currentTotal = $sorted[$i]['total'];
-                            $tiedParticipants = [$sorted[$i]['participant_id']];
-                            $j = $i + 1;
+                $criteriaWeights = PrelimScoringMethod::where('group_id', $groupId)
+                    ->where('contest_id', $contestId)
+                    ->get()
+                    ->pluck('weight', 'contest_name')
+                    ->mapWithKeys(fn($value, $key) => [trim($key) => $value])
+                    ->toArray();
 
-                            while ($j < $totalCount && $sorted[$j]['total'] == $currentTotal) {
-                                $tiedParticipants[] = $sorted[$j]['participant_id'];
-                                $j++;
-                            }
+                $participantsScores = OverallScoring::where('group_id', $groupId)
+                    ->where('contest_id', $contestId)
+                    ->where('round', $roundType)
+                    ->get()
+                    ->groupBy('participant_id');
 
-                            $groupSize = count($tiedParticipants);
-                            $middleRank = ($currentRank + ($currentRank + $groupSize - 1)) / 2;
+                foreach ($participantsScores as $participantId => $scores) {
 
-                            foreach ($tiedParticipants as $participantId) {
-                                OverallScoring::where('contest_id', $contestId)
-                                    ->where('group_id', $groupId)
-                                    ->where('round', $roundType)
-                                    ->where('participant_id', $participantId)
-                                    ->where('criteria', $criteriaName)
-                                    ->update(['final_rank' => $middleRank]);
-                            }
+                    $byCriteria = $scores->groupBy('criteria');
 
-                            $currentRank += $groupSize;
-                            $i = $j;
+                    foreach ($byCriteria as $criteriaName => $criteriaScores) {
+                        $criteriaName = trim($criteriaName);
+
+                        // use rank column
+                        $rank = (float) ($criteriaScores->first()->rank ?? 0);
+
+                        $weight = (float) ($criteriaWeights[$criteriaName] ?? 0);
+
+                        $totalWeightedRank = 0;
+
+                        if ($weight > 0 && $rank > 0) {
+                            $totalWeightedRank = $rank * ($weight / 100.0);
                         }
+
+
+
+                        OverallScoring::where('group_id', $groupId)
+                            ->where('contest_id', $contestId)
+                            ->where('round', $roundType)
+                            ->where('participant_id', $participantId)
+                            ->where('criteria', $criteriaName)   // IMPORTANT FIX
+                            ->update([
+                                'total_rank' => $totalWeightedRank,
+                            ]);
+                    }
+
+                    // Step 2: After all criteria updated, compute the total
+                    $totalRankSumWeight = OverallScoring::where('contest_id', $contestId)
+                        ->where('group_id', $groupId)
+                        ->where('round', $roundType)
+                        ->where('participant_id', $participantId)
+                        ->sum('total_rank');
+
+                    $totalRankSum = OverallScoring::where('contest_id', $contestId)
+                        ->where('group_id', $groupId)
+                        ->where('round', $roundType)
+                        ->where('participant_id', $participantId)
+                        ->sum('rank');
+
+                    // $criteriaCount = OverallScoring::where('contest_id', $contestId)
+                    //     ->where('group_id', $groupId)
+                    //     ->where('round', $roundType)
+                    //     ->where('participant_id', $participantId)
+                    //     ->distinct('criteria')
+                    //     ->count('criteria');
+
+                    // Step 3: Update total_points for ALL rows of the participant
+                    OverallScoring::where('contest_id', $contestId)
+                        ->where('group_id', $groupId)
+                        ->where('round', $roundType)
+                        ->where('participant_id', $participantId)
+                        ->update([
+                            'total_points' => $totalRankSum /  $judgeCounts->count(),
+                            'total' => $totalRankSumWeight /  $judgeCounts->count()
+                        ]);
+                }
+            }
+
+            foreach ($participantsByGender as $gender => $participantsGroup) {
+                $participantIds = $participantsGroup->pluck('id');
+
+                $participantsScores = OverallScoring::where('contest_id', $contestId)
+                    ->where('group_id', $groupId)
+                    ->where('round', $roundType)
+                    ->whereIn('participant_id', $participantIds)
+                    ->get()
+                    ->groupBy('criteria');
+
+                foreach ($participantsScores as $criteriaName => $scoresForCriteria) {
+                    $participantTotals = $scoresForCriteria
+                        ->groupBy('participant_id')
+                        ->map(fn($scores) => [
+                            'participant_id' => $scores->first()->participant_id,
+                            'total' => (float)$scores->first()->total,
+                            'tieBreaker' => (float)$scores->first()->total_rank,
+                        ])
+                        ->values();
+
+                    $sorted = $participantTotals->sort(fn($a, $b) => $a['total'] <=> $b['total'])->values();
+
+                    $currentRank = 1;
+                    $i = 0;
+                    $totalCount = $sorted->count();
+
+                    while ($i < $totalCount) {
+                        $currentTotal = $sorted[$i]['total'];
+                        $tiedParticipants = [$sorted[$i]['participant_id']];
+                        $j = $i + 1;
+
+                        while ($j < $totalCount && $sorted[$j]['total'] == $currentTotal) {
+                            $tiedParticipants[] = $sorted[$j]['participant_id'];
+                            $j++;
+                        }
+
+                        $groupSize = count($tiedParticipants);
+                        $middleRank = ($currentRank + ($currentRank + $groupSize - 1)) / 2;
+
+
+                        foreach ($tiedParticipants as $participantId) {
+
+
+                            OverallScoring::where('contest_id', $contestId)
+                                ->where('group_id', $groupId)
+                                ->where('round', $roundType)
+                                ->where('participant_id', $participantId)
+                                ->where('criteria', $criteriaName)
+                                ->update(['final_rank' => $middleRank]);
+                        }
+
+                        $currentRank += $groupSize;
+                        $i = $j;
                     }
                 }
             }
@@ -2013,88 +2244,163 @@ class ResultController extends Controller
 
                 foreach ($scoreRecords as $judgeId => $scoresByJudge) {
 
-                    // Use sum or average if needed
-                    // or avg
                     foreach ($scoresByJudge as $scoreRecord) {
+
                         OverallScoring::updateOrCreate(
                             [
                                 'group_id' => $groupId,
                                 'contest_id' => $contestId,
                                 'participant_id' => $participant->id,
                                 'criteria' => $scoreRecord->criteria,
-                                'judges_id' => $judgeId,
                                 'round' => $roundType,
                                 'type' => 'point based',
+                                'judges_id' => $judgeId,
+                                'total_points' => $scoreRecord->total_score,
                             ],
                             [
                                 'participant_type' => get_class($participant),
-                                'rank' => $scoreRecord->rank,
-                                'total' => $scoreRecord->total,
-                                'total_points' => $scoreRecord->total_score,
-                                'score' => round($scoreRecord->total_score / max($judgeCounts->count(), 1), 1),
-                                'total_rank' => $scoreRecord->total_rank,
-                                'final_rank' => $scoreRecord->final_rank,
+                                'rank' => null,
+                                'total' => null,
+                                // 'total_points' => null,
+                                'score' => round($scoreRecord->total_score / max($judgeCounts->count(), 1), 1, PHP_ROUND_HALF_UP),
+                                'total_rank' => null,
+                                'final_rank' => null,
                             ]
                         );
                     }
                 }
+            }
 
-                foreach ($participantsByGender as $gender => $participantsGroup) {
-                    $participantIds = $participantsGroup->pluck('id');
+            if ($prelimScoringType == 'weighted' && $roundType == 'Preliminary') {
 
-                    // Get all overall scores for these participants
-                    $participantsScores = OverallScoring::where('contest_id', $contestId)
-                        ->where('group_id', $groupId)->where('round', $roundType)
-                        ->whereIn('participant_id', $participantIds)
-                        ->get()
-                        ->groupBy(function ($item) {
-                            // Group by criteria only
-                            return $item->criteria;
-                        });
+                $criteriaWeights = PrelimScoringMethod::where('group_id', $groupId)
+                    ->where('contest_id', $contestId)
+                    ->get()
+                    ->pluck('weight', 'contest_name')
+                    ->mapWithKeys(fn($value, $key) => [trim($key) => $value])
+                    ->toArray();
 
-                    foreach ($participantsScores as $criteriaName => $scoresForCriteria) {
-                        // Sum scores per participant for this criteria
-                        $participantTotals = $scoresForCriteria
-                            ->groupBy('participant_id')
-                            ->map(fn($scores) => $scores->sum('score'))
-                            ->sortDesc(); // higher score = better rank
+                $participantsScores = OverallScoring::where('group_id', $groupId)
+                    ->where('contest_id', $contestId)
+                    ->where('round', $roundType)
+                    ->get()
+                    ->groupBy('participant_id');
 
-                        $sorted = $participantTotals->toArray();
-                        $participantIdsSorted = array_keys($sorted);
-                        $scores = array_values($sorted);
+                foreach ($participantsScores as $participantId => $scores) {
 
-                        $currentRank = 1;
-                        $i = 0;
-                        $totalCount = count($scores);
+                    $byCriteria = $scores->groupBy('criteria');
 
-                        while ($i < $totalCount) {
-                            $currentScore = $scores[$i];
-                            $tiedParticipants = [$participantIdsSorted[$i]];
-                            $j = $i + 1;
+                    foreach ($byCriteria as $criteriaName => $criteriaScores) {
 
-                            // Collect ties
-                            while ($j < $totalCount && $scores[$j] == $currentScore) {
-                                $tiedParticipants[] = $participantIdsSorted[$j];
-                                $j++;
-                            }
+                        $criteriaName = trim($criteriaName);
 
-                            // Middle rank formula
-                            $groupSize = count($tiedParticipants);
-                            $middleRank = ($currentRank + ($currentRank + $groupSize - 1)) / 2;
+                        // ✅ Get weight (example: 25)
+                        $weight = (float) ($criteriaWeights[$criteriaName] ?? 0);
 
-                            // ✅ Update using $criteriaName instead of $criteria
-                            OverallScoring::where('contest_id', $contestId)
-                                ->where('group_id', $groupId)
-                                ->whereIn('participant_id', $tiedParticipants)
-                                ->where('criteria', $criteriaName)
-                                ->update(['rank' => $middleRank]);
+                        // ✅ Get participant total points for THIS criteria (example: 89.70)
+                        $totalPoints = (float) ($criteriaScores->first()->total_points ?? 0);
 
-                            $currentRank += $groupSize;
-                            $i = $j;
+                        // ✅ Final weighted computation
+                        $totalWeighted = 0;
+                        if ($weight > 0 && $totalPoints > 0) {
+                            $totalWeighted = $totalPoints * ($weight / 100);
                         }
-                    }
 
-                    $participantIds = $participantsGroup->pluck('id');
+                        // ✅ Save weighted result
+                        OverallScoring::where('group_id', $groupId)
+                            ->where('contest_id', $contestId)
+                            ->where('round', $roundType)
+                            ->where('participant_id', $participantId)
+                            ->where('criteria', $criteriaName)
+                            ->update([
+                                'total_points' => round($totalWeighted, 3), // ✅ precision safe
+                            ]);
+                    }
+                    // Step 2: After all criteria updated, compute the total
+                    $totalRankSumWeight = OverallScoring::where('contest_id', $contestId)
+                        ->where('group_id', $groupId)
+                        ->where('round', $roundType)
+                        ->where('participant_id', $participantId)
+                        ->sum('total_rank');
+
+                    $totalSum = OverallScoring::where('contest_id', $contestId)
+                        ->where('group_id', $groupId)
+                        ->where('round', $roundType)
+                        ->where('participant_id', $participantId)
+                        ->sum('total_points');
+
+                    // Step 3: Update total_points for ALL rows of the participant
+                    OverallScoring::where('contest_id', $contestId)
+                        ->where('group_id', $groupId)
+                        ->where('round', $roundType)
+                        ->where('participant_id', $participantId)
+                        ->update([
+                            // 'total_points' => $totalRankSum,
+                            'total' => $totalSum / $judgeCounts->count()
+                        ]);
+                }
+            }
+
+
+
+            foreach ($participantsByGender as $gender => $participantsGroup) {
+                $participantIds = $participantsGroup->pluck('id');
+
+                // Get all overall scores for these participants
+                $participantsScores = OverallScoring::where('contest_id', $contestId)
+                    ->where('group_id', $groupId)->where('round', $roundType)
+                    ->whereIn('participant_id', $participantIds)
+                    ->get()
+                    ->groupBy(function ($item) {
+                        // Group by criteria only
+                        return $item->criteria;
+                    });
+
+                foreach ($participantsScores as $criteriaName => $scoresForCriteria) {
+                    // Sum scores per participant for this criteria
+                    $participantTotals = $scoresForCriteria
+                        ->groupBy('participant_id')
+                        ->map(fn($scores) => $scores->sum('score'))
+                        ->sortDesc(); // higher score = better rank
+
+                    $sorted = $participantTotals->toArray();
+                    $participantIdsSorted = array_keys($sorted);
+                    $scores = array_values($sorted);
+
+                    $currentRank = 1;
+                    $i = 0;
+                    $totalCount = count($scores);
+
+                    while ($i < $totalCount) {
+                        $currentScore = $scores[$i];
+                        $tiedParticipants = [$participantIdsSorted[$i]];
+                        $j = $i + 1;
+
+                        // Collect ties
+                        while ($j < $totalCount && $scores[$j] == $currentScore) {
+                            $tiedParticipants[] = $participantIdsSorted[$j];
+                            $j++;
+                        }
+
+                        // Middle rank formula
+                        $groupSize = count($tiedParticipants);
+                        $middleRank = ($currentRank + ($currentRank + $groupSize - 1)) / 2;
+
+                        // ✅ Update using $criteriaName instead of $criteria
+                        OverallScoring::where('contest_id', $contestId)
+                            ->where('group_id', $groupId)
+                            ->whereIn('participant_id', $tiedParticipants)
+                            ->where('criteria', $criteriaName)
+                            ->update(['rank' => $middleRank]);
+
+                        $currentRank += $groupSize;
+                        $i = $j;
+                    }
+                }
+
+                $participantIds = $participantsGroup->pluck('id');
+
+                if ($prelimScoringType != 'weighted') {
 
                     foreach ($participantIds as $participantId) {
                         // compute total across ALL criteria for this participant
@@ -2107,75 +2413,77 @@ class ResultController extends Controller
                         OverallScoring::where('contest_id', $contestId)
                             ->where('group_id', $groupId)->where('round', $roundType)
                             ->where('participant_id', $participantId)
+
                             ->update([
-                                'total' => round($grandTotal  / $judgeCounts->count(), 1),
+                                'total' => round($grandTotal / $judgeCounts->count(), 1),
                             ]);
                     }
+                }
 
-                    $allParticipants = OverallScoring::where('contest_id', $contestId)
+                $allParticipants = OverallScoring::where('contest_id', $contestId)
+                    ->where('group_id', $groupId)->where('round', $roundType)
+                    ->select('participant_id', DB::raw('SUM(rank) as total_rank'))
+                    ->groupBy('participant_id')
+                    ->get();
+
+                // Now update each participant with their total_rank
+                foreach ($allParticipants as $participant) {
+                    OverallScoring::where('contest_id', $contestId)
                         ->where('group_id', $groupId)->where('round', $roundType)
-                        ->select('participant_id', DB::raw('SUM(rank) as total_rank'))
-                        ->groupBy('participant_id')
-                        ->get();
+                        ->where('participant_id', $participant->participant_id)
+                        ->update([
+                            'total_rank' => $participant->total_rank / $judgeCounts->count(),
+                        ]);
+                }
 
-                    // Now update each participant with their total_rank
-                    foreach ($allParticipants as $participant) {
-                        OverallScoring::where('contest_id', $contestId)
-                            ->where('group_id', $groupId)->where('round', $roundType)
-                            ->where('participant_id', $participant->participant_id)
-                            ->update([
-                                'total_rank' => $participant->total_rank  / $judgeCounts->count(),
-                            ]);
+                $rows = OverallScoring::where('contest_id', $contestId)
+                    ->where('group_id', $groupId)
+                    ->where('round', $roundType)
+                    ->whereIn('participant_id', $participantIds)
+                    ->select('participant_id', 'total', 'total_rank')
+                    ->groupBy('participant_id', 'total', 'total_rank')
+
+                    ->orderBy('total', 'desc')
+                    ->get();
+
+
+                $rank = 1;
+                $i = 0;
+                $totalCount = $rows->count();
+
+                while ($i < $totalCount) {
+                    $currentTotalRank = $rows[$i]->total_rank;
+                    $currentTotal = $rows[$i]->total;
+
+                    // Collect tied participants
+                    $tiedParticipants = [$rows[$i]->participant_id];
+                    $j = $i + 1;
+                    while (
+                        $j < $totalCount &&
+                        $rows[$j]->total_rank == $currentTotalRank &&
+                        $rows[$j]->total == $currentTotal
+                    ) {
+                        $tiedParticipants[] = $rows[$j]->participant_id;
+                        $j++;
                     }
 
-                    $rows = OverallScoring::where('contest_id', $contestId)
+                    // Middle rank formula
+                    $groupSize = count($tiedParticipants);
+                    $middleRank = ($rank + ($rank + $groupSize - 1)) / 2;
+
+                    // Update final rank for all tied participants
+                    OverallScoring::where('contest_id', $contestId)
                         ->where('group_id', $groupId)
                         ->where('round', $roundType)
-                        ->whereIn('participant_id', $participantIds)
-                        ->select('participant_id', 'total', 'total_rank')
-                        ->groupBy('participant_id', 'total', 'total_rank')
-                        ->orderBy('total_rank', 'asc')
-                        ->orderBy('total', 'desc')
-                        ->get();
+                        ->whereIn('participant_id', $tiedParticipants)
+                        ->update(['final_rank' => $middleRank]);
 
-                    $rank = 1;
-                    $i = 0;
-                    $totalCount = $rows->count();
-
-                    while ($i < $totalCount) {
-                        $currentTotalRank = $rows[$i]->total_rank;
-                        $currentTotal = $rows[$i]->total;
-
-                        // Collect tied participants
-                        $tiedParticipants = [$rows[$i]->participant_id];
-                        $j = $i + 1;
-                        while (
-                            $j < $totalCount &&
-                            $rows[$j]->total_rank == $currentTotalRank &&
-                            $rows[$j]->total == $currentTotal
-                        ) {
-                            $tiedParticipants[] = $rows[$j]->participant_id;
-                            $j++;
-                        }
-
-                        // Middle rank formula
-                        $groupSize = count($tiedParticipants);
-                        $middleRank = ($rank + ($rank + $groupSize - 1)) / 2;
-
-                        // Update final rank for all tied participants
-                        OverallScoring::where('contest_id', $contestId)
-                            ->where('group_id', $groupId)
-                            ->where('round', $roundType)
-                            ->whereIn('participant_id', $tiedParticipants)
-                            ->update(['final_rank' => $middleRank]);
-
-                        $rank += $groupSize;
-                        $i = $j;
-                    }
+                    $rank += $groupSize;
+                    $i = $j;
                 }
             }
         }
-     broadcast(new TopParticipantsUpdated($contestId, $groupId))->toOthers();
+        broadcast(new TopParticipantsUpdated($contestId, $groupId))->toOthers();
         return redirect()->back()->with('success', 'Score tabulated');
     }
 
@@ -2386,7 +2694,7 @@ class ResultController extends Controller
             }
         }
 
-     broadcast(new TopParticipantsUpdated($contestId, $groupId))->toOthers();
+        broadcast(new TopParticipantsUpdated($contestId, $groupId))->toOthers();
 
         return redirect()->back()->with('success', 'Score tabulated');
     }

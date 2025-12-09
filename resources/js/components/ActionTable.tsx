@@ -325,7 +325,7 @@ const TableAction = <
                         </div>
                         {enableArchive && (
                             <div className="hover:bg-accent flex cursor-pointer items-center gap-2 rounded-md border-2">
-                                <Button onClick={handleArchive} className={`${isArchive && 'bg-rose-600'}`}>
+                                <Button onClick={handleArchive} className={`${isArchive && 'bg-destructive'}`}>
                                     {!isArchive ? <Archive /> : <ArchiveRestore />}
                                     <p className="font-medium">Archive</p>
                                 </Button>
@@ -363,7 +363,7 @@ const TableAction = <
                             table.getRowModel().rows.map((row) => (
                                 <TableRow
                                     // className="cursor-pointer  hover:text-slate-100 hover:duration-500 data-[state=selected]:bg-slate-950 data-[state=selected]:text-slate-100"
-                                    className="cursor-pointer"
+                                    className="cursor-pointer hover:bg-[#45226b] hover:text-slate-100 hover:duration-500"
                                     key={row.id}
                                     onClick={() =>
                                         handleClick?.(

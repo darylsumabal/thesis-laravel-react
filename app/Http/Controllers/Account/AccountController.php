@@ -67,9 +67,9 @@ class AccountController extends Controller
         $judgeExist = User::where('email', $validate['email'])->exists();
 
         if ($judgeExist) {
-            return response()->json([
-                'message' => 'Judge already exists',
-            ], 409);
+            return back()->withErrors(
+                'Account already exist!',
+            );
         }
 
         User::create([

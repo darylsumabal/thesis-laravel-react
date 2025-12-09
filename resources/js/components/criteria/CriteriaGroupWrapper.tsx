@@ -36,11 +36,13 @@ export type CriteriaTests = {
 export function CriteriaGroupWrapper({ group, criteriaGroup }: { group: CriteriaTests; criteriaGroup: CriteriaTests }) {
     const { judge, savedCriteria, auth, contestId, groupId } = usePage().props;
     const judgeId = auth?.user.id;
+
     const filteredParticipants = (criteriaGroup.participants || []).filter((p) => p.gender === p.gender);
     const [loading, setLoading] = useState<boolean>(false);
     const [, setIsSubmitted] = useState(false);
     const { setPendingSubmitScore } = useContextUser();
     const currentRounds = group.items.find((i) => ['Final', 'Preliminary'].includes(i.round))?.round ?? '';
+    const [loadingRequest, setLoadingRequest] = useState(false);
 
     useEcho('submit-score', 'JudgeSubmit', (event: { contestId: number; groupId: number }) => {
         if (event.contestId == contestId && event.groupId == groupId) {
@@ -62,6 +64,23 @@ export function CriteriaGroupWrapper({ group, criteriaGroup }: { group: Criteria
                 only: ['judge'],
                 // onFinish: () => resolve('success'),
                 // onError: () => reject('error'),
+            });
+        }
+    });
+
+    useEcho('request-edit', 'RequestEdit', (event: { contestId: number; groupId: number; judgeId: number; judgeName: string; action: string }) => {
+        if (event.contestId == contestId && event.groupId == groupId) {
+            if (event.judgeId == judgeId) {
+                if (event.action === 'request') {
+                    toast.success(`Requested to edit scores`);
+                } else if (event.action === 'grant') {
+                    toast.success(`You can now edit the scores`);
+                }
+            }
+
+            // If you want to reload judges list:
+            router.reload({
+                only: ['judge'],
             });
         }
     });
@@ -164,20 +183,7 @@ export function CriteriaGroupWrapper({ group, criteriaGroup }: { group: Criteria
             });
         });
         setLoading(true);
-        // router.post(
-        //     `/judging/score/${judgeId}/${contestId}/${groupId}/${currentRounds}`,
-        //     { criteria: flat },
-        //     {
-        //         onSuccess: () => {
-        //             toast.success('Score Submitted');
-        //             form.reset(values);
-        //             setLoading(false);
-        //         },
-        //         onError: () => {
-        //             setLoading(false);
-        //         },
-        //     },
-        // );
+
         const promise = new Promise((resolve, reject) => {
             router.post(
                 `/judging/score/${judgeId}/${contestId}/${groupId}/${currentRounds}`,
@@ -223,12 +229,39 @@ export function CriteriaGroupWrapper({ group, criteriaGroup }: { group: Criteria
         setPendingSubmitScore(loading);
     }, [loading, setPendingSubmitScore]);
 
+    const handleRequestEdit = (criteria: string) => {
+        setLoadingRequest(true);
+        const promise = new Promise((resolve, reject) => {
+            router.post(
+                `/judging/edit-score/${contestId}/${groupId}/${judgeId}`,
+                { criteria, approved: 1 },
+                {
+                    preserveScroll: true,
+                    onSuccess: (page) => {
+                        setLoadingRequest(false);
+                        resolve(page);
+                    },
+                    onError: (errors) => {
+                        setLoadingRequest(false);
+                        reject(errors);
+                    },
+                },
+            );
+        });
+
+        toast.promise(promise, {
+            loading: 'Loading...',
+            success: 'Judge requested edit',
+            error: 'Judge enabled failed',
+        });
+    };
+
     return (
         <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="w-full">
                 <div className="flex flex-col">
                     <div>
-                        <p className="mb-4 rounded-md bg-zinc-800 p-3 text-center text-5xl font-medium text-white uppercase">{group.criteria}</p>
+                        <p className="mb-4 rounded-md bg-[#45226b] p-3 text-center text-5xl font-medium text-white uppercase">{group.criteria}</p>
                     </div>
 
                     <div className="flex flex-wrap gap-6">
@@ -269,7 +302,14 @@ export function CriteriaGroupWrapper({ group, criteriaGroup }: { group: Criteria
                 {group.participants.length <= 0 && !isFormReady ? (
                     <p className="text-center text-2xl font-medium">No participants yet!</p>
                 ) : (
-                    <div className="mt-4 text-right">
+                    <div className="mt-4 space-x-2 text-right">
+                        {hasMatch && (
+                            <Button disabled={!hasMatch || loadingRequest} onClick={() => handleRequestEdit(group.criteria)} type="button">
+                                {loadingRequest && <Loader2 strokeWidth={3} className="animate-spin" />}
+                                Request Edit Score
+                            </Button>
+                        )}
+
                         <Button disabled={hasMatch || loading} type="submit">
                             {loading && <Loader2 strokeWidth={3} className="animate-spin" />}
                             Submit

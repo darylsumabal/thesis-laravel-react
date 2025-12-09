@@ -1,6 +1,6 @@
 import { Contest } from '@/api/contest';
 import { JudgesGroup } from '@/api/result';
-import { usePage } from '@inertiajs/react';
+import { router, usePage } from '@inertiajs/react';
 import { useRef } from 'react';
 import { useReactToPrint } from 'react-to-print';
 import { Button } from '../ui/button';
@@ -21,8 +21,6 @@ const ResultSingleRound = ({
     sortedUniqueJudges,
 }: ResultProps) => {
     const { resultSingleRound } = usePage().props;
-    // const result = resultSingleRound.filter((item) => item.top_male.criteria === criteria);
-    // const result = resultSingleRound.filter((item) => item.participant?.criteria === criteria);
 
     const sectionRef = useRef<HTMLDivElement>(null);
     const handlePrint = useReactToPrint({ contentRef: sectionRef });
@@ -64,8 +62,7 @@ const ResultSingleRound = ({
                                 <div key={index} className="mt-4 flex w-full flex-col items-center justify-center gap-4">
                                     <div className="mt-4 mb-10">
                                         <p className="text-lg font-bold uppercase">
-                                            {criteria}{' '}
-                                            {getPlacement(index, resultSingleRound.length)}
+                                            {criteria} {getPlacement(index, resultSingleRound.length)}
                                         </p>
                                         <p className="text-center">Category</p>
                                     </div>

@@ -11,20 +11,26 @@ use Illuminate\Contracts\Broadcasting\ShouldBroadcastNow;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
 
-class JudgeSubmit implements ShouldBroadcastNow
+class RequestEdit implements ShouldBroadcastNow
 {
     use Dispatchable, InteractsWithSockets;
 
+    /**
+     * Create a new event instance.
+     */
+
     public $contestId;
     public $groupId;
+    public $judgeId;
     public $judgeName;
-    // public $judgeId;
-    public function __construct($contestId, $groupId, $judgeName)
+    public $action;
+    public function __construct($contestId, $groupId, $judgeId, $judgeName, $action)
     {
         $this->contestId = $contestId;
         $this->groupId = $groupId;
+        $this->judgeId = $judgeId;
         $this->judgeName = $judgeName;
-        // $this->judgeId = $judgeId;
+        $this->action = $action;
     }
 
     public function broadcastWith(): array
@@ -32,8 +38,9 @@ class JudgeSubmit implements ShouldBroadcastNow
         return [
             'contestId' => $this->contestId,
             'groupId' => $this->groupId,
+            'judgeId' => $this->judgeId,
             'judgeName' => $this->judgeName,
-            // 'judgeId' => $this->judgeId,
+            'action' => $this->action,
             'timestamp' => now()->timestamp,
         ];
     }
@@ -45,8 +52,7 @@ class JudgeSubmit implements ShouldBroadcastNow
     public function broadcastOn(): array
     {
         return [
-            // new PrivateChannel('submit-score' . $this->judgeId),
-            new PrivateChannel('submit-score'),
+            new PrivateChannel('request-edit'),
         ];
     }
 }
