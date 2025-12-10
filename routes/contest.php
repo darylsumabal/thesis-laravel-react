@@ -7,7 +7,6 @@ Route::prefix('contest')->group(function () {
 
     Route::post('/{contestId}/{participantType}/upload', [ContestController::class, 'storeImportParticipant']);
 
-
     Route::delete('/participant/{contestId}/{id}', [ContestController::class, 'destroyParticipant']);
 
     Route::delete('/team-participant/{contestId}/{id}', [ContestController::class, 'destroyTeamParticipant']);

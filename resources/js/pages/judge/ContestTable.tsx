@@ -14,20 +14,6 @@ const breadcrumbs: BreadcrumbItem[] = [
 export default function JudgeContestTable() {
     const { criteria } = usePage().props;
 
-    // const handleClickEvent = (
-    //     _id: string,
-    //     contest_id?: string,
-    //     group_id?: string,
-    //     contest?: {
-    //         contest_scoring_type: string;
-    //         contest_type: string;
-    //     },
-    // ) => {
-    //
-    //     console.log(scoringType);
-    //     console.log(contest_id);
-    // };
-
     const handleClick = (_id: string, _contest_scoring_type?: string, contest_id?: string, group_id?: string) => {
         router.visit(`/judging/criteria-list/${contest_id}/${group_id}`);
     };

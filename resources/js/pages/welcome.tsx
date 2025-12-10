@@ -4,7 +4,7 @@ import { Head, Link, usePage } from '@inertiajs/react';
 
 export default function Welcome() {
     const { auth } = usePage<SharedData>().props;
-    const userRole = auth.user.role;
+    const userRole = auth.user?.role;
     return (
         <>
             <Head title="Welcome">

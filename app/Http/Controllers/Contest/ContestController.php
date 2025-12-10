@@ -180,7 +180,6 @@ class ContestController extends Controller
 
     public function storeImportParticipant(Request $request, $contestId,  $participantType = 'participant')
     {
-
         try {
 
             $contest = Contest::where('id', $contestId)->firstOrFail();
@@ -193,7 +192,7 @@ class ContestController extends Controller
 
             return redirect()->back()->with('success', 'Participant imported');
         } catch (\Exception $e) {
-            return redirect()->back()->with('error',  $e->getMessage());
+            return redirect()->back()->withErrors($e->getMessage());
         }
     }
 
@@ -240,12 +239,11 @@ class ContestController extends Controller
             // Check if participant already exists
             $existingParticipant = Participants::where('contest_id', $contest->id)
                 ->where('participant_no', $validated['participant_no'])
+                ->where('gender',$validated['gender'])
                 ->first();
 
             if ($existingParticipant) {
-                return response()->json([
-                    'message' => 'Participant number already exists for this contest.',
-                ], 409); // 409 Conflict
+                return redirect()->back()->withErrors('A participant with this number already exists in this contest.');
             }
 
             // Handle file upload
@@ -362,7 +360,7 @@ class ContestController extends Controller
                 ->first();
 
             if ($existingParticipant) {
-                return redirect()->back()->with('error', 'A team with this participant number already exists in this contest.');
+                return redirect()->back()->withErrors('A team with this participant number already exists in this contest.');
             }
 
             // ✅ Handle poster upload

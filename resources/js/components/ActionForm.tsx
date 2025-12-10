@@ -10,19 +10,6 @@ import ActionCombobox from './ActionCombobox';
 import { Field } from './CardWrap';
 import { Button } from './ui/button';
 import { Calendar } from './ui/calendar';
-import {
-    DropdownMenu,
-    DropdownMenuContent,
-    DropdownMenuGroup,
-    DropdownMenuItem,
-    DropdownMenuLabel,
-    DropdownMenuPortal,
-    DropdownMenuSeparator,
-    DropdownMenuSub,
-    DropdownMenuSubContent,
-    DropdownMenuSubTrigger,
-    DropdownMenuTrigger,
-} from './ui/dropdown-menu';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from './ui/form';
 import { Input } from './ui/input';
 import { Popover, PopoverContent } from './ui/popover';
@@ -197,30 +184,6 @@ const ActionForm = <TSchema extends z.ZodType>({
                                                 <FormMessage />
                                             </FormItem>
                                         )}
-                                    {input.inputType === 'test' && (
-                                        <DropdownMenu>
-                                            <DropdownMenuTrigger asChild>
-                                                <Button variant="outline">Basic</Button>
-                                            </DropdownMenuTrigger>
-                                            <DropdownMenuContent className="w-56">
-                                                <DropdownMenuLabel>Event List</DropdownMenuLabel>
-                                                <DropdownMenuSeparator />
-                                                <DropdownMenuGroup>
-                                                    <DropdownMenuSub>
-                                                        <DropdownMenuSubTrigger>Invite users</DropdownMenuSubTrigger>
-                                                        <DropdownMenuPortal>
-                                                            <DropdownMenuSubContent>
-                                                                <DropdownMenuItem>Email</DropdownMenuItem>
-                                                                <DropdownMenuItem>Message</DropdownMenuItem>
-                                                                <DropdownMenuSeparator />
-                                                                <DropdownMenuItem>More...</DropdownMenuItem>
-                                                            </DropdownMenuSubContent>
-                                                        </DropdownMenuPortal>
-                                                    </DropdownMenuSub>
-                                                </DropdownMenuGroup>
-                                            </DropdownMenuContent>
-                                        </DropdownMenu>
-                                    )}
                                 </div>
                             )}
                         />

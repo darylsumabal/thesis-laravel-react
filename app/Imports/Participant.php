@@ -43,6 +43,16 @@ class Participant implements ToCollection, ToModel, WithChunkReading
             return null;
         }
 
+
+        // 🔍 Check for duplicate participant number in this contest
+        $existing = Participants::where('contest_id', $this->contestId)
+            ->where('participant_no', $rows[0])
+            ->first();
+
+        if ($existing) {
+            throw new \Exception("Some of participant number already exists in this contest.");
+        }
+
         if ($this->current > 1) {
             Participants::create([
                 // 'organizer_id' => $this->organizerId,

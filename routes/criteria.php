@@ -32,11 +32,12 @@ Route::prefix('criteria')->group(function () {
 
   Route::delete('/delete-judges/{judgeId}/{contestId}/{groupId}', [CriteriaController::class, 'deleteJudgesCriteria']);
 
+
+  Route::delete('/{id}/scores', [CriteriaController::class, 'destroy']);
+
   //delete criteria
   Route::delete('/{contestId}/{groupId}', [CriteriaController::class, 'destroyCriteria']);
 
-
-  Route::delete('/{id}/scores', [CriteriaController::class, 'destroy']);
 
   Route::post('/{id}/scores/archived', [CriteriaController::class, 'archivedCriteria']);
 

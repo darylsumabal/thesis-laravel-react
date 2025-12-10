@@ -94,6 +94,7 @@ export default function Team({ contest, participant, poster }: PROPS) {
                 router.reload({ only: ['participants'] });
             },
             onError: (error) => {
+                toast.error(error[0]);
                 setLoading(false);
                 console.log(error);
             },
@@ -110,6 +111,7 @@ export default function Team({ contest, participant, poster }: PROPS) {
                 toast.success('Participant imported');
             },
             onError: (error) => {
+                toast.error(error[0]);
                 setLoading(false);
                 console.log(error);
             },

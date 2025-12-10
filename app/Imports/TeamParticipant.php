@@ -43,7 +43,13 @@ class TeamParticipant implements ToCollection, ToModel, WithChunkReading
         ) {
             return null;
         }
+        $existing = TeamParticipants::where('contest_id', $this->contestId)
+            ->where('team_participant_no', $row[0])
+            ->first();
 
+        if ($existing) {
+            throw new \Exception("Some of team participant number already exists in this contest.");
+        }
 
         if ($this->current > 1) {
             TeamParticipants::create([
