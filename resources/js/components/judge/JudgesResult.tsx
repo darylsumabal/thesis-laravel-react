@@ -23,9 +23,6 @@ export type PROPS = {
 const JudgesResult = ({ judgeId, judgeName, judgeRole }: { judgeId: string; judgeName: string; judgeRole: string }) => {
     const { qualified, judgeData, auth } = usePage<PROPS>().props;
 
-    // const filteredJudgeData = judgeData.filter((item) => item.id === judgeId);
-    console.log(judgeData);
-    
     const filteredJudgeData = judgeData.map((item) => {
         return {
             criteria: item.criteria,

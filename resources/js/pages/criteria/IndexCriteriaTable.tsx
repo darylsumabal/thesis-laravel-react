@@ -30,14 +30,13 @@ export default function IndexCriteriaTable() {
     const handleArchive = () => {
         setArchived(!archive);
     };
-
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Criteria" />
             {!archive ? (
                 <TableAction
                     // isPending={isPending}
-                    data={criteria || []}
+                    data={criteria.data || []}
                     columns={columns}
                     handleClick={handleClick}
                     placeholder="Search contest..."
@@ -45,11 +44,18 @@ export default function IndexCriteriaTable() {
                     enableArchive={true}
                     isArchive={archive}
                     handleArchive={handleArchive}
+                    links={criteria.links}
+                    pagination={{
+                        currentPage: criteria.current_page,
+                        lastPage: criteria.last_page,
+                        perPage: criteria.per_page,
+                        total: criteria.total,
+                    }}
                 />
             ) : (
                 <TableAction
                     // isPending={pendingArchive}
-                    data={archivedCriteria || []}
+                    data={archivedCriteria.data || []}
                     columns={columnsArchive}
                     handleClick={handleClick}
                     placeholder="Search archive contest..."
@@ -57,6 +63,13 @@ export default function IndexCriteriaTable() {
                     enableArchive={true}
                     isArchive={archive}
                     handleArchive={handleArchive}
+                    links={archivedCriteria.links}
+                    pagination={{
+                        currentPage: archivedCriteria.current_page,
+                        lastPage: archivedCriteria.last_page,
+                        perPage: archivedCriteria.per_page,
+                        total: archivedCriteria.total,
+                    }}
                 />
             )}
         </AppLayout>

@@ -37,7 +37,7 @@ class ResultViewController extends Controller
         $preliminaryScore =  PrelimScoringMethod::where('group_id', operator: $groupId)->get();
         $result = $judgesGroup->mapWithKeys(function ($judges, $round) {
             $unfinished = $judges->where('is_finished', 0)->count();
-          
+
             return [
                 strtolower($round) => [
                     'is_finished' => $unfinished === 0,
@@ -392,41 +392,6 @@ class ResultViewController extends Controller
             ];
         })->values();
     }
-
-    // private function indexResult($contestId, $groupId, $participantModel, $genderCategory)
-    // {
-    //     $participants = $participantModel::where('contest_id', $contestId)
-    //         ->with(['scoreJudgings.judges', 'scoreJudgings.participant','scoreJudgings.teamParticipant'])
-    //         ->get();
-
-    //     foreach ($participants as $participant) {
-    //         $judge = $participant->scoreJudgings->where('group_id', $groupId);
-
-    //         $results[] = [
-    //             // 'overall_scores' => $overall,
-    //             'judges_score' => $judge->map(function ($scoreJudge) use ($genderCategory) {
-    //                 return [
-    //                     'id' => $scoreJudge->id,
-    //                     'gender_category' => $genderCategory,
-    //                     'criteria' => $scoreJudge->criteria,
-    //                     'rank' => $scoreJudge->rank,
-    //                     'total' => $scoreJudge->total,
-    //                     'participant_no' => $scoreJudge->participant?->participant_no,
-    //                     'team_participant_no' => $scoreJudge->participant?->team_participant_no,
-    //                     'participant_gender' => $scoreJudge->participant->gender,
-    //                     'total_score' => $scoreJudge->total_score,
-    //                     'total_rank' => $scoreJudge->total_rank,
-    //                     'final_rank' => $scoreJudge->final_rank,
-    //                     'judge_name' => $scoreJudge->judges->name,
-    //                 ];
-    //             }),
-    //         ];
-    //     }
-
-    //     return $results ?? [];
-    // }
-
-
 
     private function indexResult($contestId, $groupId, $participantModel, $genderCategory)
     {

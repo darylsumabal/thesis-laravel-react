@@ -21,7 +21,19 @@ export default function JudgeContestTable() {
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Contest List" />
-            <TableAction data={criteria || []} handleClick={handleClick} searchInput="contest_name" columns={columns} />
+            <TableAction
+                data={criteria.data || []}
+                handleClick={handleClick}
+                searchInput="contest_name"
+                columns={columns}
+                links={criteria.links}
+                pagination={{
+                    currentPage: criteria.current_page,
+                    lastPage: criteria.last_page,
+                    perPage: criteria.per_page,
+                    total: criteria.total,
+                }}
+            />
         </AppLayout>
     );
 }

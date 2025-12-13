@@ -31,25 +31,39 @@ export default function IndexContestTable({ contest, archiveContest, eventId }: 
                     <TableAction
                         // isPending={isPending}
                         columns={columns}
-                        data={contest || []}
+                        data={contest.data || []}
                         placeholder="Search contest..."
                         searchInput="contest_name"
                         handleClick={handleClick}
                         handleArchive={handleArchive}
                         isArchive={archive}
                         enableArchive={true}
+                        links={contest.links}
+                        pagination={{
+                            currentPage: contest.current_page,
+                            lastPage: contest.last_page,
+                            perPage: contest.per_page,
+                            total: contest.total,
+                        }}
                     />
                 ) : (
                     <TableAction
                         // isPending={isPending}
                         columns={columnsArchive}
-                        data={archiveContest || []}
+                        data={archiveContest.data || []}
                         placeholder="Search archived contest..."
                         searchInput="contest_name"
                         handleClick={handleClick}
                         handleArchive={handleArchive}
                         isArchive={archive}
                         enableArchive={true}
+                        links={archiveContest.links}
+                        pagination={{
+                            currentPage: archiveContest.current_page,
+                            lastPage: archiveContest.last_page,
+                            perPage: archiveContest.per_page,
+                            total: archiveContest.total,
+                        }}
                     />
                 )}
             </CardContent>

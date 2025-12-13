@@ -18,6 +18,7 @@ import { scoreMap, scoringTypeMap } from '@/lib/constant/contest';
 import { router, usePage } from '@inertiajs/react';
 import { useRef } from 'react';
 import { useReactToPrint } from 'react-to-print';
+import { toast } from 'sonner';
 
 export type PROPS = {
     rounds: JudgesGroups;
@@ -122,15 +123,29 @@ export default function ScoreResultTeam() {
                             <TabsTrigger
                                 value="major_awards"
                                 onClick={() => {
-                                    router.get(
-                                        `/result/${contestId}/${groupId}/team`,
-                                        { award: 1 },
-                                        {
-                                            preserveScroll: true,
-                                            preserveState: true,
-                                            replace: false,
-                                        },
-                                    );
+                                    const promise = new Promise((resolve, reject) => {
+                                        router.get(
+                                            `/result/${contestId}/${groupId}/team`,
+                                            { award: 1 },
+                                            {
+                                                preserveScroll: true,
+                                                preserveState: true,
+                                                replace: false,
+                                                onSuccess: (page) => {
+                                                    resolve(page);
+                                                },
+                                                onError: (error) => {
+                                                    reject(error);
+                                                },
+                                            },
+                                        );
+                                    });
+
+                                    toast.promise(promise, {
+                                        loading: 'Loading Major Awards',
+                                        success: 'Data Loaded!',
+                                        error: 'An error occurred',
+                                    });
                                 }}
                             >
                                 MAJOR AWARDS
@@ -170,16 +185,30 @@ export default function ScoreResultTeam() {
 
             {criteria.map((criteriaName, idx) => {
                 const refreshByCriteria = () => {
-                    router.get(
-                        `/result/${contestId}/${groupId}/team`,
-                        {
-                            criteria: criteriaName, // ✅ PASSED TO BACKEND
-                        },
-                        {
-                            preserveScroll: true,
-                            preserveState: true,
-                        },
-                    );
+                    const promise = new Promise((resolve, reject) => {
+                        router.get(
+                            `/result/${contestId}/${groupId}/team`,
+                            {
+                                criteria: criteriaName,
+                            },
+                            {
+                                preserveScroll: true,
+                                preserveState: true,
+                                onSuccess: (page) => {
+                                    resolve(page);
+                                },
+                                onError: (error) => {
+                                    reject(error);
+                                },
+                            },
+                        );
+                    });
+
+                    toast.promise(promise, {
+                        loading: 'Loading Result',
+                        success: 'Data Loaded!',
+                        error: 'An error occurred',
+                    });
                 };
 
                 return (

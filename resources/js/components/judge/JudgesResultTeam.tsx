@@ -19,15 +19,15 @@ export type JudgeScore = {
 
 const JudgesResultTeam = ({ judgeId, judgeName, judgeRole }: { judgeId: string; judgeName: string; judgeRole: string }) => {
     const { qualified, judgeData, auth } = usePage<PROPS>().props;
-    console.log(judgeData);
-    // const filteredJudgeData = judgeData.filter((item) => item.judgeId === judgeId);
+
+
     const filteredJudgeData = judgeData.map((item) => {
         return {
             criteria: item.criteria,
             scores: item.scores.filter((score) => score.judgeId === judgeId),
         };
     });
-    console.log(filteredJudgeData);
+
     const computeTotalsAndRanks = (byParticipant: Record<string, JudgeScore[]>) => {
         const totals = Object.entries(byParticipant).map(([participantNo, scores]) => {
             const total = scores.reduce((sum, s) => sum + (parseFloat(s.score) || 0), 0);

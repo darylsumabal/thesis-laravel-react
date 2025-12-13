@@ -19,7 +19,6 @@ Route::prefix('result')->group(function () {
 
     Route::post('/single-round/individual/{contestId}/{groupId}/{resultType}', [ResultController::class, 'storeResultSingleRound']);
 
-
     Route::post('/single-round/team/{contestId}/{groupId}/{resultType}', [ResultController::class, 'storeResultSingleRoundTeam']);
 
     Route::post('/final/{contestId}/{groupId}/{resultType}', [ResultController::class, 'storeResultFinal']);

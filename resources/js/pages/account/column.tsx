@@ -110,6 +110,6 @@ export const columns: ColumnDef<Account>[] = [
         id: 'id',
         header: 'Action',
         enableHiding: false,
-        cell: ({ row }) => <AccountCell row={row}  />, // ✅ Pass handler
+        cell: ({ row }) => <AccountCell row={row}  />, 
     },
 ];

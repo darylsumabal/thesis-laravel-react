@@ -44,7 +44,7 @@ export default function IndexResultTable() {
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Result List" />
             {/* {!archive ? (
-               
+
             ) : (
                 <TableAction
                     placeholder="Search contest..."
@@ -60,13 +60,20 @@ export default function IndexResultTable() {
              */}
             <TableAction
                 placeholder="Search contest..."
-                data={criteria || []}
+                data={criteria.data || []}
                 columns={columnResultTable}
                 handleClick={handleClick}
                 searchInput="contest_name"
                 enableArchive={false}
                 isArchive={archive}
                 handleArchive={handleArchive}
+                links={criteria.links}
+                pagination={{
+                    currentPage: criteria.current_page,
+                    lastPage: criteria.last_page,
+                    perPage: criteria.per_page,
+                    total: criteria.total,
+                }}
             />
         </AppLayout>
     );

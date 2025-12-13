@@ -19,6 +19,7 @@ import { scoreMap, scoringTypeMap } from '@/lib/constant/contest';
 import { router, usePage } from '@inertiajs/react';
 import { useRef } from 'react';
 import { useReactToPrint } from 'react-to-print';
+import { toast } from 'sonner';
 
 export type PROPS = {
     rounds: JudgesGroups;
@@ -105,7 +106,36 @@ export default function ScoreResult() {
             <ScrollArea className="rounded-md">
                 <TabsList>
                     {scoringMr && (
-                        <TabsTrigger value="preliminary" className="uppercase">
+                        <TabsTrigger
+                            value="preliminary"
+                            className="uppercase"
+                            // onClick={() => {
+                            //     const promise = new Promise((resolve, reject) => {
+                            //         router.get(
+                            //             `/result/${contestId}/${groupId}/individual`,
+                            //             { preliminary: 1 },
+                            //             {
+                            //                 preserveScroll: true,
+                            //                 preserveState: true,
+                            //                 replace: false,
+                            //                 onFinish: (page) => {
+                            //                     // Dismiss the loading toast when done
+                            //                     resolve(page);
+                            //                 },
+                            //                 onError: (error) => {
+                            //                     reject(error);
+                            //                 },
+                            //             },
+                            //         );
+                            //     });
+
+                            //     toast.promise(promise, {
+                            //         loading: 'Loading Major Awards',
+                            //         success: 'Data loaded!',
+                            //         error: 'An error occurred.',
+                            //     });
+                            // }}
+                        >
                             Preliminary
                         </TabsTrigger>
                     )}
@@ -120,17 +150,30 @@ export default function ScoreResult() {
 
                             {sortedUniqueJudges?.map((i) => {
                                 const refreshByJudge = () => {
-                                    router.get(
-                                        `/result/${contestId}/${groupId}/individual`,
-                                        {
-                                            judgeId: i.judges.id, // ✅ PASSED TO BACKEND
-                                        },
-                                        {
-                                            preserveScroll: true,
-                                            preserveState: true,
-                                            replace: false,
-                                        },
-                                    );
+                                    const promise = new Promise((resolve, reject) => {
+                                        router.get(
+                                            `/result/${contestId}/${groupId}/individual`,
+                                            {
+                                                judgeId: i.judges.id, // ✅ PASSED TO BACKEND
+                                            },
+                                            {
+                                                preserveScroll: true,
+                                                preserveState: true,
+                                                replace: false,
+                                                onSuccess: (page) => {
+                                                    resolve(page);
+                                                },
+                                                onError: (error) => {
+                                                    reject(error);
+                                                },
+                                            },
+                                        );
+                                    });
+                                    toast.promise(promise, {
+                                        loading: `Loading result ${i.judges.name}}`,
+                                        success: 'Data loaded!',
+                                        error: 'An error occurred.',
+                                    });
                                 };
                                 return (
                                     <TabsTrigger onClick={refreshByJudge} key={i.id} value={i.judges.name}>
@@ -149,15 +192,30 @@ export default function ScoreResult() {
                             <TabsTrigger
                                 value="major_awards"
                                 onClick={() => {
-                                    router.get(
-                                        `/result/${contestId}/${groupId}/individual`,
-                                        { award: 1 },
-                                        {
-                                            preserveScroll: true,
-                                            preserveState: true,
-                                            replace: false,
-                                        },
-                                    );
+                                    const promise = new Promise((resolve, reject) => {
+                                        router.get(
+                                            `/result/${contestId}/${groupId}/individual`,
+                                            { award: 1 },
+                                            {
+                                                preserveScroll: true,
+                                                preserveState: true,
+                                                replace: false,
+                                                onFinish: (page) => {
+                                                    // Dismiss the loading toast when done
+                                                    resolve(page);
+                                                },
+                                                onError: (error) => {
+                                                    reject(error);
+                                                },
+                                            },
+                                        );
+                                    });
+
+                                    toast.promise(promise, {
+                                        loading: 'Loading Major Awards',
+                                        success: 'Data loaded!',
+                                        error: 'An error occurred.',
+                                    });
                                 }}
                             >
                                 MAJOR AWARDS
@@ -166,17 +224,30 @@ export default function ScoreResult() {
                             <TabsTrigger value="final_results">FINAL RESULTS</TabsTrigger>
                             {sortedUniqueJudges?.map((i) => {
                                 const refreshByJudge = () => {
-                                    router.get(
-                                        `/result/${contestId}/${groupId}/individual`,
-                                        {
-                                            judgeId: i.judges.id, // ✅ PASSED TO BACKEND
-                                        },
-                                        {
-                                            preserveScroll: true,
-                                            preserveState: true,
-                                            replace: false,
-                                        },
-                                    );
+                                    const promise = new Promise((resolve, reject) => {
+                                        router.get(
+                                            `/result/${contestId}/${groupId}/individual`,
+                                            {
+                                                judgeId: i.judges.id, // ✅ PASSED TO BACKEND
+                                            },
+                                            {
+                                                preserveScroll: true,
+                                                preserveState: true,
+                                                replace: false,
+                                                onSuccess: (page) => {
+                                                    resolve(page);
+                                                },
+                                                onError: (error) => {
+                                                    reject(error);
+                                                },
+                                            },
+                                        );
+                                    });
+                                    toast.promise(promise, {
+                                        loading: `Loading result ${i.judges.name}`,
+                                        success: 'Data loaded!',
+                                        error: 'An error occurred.',
+                                    });
                                 };
                                 return (
                                     <TabsTrigger onClick={refreshByJudge} key={i.id} value={i.judges.name}>
@@ -212,16 +283,30 @@ export default function ScoreResult() {
 
             {criteria.map((criteriaName, idx) => {
                 const refreshByCriteria = () => {
-                    router.get(
-                        `/result/${contestId}/${groupId}/individual`,
-                        {
-                            criteria: criteriaName, // ✅ PASSED TO BACKEND
-                        },
-                        {
-                            preserveScroll: true,
-                            preserveState: true,
-                        },
-                    );
+                    const promise = new Promise((resolve, reject) => {
+                        router.get(
+                            `/result/${contestId}/${groupId}/individual`,
+                            {
+                                criteria: criteriaName,
+                            },
+                            {
+                                preserveScroll: true,
+                                preserveState: true,
+                                onSuccess: (page) => {
+                                    resolve(page);
+                                },
+                                onError: (error) => {
+                                    reject(error);
+                                },
+                            },
+                        );
+                    });
+
+                    toast.promise(promise, {
+                        loading: `Loading result ${criteriaName}`,
+                        success: 'Data loaded!',
+                        error: 'An error occurred.',
+                    });
                 };
 
                 return (

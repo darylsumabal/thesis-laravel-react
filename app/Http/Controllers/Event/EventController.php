@@ -45,13 +45,17 @@ class EventController extends Controller
         //     $eventQuery->where('id', $eventId);
         // }
 
-        $events = $eventQuery->where('is_archived', 0)->get();
+        $events = $eventQuery
+        ->where('is_archived', 0)
+        ->paginate(10)
+        ->withQueryString();
 
         // If empty, still return Inertia — avoid early JSON return
         // (better for consistency)
         $archivedEvents = (clone $baseQuery)
             ->where('is_archived', 1)
-            ->get();
+            ->paginate(10)
+            ->withQueryString();
 
         return Inertia::render('event/IndexTable', [
             'event' => $events,
@@ -74,11 +78,11 @@ class EventController extends Controller
 
         $queryContest = Contest::where('organizer_id', $organizerId)->where('event_id', $eventId)->where('is_archived', 0)->with('event');
 
-        $contest = $queryContest->get();
+        $contest = $queryContest->paginate(10)->withQueryString();
 
-        $archivedEvents =  Contest::where('organizer_id', $organizerId)->where('event_id', $eventId)->where('is_archived', 1)->with('event');
+        $archivedContest =  Contest::where('organizer_id', $organizerId)->where('event_id', $eventId)->where('is_archived', 1)->with('event');
 
-        $archived = $archivedEvents->get();
+        $archived = $archivedContest->paginate(10)->withQueryString();
 
         return Inertia::render('event/IndexCard', [
             'event' => $event,

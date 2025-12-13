@@ -3,10 +3,10 @@ import { Button } from '@/components/ui/button';
 import { router } from '@inertiajs/react';
 import { Row } from '@tanstack/react-table';
 import { toast } from 'sonner';
-import { useArchivedEvent } from '../utils/tanstack/event';
+
 
 const Action = ({ row }: { row: Row<Event> }) => {
-    const { archivedEvent } = useArchivedEvent();
+
 
     const handleArchiveClick = async (e: React.MouseEvent<HTMLButtonElement>) => {
         e.stopPropagation();

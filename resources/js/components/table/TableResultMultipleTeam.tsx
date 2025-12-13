@@ -86,7 +86,6 @@ function TableResultTypeTeamMultiple({ scoringType, contest }: { scoringType: st
         criteriaWeightsMap[item.contest_name.trim()] = Number(item.weight); // convert string to number
     });
 
-    console.log(prelimScoringType);
     return (
         <div className="flex flex-col">
             <ResultHeader contest={contest ?? { contest: [], message: '' }} />

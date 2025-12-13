@@ -45,7 +45,7 @@ export const ActionArchive = ({ row }: { row: Row<CriteriaInfos> }) => {
             {
                 onSuccess: () => {
                     toast.success('Criteria restore successfully!');
-                    router.reload({ only: ['contest'] });
+                    router.reload({ only: ['criteria'] });
                 },
                 onError: () => {
                     toast.success('An error occurred');
@@ -60,7 +60,7 @@ export const ActionArchive = ({ row }: { row: Row<CriteriaInfos> }) => {
         router.delete(`/criteria/${id}/scores`, {
             onSuccess: () => {
                 toast.success('Contest deleted successfully!');
-                router.reload({ only: ['contest'] });
+                router.reload({ only: ['criteria'] });
             },
             onError: () => {
                 toast.success('An error occurred');

@@ -20,6 +20,7 @@ export default function CreateJudge({ contest }: PROPS) {
                 setIsPending(false);
             },
             onError: (error) => {
+                setIsPending(false);
                 toast.error(error[0]);
             },
         });

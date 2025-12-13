@@ -71,7 +71,6 @@ const CardContent = <T extends { id: string; poster: string }, U>({
             preserveScroll: true,
             onSuccess: () => {
                 toast.success('Event updated successfully!');
-                console.log('Event updated!');
                 router.reload({ only: ['event'] });
             },
             onError: (errors) => {

@@ -31,7 +31,7 @@ type CriteriaJudgingProps = {
 };
 
 const CriteriaJudging = ({ data }: CriteriaJudgingProps) => {
-    console.log(data.map((contestant) => contestant.contest.contest_poster));
+
     return (
         <div className="h-full gap-10">
             <div className="space-y-4">

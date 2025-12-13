@@ -1,19 +1,7 @@
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { cn } from '@/lib/utils';
-import {
-    ColumnDef,
-    ColumnFiltersState,
-    flexRender,
-    getCoreRowModel,
-    getFilteredRowModel,
-    getPaginationRowModel,
-    getSortedRowModel,
-    RowSelectionState,
-    SortingState,
-    useReactTable,
-    VisibilityState,
-} from '@tanstack/react-table';
-
+import { ColumnDef, flexRender, getCoreRowModel, getFilteredRowModel, getSortedRowModel, useReactTable } from '@tanstack/react-table';
+import { Link } from '@inertiajs/react';
 import { Archive, ArchiveRestore, Check, ChevronDownIcon, ChevronsUpDown, Loader2 } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { Button } from './ui/button';
@@ -36,6 +24,17 @@ type TableProps<
     },
 > = {
     data: T[];
+    links?: {
+        label: string;
+        url: string;
+        active: boolean;
+    }[];
+    pagination?: {
+        currentPage: number;
+        lastPage: number;
+        perPage: number;
+        total: number;
+    };
     columns: ColumnDef<T>[];
     searchInput?: string;
     handleClick?: (
@@ -85,11 +84,13 @@ const TableAction = <
     isFilter = true,
     placeholder,
     isPagination = true,
-    paginationSize = 10,
+    // paginationSize = 10,
     className,
     isArchive,
     handleArchive,
     enableArchive = false,
+    links,
+    pagination,
 }: TableProps<T>) => {
     const [open, setOpen] = useState(false);
     const [date, setDate] = useState<Date | undefined>(undefined);
@@ -104,36 +105,12 @@ const TableAction = <
     const [selectedMonth, setSelectedMonth] = useState<string | null>(null);
     const [selectedYear, setSelectedYear] = useState<string | null>(null);
 
-    const [sorting, setSorting] = useState<SortingState>([]);
-    const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
-    const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
-    const [rowSelection, setRowSelection] = useState<RowSelectionState>({});
-
-    const [pagination, setPagination] = useState({
-        pageIndex: 0,
-        pageSize: paginationSize,
-    });
-    // const test = !isArchive ? data : archiveData;
-    // console.log(data);
     const table = useReactTable({
         data: data ?? [],
-        columns: columns,
-        onSortingChange: setSorting,
-        onColumnFiltersChange: setColumnFilters,
+        columns,
         getCoreRowModel: getCoreRowModel(),
-        getPaginationRowModel: getPaginationRowModel(),
         getSortedRowModel: getSortedRowModel(),
         getFilteredRowModel: getFilteredRowModel(),
-        onColumnVisibilityChange: setColumnVisibility,
-        onRowSelectionChange: setRowSelection,
-        onPaginationChange: setPagination,
-        state: {
-            sorting,
-            columnFilters,
-            columnVisibility,
-            rowSelection,
-            pagination,
-        },
     });
 
     const monthList = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
@@ -394,33 +371,26 @@ const TableAction = <
                     </TableBody>
                 </Table>
             </Card>
-            {isPagination && (
-                <div className="flex items-center justify-end space-x-2 py-4">
-                    <div className="flex-1 flex-col text-sm">
-                        <div>Items {table.getFilteredRowModel().rows.length}</div>
-                        <div>
-                            Page {table.getState().pagination.pageIndex + 1} of {table.getPageCount()}
-                        </div>
+            {isPagination && links && pagination && (
+                <div className="flex items-center justify-between py-4">
+                    <div className="text-muted-foreground text-sm">
+                        Page {pagination.currentPage} of {pagination.lastPage} — Total {pagination.total}
                     </div>
-                    <div className="space-x-2">
-                        <Button
-                            variant="outline"
-                            size="sm"
-                            className="cursor-pointer"
-                            onClick={() => table.previousPage()}
-                            disabled={!table.getCanPreviousPage()}
-                        >
-                            Previous
-                        </Button>
-                        <Button
-                            variant="outline"
-                            size="sm"
-                            className="cursor-pointer"
-                            onClick={() => table.nextPage()}
-                            disabled={!table.getCanNextPage()}
-                        >
-                            Next
-                        </Button>
+
+                    <div className="flex gap-2">
+                        {links.map((link, index) => (
+                            <Link
+                                key={index}
+                                href={link.url ?? ''}
+                                preserveScroll
+                                className={cn(
+                                    'rounded border px-3 py-1 text-sm',
+                                    link.active && 'bg-[#45226b] text-white',
+                                    !link.url && 'pointer-events-none opacity-50',
+                                )}
+                                dangerouslySetInnerHTML={{ __html: link.label }}
+                            />
+                        ))}
                     </div>
                 </div>
             )}

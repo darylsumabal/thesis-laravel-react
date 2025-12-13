@@ -19,18 +19,23 @@ const breadcrumbs: BreadcrumbItem[] = [
 ];
 
 export default function Index() {
-    const { account, flash } = usePage<AccountType>().props;
+    const { account } = usePage<AccountType>().props;
+
     const [isPending, setIsPending] = useState(false);
 
     const handleCreateJudge = async ({ data }: { id: string | null; data: FormData }) => {
         setIsPending(true);
+
         router.post('/accounts', data, {
-            onSuccess: () => {
+            onSuccess: (page) => {
                 setIsPending(false);
-                toast.success(flash.success);
+                toast.success(page.props.flash?.success);
+                // setIsDialogOpen(false);
                 router.reload({ only: ['account'] });
             },
             onError: (error) => {
+                setIsPending(false);
+                // setIsDialogOpen(false);
                 toast.error(error[0]);
             },
         });
@@ -61,12 +66,18 @@ export default function Index() {
             </div>
             <div>
                 <TableAction
-                    // isPending={pendingAccount}
-                    data={account || []}
+                    data={account.data || []}
                     columns={columns}
                     placeholder="Search email..."
                     isFilter={false}
                     searchInput="email"
+                    links={account.links}
+                    pagination={{
+                        currentPage: account.current_page,
+                        lastPage: account.last_page,
+                        perPage: account.per_page,
+                        total: account.total,
+                    }}
                 />
             </div>
         </AppLayout>

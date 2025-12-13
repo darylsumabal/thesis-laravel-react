@@ -15,7 +15,10 @@ class AccountController extends Controller
     public function index()
     {
         // return Inertia::render('Account/Index', []);
-        $accounts = User::with('contest')->where('accountType', 'JUDGE')->get();
+        $accounts = User::with('contest')
+        ->where('accountType', 'JUDGE')
+        ->paginate(10)
+        ->withQueryString();
 
         // return response()->json(['account' => $account]);
         return Inertia::render('account/Index', [
@@ -31,21 +34,6 @@ class AccountController extends Controller
         return response()->json(['account' => $account]);
     }
 
-
-    // public function fetchJudges()
-    // {
-
-    //     $accounts = User::with('contest')->where('accountType', 'JUDGE')->get();
-
-    //     // return response()->json(['account' => $account]);
-    //     return Inertia::render('Account/Index', [
-    //         'account' => $accounts
-    //     ]);
-    // }
-
-    /**
-     * Store a newly created resource in storage.
-     */
 
     public function storeJudge(Request $request)
     {

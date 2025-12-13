@@ -23,9 +23,9 @@ export type ComboboxField = {
     }[];
 };
 
-type FormProps<TSchema extends z.ZodType> = {
+type FormProps<TSchema extends z.ZodType<any, any, any>> = {
     fields: Field[];
-    fieldNames: Record<string, keyof z.infer<TSchema>>;
+    fieldNames: Record<string, string>;
     comboboxField?: ComboboxField[];
     buttonText: string;
     onSubmit: (data: z.infer<TSchema>) => Promise<void>;
@@ -36,7 +36,7 @@ type FormProps<TSchema extends z.ZodType> = {
     contestType?: string;
 };
 
-const ActionForm = <TSchema extends z.ZodType>({
+const ActionForm = <TSchema extends z.ZodType<any, any, any>>({
     fields,
     fieldNames,
     comboboxField,

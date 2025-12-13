@@ -40,59 +40,142 @@ class CriteriaController extends Controller
 
     public function indexCriteriaTable(Request $request)
     {
+        // $user = auth()->user();
+        // $userId = $user->id;
+        // $role = $user->role; // default to organizer if role is empty/null
+
+        // $query = Score::with('contest.event')->where('is_archived', 0);
+
+        // if ($role === 'Admin') {
+        //     $query->where('organizer_id', $userId);
+        // } else {
+        //     $query->whereHas('judges', function ($query) use ($userId) {
+        //         $query->where('judge_id', $userId);
+        //     });
+        // }
+
+        // $scores = $query->paginate(10)->withQueryString();
+
+        // $groupIds = $scores->pluck('group_id')->unique()->values()->all();
+
+        // $finalMethods = FinalScoringMethod::whereIn('group_id', $groupIds)->get()->keyBy('group_id');
+
+        // $scores = $scores->map(function ($score) use ($finalMethods) {
+        //     $method = $finalMethods->get($score->group_id);
+
+        //     $score->scoring_method = $method ? $method->scoring_method : null;
+        //     $score->gender_category = $method ? $method->gender_category : null;
+
+        //     return $score;
+        // });
+
+        // if ($request->routeIs('resultTable')) {
+        //     return Inertia::render('result/IndexTable', ['criteria' => $scores]);
+        // }
+
+        // if ($request->routeIs('judgesTable')) {
+        //     return Inertia::render('judge/ContestTable', ['criteria' => $scores]);
+        // }
+
+
+
+        // $queryArchived = Score::with('contest.event')->where('is_archived', 1);
+
+        // if ($role === 'Admin') {
+        //     $queryArchived->where('organizer_id', $userId);
+        // } else {
+        //     $queryArchived->whereHas('judges', function ($queryArchived) use ($userId) {
+        //         $queryArchived->where('judge_id', $userId);
+        //     });
+        // }
+
+        // $archivedCriteria = $queryArchived->paginate(10)->withQueryString();
+
+
+        // return Inertia::render('criteria/IndexCriteriaTable', ['criteria' => $scores, 'archivedCriteria' => $archivedCriteria]);
+
         $user = auth()->user();
         $userId = $user->id;
-        $role = $user->role; // default to organizer if role is empty/null
+        $role = $user->role;
 
-        $query = Score::with('contest.event')->where('is_archived', 0);
+        /*
+    |--------------------------------------------------------------------------
+    | ACTIVE (NOT ARCHIVED) SCORES
+    |--------------------------------------------------------------------------
+    */
+        $query = Score::with('contest.event')
+            ->where('is_archived', 0);
 
         if ($role === 'Admin') {
             $query->where('organizer_id', $userId);
         } else {
-            $query->whereHas('judges', function ($query) use ($userId) {
-                $query->where('judge_id', $userId);
+            $query->whereHas('judges', function ($q) use ($userId) {
+                $q->where('judge_id', $userId);
             });
         }
 
-        $scores = $query->get();
+        // ✅ PAGINATE FIRST
+        $scores = $query->paginate(10)->withQueryString();
 
-        $groupIds = $scores->pluck('group_id')->unique()->values()->all();
+        // Collect group IDs from the paginated collection
+        $groupIds = $scores->pluck('group_id')->unique()->values();
 
-        $finalMethods = FinalScoringMethod::whereIn('group_id', $groupIds)->get()->keyBy('group_id');
+        // Fetch final scoring methods in one query
+        $finalMethods = FinalScoringMethod::whereIn('group_id', $groupIds)
+            ->get()
+            ->keyBy('group_id');
 
-        $scores = $scores->map(function ($score) use ($finalMethods) {
+        // ✅ USE through() INSTEAD OF map()
+        $scores = $scores->through(function ($score) use ($finalMethods) {
             $method = $finalMethods->get($score->group_id);
 
-            $score->scoring_method = $method ? $method->scoring_method : null;
-            $score->gender_category = $method ? $method->gender_category : null;
+            $score->scoring_method = $method?->scoring_method;
+            $score->gender_category = $method?->gender_category;
 
             return $score;
         });
 
+        /*
+    |--------------------------------------------------------------------------
+    | ROUTE-BASED RESPONSES
+    |--------------------------------------------------------------------------
+    */
         if ($request->routeIs('resultTable')) {
-            return Inertia::render('result/IndexTable', ['criteria' => $scores]);
+            return Inertia::render('result/IndexTable', [
+                'criteria' => $scores,
+            ]);
         }
 
         if ($request->routeIs('judgesTable')) {
-            return Inertia::render('judge/ContestTable', ['criteria' => $scores]);
+            return Inertia::render('judge/ContestTable', [
+                'criteria' => $scores,
+            ]);
         }
 
-
-
-        $queryArchived = Score::with('contest.event')->where('is_archived', 1);
+        /*
+    |--------------------------------------------------------------------------
+    | ARCHIVED SCORES
+    |--------------------------------------------------------------------------
+    */
+        $queryArchived = Score::with('contest.event')
+            ->where('is_archived', 1);
 
         if ($role === 'Admin') {
             $queryArchived->where('organizer_id', $userId);
         } else {
-            $queryArchived->whereHas('judges', function ($queryArchived) use ($userId) {
-                $queryArchived->where('judge_id', $userId);
+            $queryArchived->whereHas('judges', function ($q) use ($userId) {
+                $q->where('judge_id', $userId);
             });
         }
 
-        $archivedCriteria = $queryArchived->get();
+        $archivedCriteria = $queryArchived
+            ->paginate(10)
+            ->withQueryString();
 
-
-        return Inertia::render('criteria/IndexCriteriaTable', ['criteria' => $scores, 'archivedCriteria' => $archivedCriteria]);
+        return Inertia::render('criteria/IndexCriteriaTable', [
+            'criteria' => $scores,
+            'archivedCriteria' => $archivedCriteria,
+        ]);
     }
 
     public function indexCriteria($contestId, $groupId)

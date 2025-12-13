@@ -48,24 +48,38 @@ export default function IndexTable() {
                             // isPending={pendingEvent}
                             columns={columns}
                             handleArchive={handleArchive}
-                            data={event || []}
+                            data={event.data || []}
                             placeholder="Search events..."
                             searchInput="name"
                             isArchive={archive}
                             handleClick={handleClick}
                             enableArchive={true}
+                            links={event.links}
+                            pagination={{
+                                currentPage: event.current_page,
+                                lastPage: event.last_page,
+                                perPage: event.per_page,
+                                total: event.total,
+                            }}
                         />
                     ) : (
                         <TableAction
                             // isPending={pendingArchived}
                             columns={columnsArchive}
                             handleArchive={handleArchive}
-                            data={archiveEvent || []}
+                            data={archiveEvent.data || []}
                             placeholder="Search archive events..."
                             searchInput="name"
                             isArchive={archive}
                             handleClick={handleClick}
                             enableArchive={true}
+                            links={archiveEvent.links}
+                            pagination={{
+                                currentPage: archiveEvent.current_page,
+                                lastPage: archiveEvent.last_page,
+                                perPage: archiveEvent.per_page,
+                                total: archiveEvent.total,
+                            }}
                         />
                     )}
                 </TabsContent>

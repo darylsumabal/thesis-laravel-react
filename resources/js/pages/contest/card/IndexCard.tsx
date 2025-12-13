@@ -1,7 +1,6 @@
 import { Contests } from '@/api/contest';
 import { Participant, TeamParticipant } from '@/api/result';
 import CardContent from '@/components/card/CardContent';
-import { Toaster } from '@/components/ui/sonner';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import AppLayout from '@/layouts/app-layout';
 import { CONTEST_FIELDS } from '@/lib/constant/contest';

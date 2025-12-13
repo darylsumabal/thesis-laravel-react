@@ -26,7 +26,7 @@ type DialogProps<TSchema extends ZodSchema> = {
     buttonSaveTitle: string;
     schema: z.ZodEffects<z.ZodObject<z.ZodRawShape>> | z.ZodObject<z.ZodRawShape>;
     defaultValues: DefaultValues;
-    fieldNames: Record<string, keyof z.infer<TSchema>>;
+    fieldNames: Record<string, string>;
     mutate?: UseMutateAsyncFunction<AxiosResponse | void, Error, z.infer<TSchema>, unknown>;
     comboboxField?: ComboboxField[];
     open?: boolean;
@@ -144,6 +144,7 @@ const ActionDialog = <TSchema extends ZodSchema>(props: DialogProps<TSchema>) =>
         setIsOpen(open);
         if (!open) {
             form.reset();
+            setIsOpen(false);
             if (handleClose) handleClose();
         }
     };
