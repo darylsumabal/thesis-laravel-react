@@ -68,6 +68,7 @@ export type ScoreTeam = {
 type Judges = {
     id: string;
     name: string;
+    judge_number: string;
     role: string;
 };
 

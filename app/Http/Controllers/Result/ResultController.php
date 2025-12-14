@@ -23,30 +23,11 @@ use Illuminate\Support\Facades\DB;
 
 class ResultController extends Controller
 {
-
-
     public function storeResultMultiple(Request $request, $contestId, $groupId, $resultType)
     {
         // Check finished judges group
         $roundType = $request->input('roundType');
         $prelimScoringType = PrelimScoringMethod::where('group_id', $groupId)->value('preliminary_method');
-
-        // $judgesGroup = JudgesGroup::where('contest_id', $contestId)
-        //     ->where('group_id', $groupId)
-        //     ->whereNotExists(function ($query) use ($contestId, $groupId, $roundType) {
-        //         $query->select(DB::raw(1))
-        //             ->from('judges_groups')
-        //             ->where('contest_id', $contestId)
-        //             ->where('group_id', $groupId)
-        //             ->where('round', $roundType)
-        //             ->where('is_finished', 0)
-        //             ->whereNull('deleted_at');
-        //     })
-        //     ->get();
-
-        // if ($judgesGroup->isEmpty()) {
-        //     return response()->json(['message' => 'No finished judges group'], 400);
-        // }
 
         $participants = Participants::where('contest_id', $contestId)->get();
 
@@ -2035,7 +2016,7 @@ class ResultController extends Controller
             ->distinct()
             ->pluck('judge_id');
 
-      
+
 
         if ($resultType == 'rank_based') {
             foreach ($participants as $participant) {

@@ -18,12 +18,12 @@ const Results = ({ contest, topResult, sortedUniqueJudges, pointBasedFinal }: Re
     const sectionRef = useRef<HTMLDivElement>(null);
     const handlePrint = useReactToPrint({ contentRef: sectionRef });
     // const result =  ;
-    const result = pointBasedFinal ? topResult.slice().reverse() : topResult
+    const result = pointBasedFinal ? topResult.slice().reverse() : topResult;
 
     return (
         <>
             <Button className="mb-4 cursor-pointer" onClick={() => handlePrint()}>
-               PRINT
+                PRINT
             </Button>
             <div ref={sectionRef}>
                 <ResultHeader contest={contest ?? { contest: [], message: '' }} />
@@ -102,7 +102,7 @@ const Results = ({ contest, topResult, sortedUniqueJudges, pointBasedFinal }: Re
                         })}
                     </div>
 
-                    <div>
+                    <div className="w-full">
                         <ResultFooter sortedUniqueJudges={sortedUniqueJudges} />
                     </div>
                 </div>

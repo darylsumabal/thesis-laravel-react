@@ -4,9 +4,7 @@ namespace App\Http\Controllers\Event;
 
 use App\Http\Controllers\Controller;
 use App\Models\Event;
-use App\Models\User;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Storage;
 
 class AddEventController extends Controller
 {
@@ -44,5 +42,5 @@ class AddEventController extends Controller
         return redirect()->back()->with('success', 'Event created successfully');
     }
 
-   
+
 }

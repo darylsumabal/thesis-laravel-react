@@ -17,9 +17,18 @@ export type JudgeScore = {
     total?: number;
 };
 
-const JudgesResultTeam = ({ judgeId, judgeName, judgeRole }: { judgeId: string; judgeName: string; judgeRole: string }) => {
+const JudgesResultTeam = ({
+    judgeId,
+    judgeName,
+    judgeRole,
+    judgeNumber,
+}: {
+    judgeId: string;
+    judgeName: string;
+    judgeRole: string;
+    judgeNumber: string;
+}) => {
     const { qualified, judgeData, auth } = usePage<PROPS>().props;
-
 
     const filteredJudgeData = judgeData.map((item) => {
         return {
@@ -156,15 +165,17 @@ const JudgesResultTeam = ({ judgeId, judgeName, judgeRole }: { judgeId: string; 
             <div>
                 <div className="mt-10 flex flex-wrap justify-center gap-10">
                     <div className="w-72 text-center">
-                        <div className='uppercase'>{judgeName}</div>
+                        <div className="uppercase">{judgeName}</div>
                         <hr className="h-[2px] bg-slate-950" />
-                        <div className="text-xs">{judgeRole}</div>
+                        <div className="text-xs">
+                            {judgeRole} {judgeNumber}
+                        </div>
                     </div>
                 </div>
 
                 <div className="mt-10 flex flex-wrap justify-center gap-10">
                     <div className="w-72 text-center">
-                        <div className='uppercase'>{auth.user.name}</div>
+                        <div className="uppercase">{auth.user.name}</div>
                         <hr className="h-[2px] bg-slate-950" />
                         <div className="text-xs">Tabulator</div>
                     </div>

@@ -23,43 +23,6 @@ use Inertia\Inertia;
 
 class JudgingController extends Controller
 {
-    public function indexParticipant($contestId)
-    {
-        $participants = Participants::where('contest_id', $contestId)->get();
-
-        return response()->json(['participants' => $participants], 200);
-    }
-
-    public function indexParticipantTeam($contestId)
-    {
-        $participants = TeamParticipants::where('contest_id', $contestId)->get();
-
-        return response()->json(['participants' => $participants], 200);
-    }
-
-    public function indexJudgesFinished($contestId, $groupId)
-    {
-        $judgesGroup = JudgesGroup::with('Judges')
-            ->where('contest_id', $contestId)
-            ->where('group_id', $groupId)
-            ->get()
-            ->groupBy('round');
-
-        $result = $judgesGroup->mapWithKeys(function ($judges, $round) {
-            $unfinished = $judges->where('is_finished', 0)->count();
-
-            return [
-                strtolower($round) => [
-                    'is_finished' => $unfinished === 0,
-                    'judge_group' => $judges,
-                ]
-            ];
-        });
-
-        return response()->json([
-            'rounds' => $result
-        ]);
-    }
 
     public function updateFinishedUpdate(Request $request, $contestId, $groupId, $judgeId)
     {
@@ -110,101 +73,6 @@ class JudgingController extends Controller
         return redirect()->back()->with('success', 'Judge can now edit score');
     }
 
-    public function indexJudgesFinishedMultiple($contestId, $groupId)
-    {
-
-        $judges = JudgesGroup::with('Judges')
-            ->where('contest_id', $contestId)
-            ->where('group_id', $groupId)
-            ->get();
-
-        // Group judges by round and format response
-        $groupedByRound = $judges->groupBy('round')->map(function ($items, $round) {
-            $isRoundFinished = $items->every(function ($item) {
-                return $item->is_finished == 1;
-            });
-
-            return [
-                'round' => $round,
-                'isRoundFinished' => $isRoundFinished,
-                'judge_group' => $items->map(function ($item) {
-                    return [
-                        'id' => $item->id,
-                        'judge' => $item->Judges,
-                        'isJudgeFinished' => $item->is_finished == 1,
-                        'round' => $item->round,
-                    ];
-                }),
-            ];
-        })->values();
-
-        return response()->json([
-            'rounds' => $groupedByRound
-        ]);
-    }
-
-
-    public function storeTest(Request $request, $judgeId, $contestId, $groupId, $roundType)
-    {
-        $criteria = $request->input('criteria_value');
-
-        try {
-            JudgesGroup::where('judges_id', $judgeId)->where('contest_id', $contestId)->where('group_id', $groupId)->where('round', $roundType)->where('criteria', $criteria)->update(['is_finished' => 1]);
-
-            $request->validate([
-                'criteria.*.contest_id' => 'required|integer',
-                'criteria.*.evaluation_criteria' => 'required|string',
-                'criteria.*.group_id' => 'required|string',
-                'criteria.*.round' => 'required|string',
-                'criteria.*.judges_id' => 'required|integer',
-                'criteria.*.score' => 'required|numeric',
-                'criteria.*.participant_id' => 'required|integer',
-                'criteria.*.participant_type' => 'required|string',
-                'criteria.*.criteria' => 'required|string'
-            ]);
-
-            $createdScores = collect($request->input('criteria'))->map(function ($score) {
-                $typeMap = [
-                    'individual' => Participants::class,
-                    'team' => TeamParticipants::class,
-                ];
-
-                $score['participant_type'] = $typeMap[$score['participant_type']] ?? null;
-
-                $score['created_at'] = now();
-                $score['updated_at'] = now();
-                return $score;
-            })->toArray();
-
-            foreach ($createdScores as $score) {
-                JudgingScore::updateOrCreate(
-                    [
-                        'contest_id' => $score['contest_id'],
-                        'group_id' => $score['group_id'],
-                        'round' => $score['round'],
-                        'judges_id' => $score['judges_id'],
-                        'participant_id' => $score['participant_id'],
-                        'criteria' => $score['criteria'],
-                        'evaluation_criteria' => $score['evaluation_criteria'],
-                    ],
-                    [
-                        'score' => $score['score'],
-                        'participant_type' => $score['participant_type'],
-                        'updated_at' => now(),
-                        'created_at' => now(),
-                    ]
-                );
-            }
-
-            return response()->json(['message' => 'Score submitted successfully', 'judging_scores' => $createdScores], 201);
-        } catch (\Exception $e) {
-            return response()->json([
-                'error' => $e->getMessage(),
-                'message' => 'Failed to create judging scores'
-            ], 500);
-        }
-    }
-
     public function storeJudge(Request $request)
     {
         $validate = $request->validate(
@@ -212,6 +80,7 @@ class JudgingController extends Controller
                 'name' => 'string|required',
                 'email' => 'string|email',
                 'accountType' => 'string|required',
+                'judgeNumber'=>'string|required',
                 'password' => [
                     'required',
                     'confirmed',
@@ -234,6 +103,7 @@ class JudgingController extends Controller
             'name' => $validate['name'],
             'email' => $validate['email'],
             'role' => $validate['panelRole'],
+            'judge_number'=>$validate['judgeNumber'],
             'accountType' =>  $validate['accountType'],
             'password' => bcrypt($validate['password']),
             'contest_id' => $validate['contest_id'],
@@ -241,50 +111,6 @@ class JudgingController extends Controller
 
 
         return redirect()->back()->with('success', 'Account created');
-    }
-
-
-    public function indexActivityLog($groupId)
-    {
-        $logs = ActivityLog::latest()->get();
-
-        $filteredLogs = $logs->map(function ($log) use ($groupId) {
-            $modelClass = $log->model;
-
-            if (!class_exists($modelClass)) {
-                return null;
-            }
-
-            $model = $modelClass::find($log->model_id);
-
-            if (!$model || !isset($model->group_id) || $model->group_id != $groupId) {
-                return null;
-            }
-
-            // Get the judge data based on judges_id (assuming Judge model exists)
-            $judge = null;
-            if (isset($model->judges_id)) {
-                $judge = User::find($model->judges_id);
-            }
-            $participant = isset($model->participant_id) ? Participants::find($model->participant_id) : null;
-            return [
-                'id' => $log->id,
-                'user_id' => $log->user_id,
-                'action' => $log->action,
-                'ip_address' => $log->ip_address,
-                'created_at' => $log->created_at,
-                'updated_at' => $log->updated_at,
-                'changes' => $log->changes,
-                'model' => class_basename($modelClass),
-                'model_data' => $model,
-                'judge' => $judge, // 👈 Added judge info here
-                'participant' => $participant,
-            ];
-        })->filter()->values();
-
-        return response()->json([
-            'activity' => $filteredLogs,
-        ]);
     }
 
     public function indexCriteria($contestId, $groupId)

@@ -8,7 +8,6 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '
 import { Input } from '@/components/ui/input';
 import MultipleSelector, { Option } from '@/components/ui/multi-select';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import { Toaster } from '@/components/ui/sonner';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import AppLayout from '@/layouts/app-layout';
 import { cn } from '@/lib/utils';
@@ -69,7 +68,7 @@ type PROPS = {
 
 export default function CreateCriteria() {
     const { judgesCategory, judges, participants, roundType, contestId } = usePage<PROPS>().props;
-
+    console.log(judgesCategory);
     const isSingleRound = roundType?.includes('sr');
     const isMultipleRound = roundType?.includes('mr');
     const [loading, setLoading] = useState<boolean>(false);
@@ -197,6 +196,7 @@ export default function CreateCriteria() {
             id: item.id,
             value: item.name,
             label: item.name,
+            number: item.judge_number,
             role: item.role,
             contest: item.contest?.contest_name,
         }));
@@ -211,6 +211,7 @@ export default function CreateCriteria() {
             id: item.id,
             value: item.name,
             label: item.name,
+            number: item.judge_number,
             role: item.role,
             contest: item.contest?.contest_name,
         }));

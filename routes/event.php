@@ -14,7 +14,7 @@ Route::prefix('event')->group(function () {
     // Route::get('/organizer/{organizerId}/{eventId}', [UpcomingEventController::class, 'indexOrganizer']);
 
 
-    Route::get('/', [EventController::class, 'index']);
+    // Route::get('/', [EventController::class, 'index']);
 
     //event list table
     Route::get('/event-list', [EventController::class, 'indexOrganizerTable']);
@@ -50,11 +50,9 @@ Route::prefix('event')->group(function () {
     //delete event
     Route::delete('/{id}', [EventController::class, 'destroy']);
 
+    // Route::get('/judge/{judgeId}/{eventId}', [UpcomingEventController::class, 'indexJudges']);
 
-
-    Route::get('/judge/{judgeId}/{eventId}', [UpcomingEventController::class, 'indexJudges']);
-
-    Route::get('/judge/{judgeId}', [UpcomingEventController::class, 'indexJudges']);
+    // Route::get('/judge/{judgeId}', [UpcomingEventController::class, 'indexJudges']);
 
     Route::post('/', [AddEventController::class, 'store']);
 
@@ -64,8 +62,8 @@ Route::prefix('event')->group(function () {
         'storePoster'
     ]);
 
-    Route::get('/event-list/{eventId}/contest/{contestId}/poster', [
-        UpcomingEventController::class,
-        'poster'
-    ]);
+    // Route::get('/event-list/{eventId}/contest/{contestId}/poster', [
+    //     UpcomingEventController::class,
+    //     'poster'
+    // ]);
 });

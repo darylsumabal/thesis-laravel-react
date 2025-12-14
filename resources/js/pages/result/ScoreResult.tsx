@@ -80,8 +80,18 @@ export default function ScoreResult() {
             ...j,
             judgeIndex: index + 1, // 1-based index
         }))
-        // Then sort by that assigned index
-        ?.sort((a, b) => a.judgeIndex - b.judgeIndex);
+        ?.sort((a, b) => {
+            const numA = parseInt(a.judges.judge_number);
+            const numB = parseInt(b.judges.judge_number);
+
+            if (isNaN(numA) && isNaN(numB)) return 0;
+            if (isNaN(numA)) return 1;
+            if (isNaN(numB)) return -1;
+
+            return numA - numB;
+        });
+    // Then sort by that assigned index
+    // ?.sort((a, b) => a.judgeIndex - b.judgeIndex);
 
     const data: JudgeScore[] = result?.flatMap((r) => r.judges_score) ?? [];
 
@@ -487,7 +497,7 @@ export default function ScoreResult() {
                                         </div>
                                     ))}
                                 </div>
-                                <div>
+                                <div className="w-full">
                                     <ResultFooter sortedUniqueJudges={sortedUniqueJudges ?? []} />
                                 </div>
                             </div>
@@ -517,7 +527,12 @@ export default function ScoreResult() {
                     <div className="space-y-10" ref={sectionRef}>
                         <ResultHeader contest={contest ?? { contest: [], message: '' }} />
                         <h2 className="text-center text-4xl">{i.judges?.name}</h2>
-                        <JudgesResult judgeId={i.judges.id} judgeName={i.judges.name} judgeRole={i.judges?.role} />
+                        <JudgesResult
+                            judgeId={i.judges.id}
+                            judgeName={i.judges.name}
+                            judgeRole={i.judges?.role}
+                            judgeNumber={i.judges?.judge_number}
+                        />
                     </div>
                 </TabsContent>
             ))}

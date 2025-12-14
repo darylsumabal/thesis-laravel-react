@@ -8,6 +8,7 @@ export type Scoring = {
 export type JudgesData = {
     id: string;
     name: string;
+    judge_number: string;
     role: string;
     contest: {
         contest_name: string;

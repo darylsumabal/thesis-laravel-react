@@ -17,14 +17,16 @@ type JudgeData = {
     judge: {
         id: number;
         name: string;
+        judge_number: string;
     };
-    scores: Record<string, boolean>; // ✅ if it's just Finished/Unfinished
+    scores: Record<string, JudgeItem>; // ✅ if it's just Finished/Unfinished
 };
 
 type JudgeItem = {
-    judges: { id: number; name: string };
+    judges: { id: number; name: string; judge_number: string };
     criteria: string;
     is_finished: boolean;
+    can_edit: boolean | number;
 };
 
 export type PROPS = {
@@ -75,12 +77,12 @@ export default function Judges() {
     });
 
     const judgesData = rounds?.preliminary?.judge_group.sort((a, b) => {
-        const numA = parseInt(a.judges.name.replace(/\D/g, '')) || 0;
-        const numB = parseInt(b.judges.name.replace(/\D/g, '')) || 0;
-        return numA - numB;
+        const judgeNumA = parseInt(a.judges.judge_number) || 999;
+        const judgeNumB = parseInt(b.judges.judge_number) || 999;
+        return judgeNumA - judgeNumB;
     });
 
-    const inertiaPost = (url, data = {}) =>
+    const inertiaPost = (url: string, data = {}) =>
         new Promise((resolve, reject) => {
             router.post(url, data, {
                 preserveScroll: true,
@@ -90,9 +92,9 @@ export default function Judges() {
         });
 
     const judgesDataFinal = rounds?.final?.judge_group.sort((a, b) => {
-        const numA = parseInt(a.judges.name.replace(/\D/g, '')) || 0;
-        const numB = parseInt(b.judges.name.replace(/\D/g, '')) || 0;
-        return numA - numB;
+        const judgeNumA = parseInt(a.judges.judge_number) || 999;
+        const judgeNumB = parseInt(b.judges.judge_number) || 999;
+        return judgeNumA - judgeNumB;
     });
 
     const handleTabulate = () => {
@@ -152,6 +154,25 @@ export default function Judges() {
         },
         { preliminary: [] },
     );
+    const sortedPreliminaryJudges = Object.values(
+        grouped?.preliminary?.reduce<Record<number, JudgeData>>((acc, item) => {
+            const judgeId = item.judges.id;
+            if (!acc[judgeId]) {
+                acc[judgeId] = { judge: item.judges, scores: {} };
+            }
+            acc[judgeId].scores[item.criteria] = {
+                judges: item.judges,
+                criteria: item.criteria,
+                is_finished: item.is_finished,
+                can_edit: item.can_edit,
+            };
+            return acc;
+        }, {}) || {},
+    ).sort((a, b) => {
+        const judgeNumA = parseInt(a.judge.judge_number) || 999;
+        const judgeNumB = parseInt(b.judge.judge_number) || 999;
+        return judgeNumA - judgeNumB;
+    });
 
     const groupedFinal = judgesDataFinal?.reduce<{ final: JudgeItem[] }>(
         (acc, item) => {
@@ -160,6 +181,27 @@ export default function Judges() {
         },
         { final: [] },
     );
+
+    const sortedFinalJudges = Object.values(
+        groupedFinal?.final?.reduce<Record<number, JudgeData>>((acc, item) => {
+            const judgeId = item.judges.id;
+            if (!acc[judgeId]) {
+                acc[judgeId] = { judge: item.judges, scores: {} };
+            }
+            acc[judgeId].scores[item.criteria] = {
+                judges: item.judges,
+                criteria: item.criteria,
+                is_finished: item.is_finished,
+                can_edit: item.can_edit,
+            };
+            return acc;
+        }, {}) || {},
+    ).sort((a, b) => {
+        const judgeNumA = parseInt(a.judge.judge_number) || 999;
+        const judgeNumB = parseInt(b.judge.judge_number) || 999;
+        return judgeNumA - judgeNumB;
+    });
+
     const [loadingButton, setLoadingButton] = useState<string | null>(null);
 
     const handleEnabled = (judgeId: number, criteria: string) => {
@@ -199,35 +241,27 @@ export default function Judges() {
                     <h3 className="text-md mb-2 font-semibold uppercase">{scoringType === 'mr' && 'Preliminary Round Judges'}</h3>
                     <Table>
                         <TableHeader>
-                            <TableRow>
-                                <TableHead>JUDGE</TableHead>
+                            <TableRow className="border-t uppercase">
+                                <TableHead>JUDGES</TableHead>
                                 {grouped?.preliminary
                                     ?.map((i) => i.criteria)
                                     .filter((v, i, a) => a.indexOf(v) === i)
                                     .map((criteria, index) => (
-                                        <TableHead className="uppercase" key={index}>
-                                            {criteria}
-                                        </TableHead>
+                                        <>
+                                            <TableHead className="e" key={index}>
+                                                {criteria}
+                                            </TableHead>
+                                        </>
                                     ))}
+                                <TableHead className="w-1/12">ACTION</TableHead>
                             </TableRow>
                         </TableHeader>
                         <TableBody className="border-b">
-                            {Object.values(
-                                grouped?.preliminary?.reduce<Record<number, JudgeData>>((acc, item) => {
-                                    const judgeId = item.judges.id;
-
-                                    if (!acc[judgeId]) {
-                                        acc[judgeId] = { judge: item.judges, scores: {} };
-                                    }
-                                    acc[judgeId].scores[item.criteria] = {
-                                        is_finished: item.is_finished,
-                                        can_edit: item.can_edit, // ✅ store can_edit here
-                                    };
-                                    return acc;
-                                }, {}) || {},
-                            ).map((judgeData) => (
+                            {sortedPreliminaryJudges.map((judgeData) => (
                                 <TableRow key={judgeData.judge.id}>
-                                    <TableCell className="uppercase">{judgeData.judge.name}</TableCell>
+                                    <TableCell className="uppercase">
+                                        {judgeData.judge.name} {judgeData.judge.judge_number}
+                                    </TableCell>
                                     {grouped?.preliminary
                                         ?.map((i) => i.criteria)
                                         .filter((v, i, a) => a.indexOf(v) === i)
@@ -236,10 +270,13 @@ export default function Judges() {
                                             const isThisButtonLoading = loadingButton === buttonId;
                                             const scoreData = judgeData.scores[criteria];
                                             return (
-                                                <TableCell key={index}>
-                                                    <div className="flex items-center justify-between uppercase">
-                                                        <p>{scoreData?.is_finished ? 'Submitted' : 'Pending'}</p>
-
+                                                <>
+                                                    <TableCell key={index}>
+                                                        <div className="flex items-center justify-between uppercase">
+                                                            <p>{scoreData?.is_finished ? 'Submitted' : 'Pending'}</p>
+                                                        </div>
+                                                    </TableCell>
+                                                    <TableCell>
                                                         <Button
                                                             className={`relative cursor-pointer ${
                                                                 scoreData?.is_finished ? 'border-l bg-emerald-600' : 'bg-destructive border-l'
@@ -248,18 +285,15 @@ export default function Judges() {
                                                             disabled={!scoreData?.is_finished}
                                                         >
                                                             {isThisButtonLoading && <Loader2 className="animate-spin" />}
-                                                            {/* <Badge className="absolute -top-2.5 -right-2.5 min-w-5 px-1" variant="default">
-                                                                <NotebookPen />
-                                                            </Badge> */}
                                                             {scoreData?.can_edit === 1 && (
-                                                                <Badge className="absolute -top-2.5 -right-2.5 min-w-5 px-1 bg-[#45226b]" >
+                                                                <Badge className="absolute -top-2.5 -right-2.5 min-w-5 bg-[#45226b] px-1">
                                                                     <NotebookPen color="white" />
                                                                 </Badge>
                                                             )}
                                                             ENABLED
                                                         </Button>
-                                                    </div>
-                                                </TableCell>
+                                                    </TableCell>
+                                                </>
                                             );
                                         })}
                                 </TableRow>
@@ -277,33 +311,17 @@ export default function Judges() {
                         <h3 className="text-md mb-2 font-semibold uppercase">Final Round Judges</h3>
                         <Table>
                             <TableHeader>
-                                <TableRow>
+                                <TableRow className="border-t uppercase">
                                     <TableHead>JUDGE</TableHead>
                                     {groupedFinal?.final
                                         ?.map((i) => i.criteria)
                                         .filter((v, i, a) => a.indexOf(v) === i) // unique criteria
-                                        .map((criteria, index) => (
-                                            <TableHead className="uppercase" key={index}>
-                                                {criteria}
-                                            </TableHead>
-                                        ))}
+                                        .map((criteria, index) => <TableHead key={index}>{criteria}</TableHead>)}
+                                    <TableHead className="w-1/12">ACTION</TableHead>
                                 </TableRow>
                             </TableHeader>
                             <TableBody className="border-b">
-                                {Object.values(
-                                    groupedFinal?.final?.reduce<Record<number, JudgeData>>((acc, item) => {
-                                        const judgeId = item.judges.id;
-                                        if (!acc[judgeId]) {
-                                            acc[judgeId] = { judge: item.judges, scores: {} };
-                                        }
-                                        // acc[judgeId].scores[item.criteria] = item.is_finished;
-                                        acc[judgeId].scores[item.criteria] = {
-                                            is_finished: item.is_finished,
-                                            can_edit: item.can_edit, // ✅ store can_edit here
-                                        };
-                                        return acc;
-                                    }, {}) || {},
-                                ).map((judgeData) => (
+                                {sortedFinalJudges.map((judgeData) => (
                                     <TableRow key={judgeData.judge.id}>
                                         <TableCell className="uppercase">{judgeData.judge.name}</TableCell>
                                         {groupedFinal?.final
@@ -314,9 +332,13 @@ export default function Judges() {
                                                 const isThisButtonLoading = loadingButton === buttonId;
                                                 const scoreData = judgeData.scores[criteria];
                                                 return (
-                                                    <TableCell key={index}>
-                                                        <div className="flex items-center justify-between uppercase">
-                                                            <p>{scoreData?.is_finished ? 'Submitted' : 'Pending'}</p>
+                                                    <>
+                                                        <TableCell key={index}>
+                                                            <div className="flex items-center justify-between uppercase">
+                                                                <p>{scoreData?.is_finished ? 'Submitted' : 'Pending'}</p>
+                                                            </div>
+                                                        </TableCell>
+                                                        <TableCell>
                                                             <Button
                                                                 className={`relative cursor-pointer ${
                                                                     scoreData?.is_finished ? 'border-l bg-emerald-600' : 'bg-destructive border-l'
@@ -327,18 +349,15 @@ export default function Judges() {
                                                                 {isThisButtonLoading && <Loader2 className="animate-spin" />}
                                                                 {scoreData?.can_edit === 1 && (
                                                                     <Badge className="absolute -top-2.5 -right-2.5 min-w-5 px-1" variant="default">
-                                                                        <Badge
-                                                                            className="absolute -top-2.5 -right-2.5 min-w-5 px-1 bg-[#45226b]"
-
-                                                                        >
+                                                                        <Badge className="absolute -top-2.5 -right-2.5 min-w-5 bg-[#45226b] px-1">
                                                                             <NotebookPen color="white" />
                                                                         </Badge>
                                                                     </Badge>
                                                                 )}
                                                                 ENABLED
                                                             </Button>
-                                                        </div>
-                                                    </TableCell>
+                                                        </TableCell>
+                                                    </>
                                                 );
                                             })}
                                     </TableRow>

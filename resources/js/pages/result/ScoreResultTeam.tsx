@@ -7,7 +7,7 @@ import ResultFooter from '@/components/result/ResultFooter';
 import ResultHeader from '@/components/result/ResultHeader';
 import ResultsTeam from '@/components/result/ResultTeam';
 import ResultsTeamSingleRound from '@/components/result/ResultTeamSingleRound';
-import ScoreTableTeam from '@/components/score/ScoreTableTeam';
+import ScoreTableTeam, { TeamParticipantScore } from '@/components/score/ScoreTableTeam';
 import TableRankedFinalTeam, { JudgeScoreTest } from '@/components/table/TableRankedFinalTeam';
 import TableResultTypeTeamMultiple from '@/components/table/TableResultMultipleTeam';
 import { JudgeScoreTeam, MajorAward } from '@/components/table/TableResultTestTeam';
@@ -71,8 +71,18 @@ export default function ScoreResultTeam() {
             ...j,
             judgeIndex: index + 1, // 1-based index
         }))
-        // Sort by judge number, non-numbered roles go to the end
-        ?.sort((a, b) => a.judgeIndex - b.judgeIndex);
+        ?.sort((a, b) => {
+            const numA = parseInt(a.judges.judge_number);
+            const numB = parseInt(b.judges.judge_number);
+
+            if (isNaN(numA) && isNaN(numB)) return 0;
+            if (isNaN(numA)) return 1;
+            if (isNaN(numB)) return -1;
+
+            return numA - numB;
+        });
+    // Sort by judge number, non-numbered roles go to the end
+    // ?.sort((a, b) => a.judgeIndex - b.judgeIndex);
 
     const data: JudgeScoreTeam[] = result?.flatMap((r) => r.judges_score) ?? [];
 
@@ -364,7 +374,7 @@ export default function ScoreResultTeam() {
                                         </div>
                                     ))}
                                 </div>
-                                <div>
+                                <div className="w-full">
                                     <ResultFooter sortedUniqueJudges={sortedUniqueJudges ?? []} />
                                 </div>
                             </div>
@@ -395,7 +405,12 @@ export default function ScoreResultTeam() {
                     <div className="space-y-10" ref={sectionRef}>
                         <ResultHeader contest={contest ?? { contest: [], message: '' }} />
                         <h2 className="text-center text-4xl">{i.judges?.name}</h2>
-                        <JudgesResultTeam judgeId={i.judges.id} judgeName={i.judges.name} judgeRole={i.judges?.role} />
+                        <JudgesResultTeam
+                            judgeId={i.judges.id}
+                            judgeName={i.judges.name}
+                            judgeRole={i.judges?.role}
+                            judgeNumber={i.judges?.judge_number}
+                        />
                     </div>
                 </TabsContent>
             ))}

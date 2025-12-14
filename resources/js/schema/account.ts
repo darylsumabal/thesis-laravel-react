@@ -12,6 +12,7 @@ export const addAccountSchema = z
         panelRole: z.string().min(1, {
             message: 'Please select a panel',
         }),
+        judgeNumber: z.string().optional(),
         email: z.string().email().min(1, {
             message: 'Please enter a valid email address',
         }),

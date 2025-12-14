@@ -20,7 +20,17 @@ export type PROPS = {
     judgeData: JudgeScore[];
 };
 
-const JudgesResult = ({ judgeId, judgeName, judgeRole }: { judgeId: string; judgeName: string; judgeRole: string }) => {
+const JudgesResult = ({
+    judgeId,
+    judgeName,
+    judgeRole,
+    judgeNumber,
+}: {
+    judgeId: string;
+    judgeName: string;
+    judgeRole: string;
+    judgeNumber: string;
+}) => {
     const { qualified, judgeData, auth } = usePage<PROPS>().props;
 
     const filteredJudgeData = judgeData.map((item) => {
@@ -269,7 +279,9 @@ const JudgesResult = ({ judgeId, judgeName, judgeRole }: { judgeId: string; judg
                     <div className="w-72 text-center">
                         <div className="uppercase">{judgeName}</div>
                         <hr className="h-[2px] bg-slate-950" />
-                        <div className="text-xs">{judgeRole}</div>
+                        <div className="text-xs">
+                            {judgeRole} {judgeNumber}
+                        </div>
                     </div>
                 </div>
 

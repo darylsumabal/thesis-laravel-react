@@ -12,25 +12,6 @@ use Inertia\Inertia;
 
 class EventController extends Controller
 {
-    public function index()
-    {
-        $organizerId = auth()->id();
-
-        // $query = Event::where('organizer_id', $organizerId)->where('is_archived', 0);
-
-
-
-        // if ($eventId) {
-        //     $query->where('id', $eventId);
-        // }
-
-        // $events = $query->get();
-
-        // Render Inertia page
-        // return Inertia::render('event/Index', [
-        //     'organizerId' => $organizerId,
-        // ]);
-    }
 
     public function indexOrganizerTable()
     {

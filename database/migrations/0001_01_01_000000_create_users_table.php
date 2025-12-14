@@ -18,6 +18,7 @@ return new class extends Migration
             $table->timestamp('email_verified_at')->nullable();
             $table->string('accountType')->nullable();
             $table->string('role')->nullable();
+            $table->string('judge_number')->nullable();
             $table->string('password');
             $table->rememberToken();
             $table->timestamps();

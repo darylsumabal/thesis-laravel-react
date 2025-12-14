@@ -5,6 +5,7 @@ export type JudgeScoreTest = {
     score: string;
     total: number;
     participant_no: string;
+    team_participant_no:string
     participant_id: number;
     participant_gender: string;
     total_score: string;

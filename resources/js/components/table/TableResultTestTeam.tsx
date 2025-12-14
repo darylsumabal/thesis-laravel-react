@@ -13,6 +13,7 @@ export type JudgeScoreTeam = {
     evaluation_criteria?: string;
     total_score: string;
     score: string;
+
     scores: [
         {
             id: string;

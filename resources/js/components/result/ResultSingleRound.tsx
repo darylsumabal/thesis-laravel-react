@@ -1,6 +1,6 @@
 import { Contest } from '@/api/contest';
 import { JudgesGroup } from '@/api/result';
-import { router, usePage } from '@inertiajs/react';
+import { usePage } from '@inertiajs/react';
 import { useRef } from 'react';
 import { useReactToPrint } from 'react-to-print';
 import { Button } from '../ui/button';
@@ -108,7 +108,7 @@ const ResultSingleRound = ({
                         })}
                     </div>
 
-                    <div>
+                    <div className="w-full">
                         <ResultFooter sortedUniqueJudges={sortedUniqueJudges} />
                     </div>
                 </div>

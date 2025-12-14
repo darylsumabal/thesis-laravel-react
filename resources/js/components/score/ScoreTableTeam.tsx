@@ -5,6 +5,7 @@ import { usePage } from '@inertiajs/react';
 export type TeamParticipantScore = {
     participant_id: number;
     participant_no: string;
+
     total?: number;
     final_rank: string;
     scores: {

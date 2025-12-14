@@ -79,7 +79,7 @@ const ResultsTeam = ({ contest, topResult, sortedUniqueJudges }: ResultProps) =>
                         })}
                     </div>
 
-                    <div>
+                    <div className="w-full">
                         <ResultFooter sortedUniqueJudges={sortedUniqueJudges} />
                     </div>
                 </div>

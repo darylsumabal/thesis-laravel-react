@@ -464,7 +464,7 @@ const MultipleSelector = ({
                 data-fixed={option.fixed}
                 data-disabled={disabled || undefined}
               >
-               {option.role} {option.label}
+               {option.role} {option.number} {option.label}
                 <button
                   className='text-muted-foreground/80 hover:text-foreground focus-visible:border-ring focus-visible:ring-ring/50 absolute -inset-y-px -right-px flex size-7 items-center justify-center rounded-r-md border border-transparent p-0 outline-hidden transition-[color,box-shadow] outline-none focus-visible:ring-[3px]'
                   onKeyDown={e => {
@@ -601,7 +601,7 @@ const MultipleSelector = ({
                                 option.disable && 'pointer-events-none cursor-not-allowed opacity-50'
                               )}
                             >
-                            {option.role}  {option.label}
+                            {option.role} {option.number} {option.label}
                             </CommandItem>
                           )
                         })}

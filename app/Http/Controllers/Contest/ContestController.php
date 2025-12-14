@@ -6,19 +6,13 @@ use App\Http\Controllers\Controller;
 use App\Imports\Participant;
 use App\Imports\TeamParticipant;
 use App\Models\Contest;
-use App\Models\ContestJudges;
 use App\Models\Participants;
 use App\Models\TeamParticipants;
 use App\Traits\HasParticipants;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
-// use Maatwebsite\Excel\Excel;
 use Maatwebsite\Excel\Facades\Excel;
-// use App\Imports\Participant as ImportParticipant;
-// use App\Imports\TeamParticipant as ImportTeamParticipant;
 use App\Models\ContestParticipantPoster;
-use App\Models\Event;
-use App\Models\User;
 use Inertia\Inertia;
 
 class ContestController extends Controller
@@ -26,42 +20,6 @@ class ContestController extends Controller
 
     use HasParticipants;
 
-    public function index()
-    {
-        $contest = Contest::with('event')->get();
-
-        if ($contest->isEmpty()) {
-            return response()->json([
-                'contest' => [],
-                'message' => 'No contest currently!'
-            ], 200);
-        }
-
-        return response()->json(['contest' => $contest], 200);
-    }
-
-    public function indexContestEvent($organizerId, $eventId)
-    {
-        $event = Event::where('organizer_id', $organizerId)->where('id', $eventId);
-
-        return response()->json(['contest' => $event]);
-    }
-
-    public function indexContestTable($eventId)
-    {
-
-        $organizerId = auth()->id();
-
-        $query = Contest::where('organizer_id', $organizerId)->where('event_id', $eventId)->where('is_archived', 0)->with('event');
-
-        $contest = $query->get();
-
-        if ($contest->isEmpty()) {
-            return response()->json(['events' => [], 'message' => 'No contest currently!'], 200);
-        }
-
-        return response()->json(['contest' => $contest], 200);
-    }
 
     public function indexContest($eventId, $contestId)
     {
@@ -82,18 +40,6 @@ class ContestController extends Controller
         ]);
     }
 
-    public function indexArchivedContest($organizerId, $eventId)
-    {
-
-
-
-        if ($contest->isEmpty()) {
-            return response()->json(['events' => [], 'message' => 'No contest currently!'], 200);
-        }
-
-        return response()->json(['contest' => $contest], 200);
-    }
-
 
     public function archivedContest($contestId)
     {
@@ -111,42 +57,6 @@ class ContestController extends Controller
         ]);
 
         return redirect()->back()->with('success', 'Contest archived restore successfully');
-    }
-
-
-    public function indexContestJudges($judgeId, $contestId = null)
-    {
-        $query = ContestJudges::where('judge_id', $judgeId)->with('contest.event');
-
-        if ($contestId) {
-            $query->where('contest_id', $contestId);
-        }
-
-        $contestJudges = $query->get();
-
-        if ($contestJudges->isEmpty()) {
-            return response()->json(['events' => [], 'message' => 'No contest currently!'], 200);
-        }
-
-        $contests = $contestJudges->map((function ($contestJudge) {
-            $contest = $contestJudge->contest;
-            return $contest;
-        }));
-
-        return response()->json(['contest' => $contests], 200);
-    }
-
-    public function indexJudges()
-    {
-        $judges = User::with('contest')->where('accountType', 'JUDGE')->get();
-
-        return response()->json(['judges' => $judges], 200);
-    }
-    public function indexCategoryJudges($contestId)
-    {
-        $judges = User::with('contest')->where('accountType', 'JUDGE')->where('contest_id', $contestId)->get();
-
-        return response()->json(['judges' => $judges], 200);
     }
 
     public function destroyParticipant($contestId, string $id)
@@ -196,31 +106,6 @@ class ContestController extends Controller
         }
     }
 
-
-    public function indexParticipant($contestId, $participantId)
-    {
-        // ParticipantRequest $request,
-        try {
-            $participant = Participants::where('contest_id', $contestId)->where('id', $participantId)->get();
-
-            return response()->json(['message' => 'Participant', 'participant' => $participant], 201);
-        } catch (\Exception  $e) {
-            return response()->json(['error' => $e->getMessage()], 409);
-        }
-    }
-
-    public function indexTeamParticipant($contestId, $participantId)
-    {
-        // ParticipantRequest $request,
-        try {
-            $participant = TeamParticipants::where('contest_id', $contestId)->where('id', $participantId)->get();
-
-            return response()->json(['message' => 'Participant', 'participant' => $participant], 201);
-        } catch (\Exception  $e) {
-            return response()->json(['error' => $e->getMessage()], 409);
-        }
-    }
-
     public function storeParticipant(Request $request, $contestId)
     {
         try {
@@ -239,7 +124,7 @@ class ContestController extends Controller
             // Check if participant already exists
             $existingParticipant = Participants::where('contest_id', $contest->id)
                 ->where('participant_no', $validated['participant_no'])
-                ->where('gender',$validated['gender'])
+                ->where('gender', $validated['gender'])
                 ->first();
 
             if ($existingParticipant) {
@@ -256,7 +141,7 @@ class ContestController extends Controller
             }
 
             // Create participant
-            $participant = Participants::create([
+            Participants::create([
                 'contest_id' => $contest->id,
                 'participant_no' => $validated['participant_no'],
                 'first_name' => $validated['first_name'],
@@ -267,9 +152,8 @@ class ContestController extends Controller
                 'poster_url' => $posterPath,
             ]);
 
-            return response()->json([
-                'message' => 'Participant created successfully',
-                'participant' => $participant,
+            return redirect()->back()->with([
+                'success' => 'Participant created successfully',
             ], 201);
         } catch (\Exception $e) {
             return response()->json(['error' => $e->getMessage()], 500);
@@ -299,16 +183,13 @@ class ContestController extends Controller
             ]);
 
             // ✅ Check if team_participant_no is already used by another team
-            $duplicate = Participants::where('contest_id', $contest->id)
+            $existingParticipant = Participants::where('contest_id', $contest->id)
                 ->where('participant_no', $validated['participant_no'])
-                ->where('id', '!=', $participantId)
                 ->where('gender', $validated['gender'])
-                ->exists();
+                ->first();
 
-            if ($duplicate) {
-                return response()->json([
-                    'message' => 'Another participant with this participant number already exists.',
-                ], 409);
+            if ($existingParticipant) {
+                return redirect()->back()->withErrors('A participant with this number already exists in this contest.');
             }
 
             // ✅ Handle poster upload
@@ -409,15 +290,12 @@ class ContestController extends Controller
             ]);
 
             // ✅ Check if team_participant_no is already used by another team
-            $duplicate = TeamParticipants::where('contest_id', $contest->id)
+            $existingParticipant = TeamParticipants::where('contest_id', $contest->id)
                 ->where('team_participant_no', $validated['team_participant_no'])
-                ->where('id', '!=', $participantId)
-                ->exists();
+                ->first();
 
-            if ($duplicate) {
-                return response()->json([
-                    'message' => 'Another team with this participant number already exists.',
-                ], 409);
+            if ($existingParticipant) {
+                return redirect()->back()->withErrors('A team with this participant number already exists in this contest.');
             }
 
             // ✅ Handle poster upload
