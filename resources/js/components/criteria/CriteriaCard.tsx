@@ -7,7 +7,6 @@ import { useEffect, useState } from 'react';
 import { UseFormReturn } from 'react-hook-form';
 import InputWithEndButton from '../input-button';
 import { CriteriaTests } from './CriteriaGroupWrapper';
-import { getRankBgClass } from '../../pages/utils/function/rank';
 
 export function CriteriaCard({
     criteriaGroup,

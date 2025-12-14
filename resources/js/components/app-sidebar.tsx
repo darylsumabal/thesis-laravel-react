@@ -4,7 +4,7 @@ import { NavUser } from '@/components/nav-user';
 import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarMenu, SidebarMenuButton, SidebarMenuItem } from '@/components/ui/sidebar';
 import { type NavItem } from '@/types';
 import { Link, usePage } from '@inertiajs/react';
-import { BarChart3, BookOpen, Calendar, Calendar1Icon, Facebook, Folder, Github, Instagram, Notebook, UserPlus2 } from 'lucide-react';
+import { BarChart3, BookOpen, Calendar, Calendar1Icon, Folder, Notebook, UserPlus2 } from 'lucide-react';
 import AppLogo from './app-logo';
 
 const judgeNavItem: NavItem[] = [
@@ -16,21 +16,12 @@ const judgeNavItem: NavItem[] = [
 ];
 
 const mainNavItems: NavItem[] = [
-    // {
-    //     title: 'Dashboard',
-    //     href: '/dashboard',
-    //     icon: LayoutGrid,
-    // },
     {
         title: 'Account',
         href: '/account',
         icon: UserPlus2,
     },
-    // {
-    //     title: 'Event',
-    //     href: '/event',
-    //     icon: Calendar,
-    // },
+
     {
         title: 'Event',
         href: '/event/event-list',
@@ -59,21 +50,6 @@ const footerNavItems: NavItem[] = [
         href: 'https://portfolio-daryl.vercel.app/home',
         icon: BookOpen,
     },
-    // {
-    //     title: 'Github',
-    //     href: 'https://github.com/darylsumabal',
-    //     icon: Github,
-    // },
-    // {
-    //     title: 'Facebook',
-    //     href: 'https://web.facebook.com/legndaryl',
-    //     icon: Facebook,
-    // },
-    // {
-    //     title: 'Instagram',
-    //     href: 'https://www.instagram.com/legndaryl',
-    //     icon: Instagram,
-    // },
 ];
 
 export function AppSidebar() {

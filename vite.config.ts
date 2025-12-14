@@ -23,7 +23,6 @@ function getLocalIP() {
 
 const localIP = getLocalIP();
 
-
 export default defineConfig({
     plugins: [
         laravel({
