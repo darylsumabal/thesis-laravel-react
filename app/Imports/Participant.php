@@ -46,7 +46,7 @@ class Participant implements ToCollection, ToModel, WithChunkReading
 
         // 🔍 Check for duplicate participant number in this contest
         $existing = Participants::where('contest_id', $this->contestId)
-            ->where('participant_no', $rows[0])
+            ->where('participant_no', $rows[0])->where('gender',$rows[5])
             ->first();
 
         if ($existing) {

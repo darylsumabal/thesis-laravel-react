@@ -11,8 +11,7 @@ Route::get('/', function () {
 
 Route::middleware(['auth', 'verified'])->group(function () {
 
-    Route::get('/account', [AccountController::class, 'index'])->name('account.index');
-
+   
     require __DIR__ . '/account.php';
     require __DIR__ . '/event.php';
     require __DIR__ . '/judging.php';

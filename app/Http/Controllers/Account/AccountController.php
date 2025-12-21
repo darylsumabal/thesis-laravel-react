@@ -13,13 +13,43 @@ class AccountController extends Controller
     public function index()
     {
         $accounts = User::with('contest')
-        ->where('accountType', 'JUDGE')
-        ->paginate(10)
-        ->withQueryString();
+            ->where('accountType', 'JUDGE')
+            ->paginate(10)
+            ->withQueryString();
 
         return Inertia::render('account/Index', [
-            'account' => $accounts
+            'account' => $accounts,
         ]);
+    }
+
+
+    public function update(Request $request, $judgeId)
+    {
+        logger($request);
+        logger($judgeId);
+        try {
+            // ✅ Validate request data
+            $validated = $request->validate([
+                'name' => 'string|nullable',
+                'panelRole' => 'string|nullable',
+                'judgeNumber' => 'string|nullable',
+            ]);
+
+            // ✅ Find the event
+            $account = User::findOrFail($judgeId);
+
+            // ✅ Update the event
+            $account->update([
+                'name' => $validated['name'] ?? $account->name,
+                'role' => $validated['panelRole'] ?? $account->role,
+                'judge_number' => $validated['judgeNumber'] ?? $account->judge_number,
+
+            ]);
+
+            return redirect()->back()->with('success', 'Account updated successfully');
+        } catch (\Exception $e) {
+            return redirect()->back()->with('message', $e->getMessage());
+        }
     }
 
     public function storeJudge(Request $request)

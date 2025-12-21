@@ -267,8 +267,8 @@ function TableResultTypeMultiple({ scoringType, contest, genderCategory }: PROPS
                                         </>
                                     ) : (
                                         <>
-                                            <TableCell className="text-center font-medium">{participant.total_points}</TableCell>
                                             <TableCell className="text-center font-medium">{participant.total}</TableCell>
+                                            <TableCell className="text-center font-medium">{participant.total_points}</TableCell>
                                         </>
                                     )}
                                     <TableCell className={`text-center font-medium ${getRankBgClass(participant.final_rank, qualified)}`}>

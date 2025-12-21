@@ -80,7 +80,7 @@ class JudgingController extends Controller
                 'name' => 'string|required',
                 'email' => 'string|email',
                 'accountType' => 'string|required',
-                'judgeNumber'=>'string|required',
+                'judgeNumber'=>'string',
                 'password' => [
                     'required',
                     'confirmed',
@@ -103,7 +103,7 @@ class JudgingController extends Controller
             'name' => $validate['name'],
             'email' => $validate['email'],
             'role' => $validate['panelRole'],
-            'judge_number'=>$validate['judgeNumber'],
+            'judge_number'=>$validate['judgeNumber'] ?? null,
             'accountType' =>  $validate['accountType'],
             'password' => bcrypt($validate['password']),
             'contest_id' => $validate['contest_id'],

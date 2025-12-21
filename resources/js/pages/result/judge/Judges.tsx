@@ -248,20 +248,16 @@ export default function Judges() {
                                     .filter((v, i, a) => a.indexOf(v) === i)
                                     .map((criteria, index) => (
                                         <>
-                                            <TableHead className="e" key={index}>
-                                                {criteria}
-                                            </TableHead>
+                                            <TableHead key={index}>{criteria}</TableHead>
+                                            <TableHead className="w-1/12">ACTION</TableHead>
                                         </>
                                     ))}
-                                <TableHead className="w-1/12">ACTION</TableHead>
                             </TableRow>
                         </TableHeader>
                         <TableBody className="border-b">
                             {sortedPreliminaryJudges.map((judgeData) => (
                                 <TableRow key={judgeData.judge.id}>
-                                    <TableCell className="uppercase">
-                                        {judgeData.judge.name} {judgeData.judge.judge_number}
-                                    </TableCell>
+                                    <TableCell className="uppercase">{judgeData.judge.name}</TableCell>
                                     {grouped?.preliminary
                                         ?.map((i) => i.criteria)
                                         .filter((v, i, a) => a.indexOf(v) === i)
@@ -315,9 +311,13 @@ export default function Judges() {
                                     <TableHead>JUDGE</TableHead>
                                     {groupedFinal?.final
                                         ?.map((i) => i.criteria)
-                                        .filter((v, i, a) => a.indexOf(v) === i) // unique criteria
-                                        .map((criteria, index) => <TableHead key={index}>{criteria}</TableHead>)}
-                                    <TableHead className="w-1/12">ACTION</TableHead>
+                                        .filter((v, i, a) => a.indexOf(v) === i)
+                                        .map((criteria, index) => (
+                                            <>
+                                                <TableHead key={index}>{criteria}</TableHead>
+                                                <TableHead className="w-1/12">ACTION</TableHead>
+                                            </>
+                                        ))}
                                 </TableRow>
                             </TableHeader>
                             <TableBody className="border-b">
@@ -348,10 +348,8 @@ export default function Judges() {
                                                             >
                                                                 {isThisButtonLoading && <Loader2 className="animate-spin" />}
                                                                 {scoreData?.can_edit === 1 && (
-                                                                    <Badge className="absolute -top-2.5 -right-2.5 min-w-5 px-1" variant="default">
-                                                                        <Badge className="absolute -top-2.5 -right-2.5 min-w-5 bg-[#45226b] px-1">
-                                                                            <NotebookPen color="white" />
-                                                                        </Badge>
+                                                                    <Badge className="absolute -top-2.5 -right-2.5 min-w-5 bg-[#45226b] px-1">
+                                                                        <NotebookPen color="white" />
                                                                     </Badge>
                                                                 )}
                                                                 ENABLED

@@ -116,36 +116,7 @@ export default function ScoreResult() {
             <ScrollArea className="rounded-md">
                 <TabsList>
                     {scoringMr && (
-                        <TabsTrigger
-                            value="preliminary"
-                            className="uppercase"
-                            // onClick={() => {
-                            //     const promise = new Promise((resolve, reject) => {
-                            //         router.get(
-                            //             `/result/${contestId}/${groupId}/individual`,
-                            //             { preliminary: 1 },
-                            //             {
-                            //                 preserveScroll: true,
-                            //                 preserveState: true,
-                            //                 replace: false,
-                            //                 onFinish: (page) => {
-                            //                     // Dismiss the loading toast when done
-                            //                     resolve(page);
-                            //                 },
-                            //                 onError: (error) => {
-                            //                     reject(error);
-                            //                 },
-                            //             },
-                            //         );
-                            //     });
-
-                            //     toast.promise(promise, {
-                            //         loading: 'Loading Major Awards',
-                            //         success: 'Data loaded!',
-                            //         error: 'An error occurred.',
-                            //     });
-                            // }}
-                        >
+                        <TabsTrigger value="preliminary" className="uppercase">
                             Preliminary
                         </TabsTrigger>
                     )}
@@ -230,7 +201,7 @@ export default function ScoreResult() {
                             >
                                 MAJOR AWARDS
                             </TabsTrigger>
-                            <TabsTrigger value="top_results">Top {qualified} RESULTS</TabsTrigger>
+                            <TabsTrigger value="top_results">TOP {qualified} RESULTS</TabsTrigger>
                             <TabsTrigger value="final_results">FINAL RESULTS</TabsTrigger>
                             {sortedUniqueJudges?.map((i) => {
                                 const refreshByJudge = () => {

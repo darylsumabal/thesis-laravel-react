@@ -39,7 +39,7 @@ const JudgesResult = ({
             scores: item.scores.filter((score) => score.judgeId === judgeId),
         };
     });
-
+ 
     const computeTotalsAndRanks = (byParticipant: Record<string, JudgeScore[]>) => {
         // Step 1: Compute totals
         const totals = Object.entries(byParticipant).map(([participantNo, scores]) => {

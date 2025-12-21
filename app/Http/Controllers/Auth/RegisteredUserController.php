@@ -48,6 +48,12 @@ class RegisteredUserController extends Controller
 
         Auth::login($user);
 
-        return to_route('dashboard');
+        if ($user->accountType === 'ADMIN') {
+            return to_route('account.index');
+        }
+
+        if ($user->accountType === 'JUDGE') {
+            return to_route('judgesTable');
+        }
     }
 }

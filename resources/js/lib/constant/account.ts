@@ -2,10 +2,6 @@ import { ComboboxField } from '@/components/ActionForm';
 import { Field } from '@/components/CardWrap';
 
 export const ADD_ACCOUNT: Field[] = [
-    // {
-    //   label: "NAME",
-    //   inputType: "text",
-    // },
     {
         label: 'NAME',
         inputType: 'text',
@@ -14,10 +10,6 @@ export const ADD_ACCOUNT: Field[] = [
         label: 'EMAIL',
         inputType: 'email',
     },
-    // {
-    //   label: "ACCOUNT TYPE",
-    //   inputType: "text",
-    // },
     {
         label: 'PANEL',
         inputType: 'combobox',
@@ -37,6 +29,21 @@ export const ADD_ACCOUNT: Field[] = [
     {
         label: 'PASSWORD CONFIRMATION',
         inputType: 'password',
+    },
+];
+
+export const EDIT_ACCOUNT: Field[] = [
+    {
+        label: 'NAME',
+        inputType: 'text',
+    },
+    {
+        label: 'PANEL',
+        inputType: 'combobox',
+    },
+    {
+        label: 'JUDGE NUMBER',
+        inputType: 'number',
     },
 ];
 
@@ -60,17 +67,6 @@ export const COMBOBOX_INPUT_PANEL: ComboboxField[] = [
     },
 ];
 
-export const EDIT_ACCOUNT: Field[] = [
-    {
-        label: 'PASSWORD',
-        inputType: 'password',
-    },
-    {
-        label: 'PASSWORD CONFIRMATION',
-        inputType: 'password',
-    },
-];
-
 export const FIELD_EDIT_ACCOUNT = {
     PASSWORD: 'password',
     'PASSWORD CONFIRMATION': 'password_confirmation',
@@ -86,6 +82,12 @@ export const FIELD_NAME_ADD_ACCOUNT = {
     PANEL: 'panelRole',
     PASSWORD: 'password',
     'PASSWORD CONFIRMATION': 'password_confirmation',
+} as const;
+
+export const FIELD_NAME_EDIT_ACCOUNT = {
+    NAME: 'name',
+    'JUDGE NUMBER': 'judgeNumber',
+    PANEL: 'panelRole',
 } as const;
 
 export const COMBOBOX_INPUT_ACCOUNT_TYPE: ComboboxField[] = [

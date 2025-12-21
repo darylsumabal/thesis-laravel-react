@@ -242,7 +242,7 @@ export default function ScoreResultTeam() {
                                             <p>CONSOLIDATED RESULT</p>
                                         </div>
                                         <div className="mb-4 flex w-full flex-col items-center justify-center rounded-md bg-[#45226b] p-4 text-center text-3xl font-medium text-white">
-                                            <p>TOP {qualified} Finalists</p>
+                                            <p>TOP {qualified} FINALISTS</p>
                                             <p className="text-base font-normal uppercase">({contest.contest_scoring_type})</p>
                                             <p className="mt-4">{criteriaName}</p>
                                         </div>
@@ -352,7 +352,7 @@ export default function ScoreResultTeam() {
                                 <p className="font-serif text-2xl font-bold uppercase">TOP {qualified} RESULTS</p>
                                 <div className="w-full border-2 border-b-black" />
                                 <div className="mt-10 mb-10 text-center">
-                                    <p className="font-serif text-2xl font-bold uppercase">Top {qualified} Finalist</p>
+                                    <p className="font-serif text-2xl font-bold uppercase">TOP {qualified} FINALISTS</p>
                                     <p>Category</p>
                                 </div>
                                 <div className="flex w-full">

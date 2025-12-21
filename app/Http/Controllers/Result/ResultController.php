@@ -453,7 +453,7 @@ class ResultController extends Controller
                         ->where('round', $roundType)
                         ->where('participant_id', $participantId)
                         ->update([
-                            'total_points' => $totalRankSum /  $judgeCounts->count(),
+                            // 'total_points' => $totalRankSum /  $judgeCounts->count(),
                             'total' => $totalRankSumWeight /  $judgeCounts->count()
                         ]);
                 }
@@ -2149,7 +2149,7 @@ class ResultController extends Controller
                         ->where('round', $roundType)
                         ->where('participant_id', $participantId)
                         ->update([
-                            'total_points' => $totalRankSum /  $judgeCounts->count(),
+                            // 'total_points' => $totalRankSum /  $judgeCounts->count(),
                             'total' => $totalRankSumWeight /  $judgeCounts->count()
                         ]);
                 }

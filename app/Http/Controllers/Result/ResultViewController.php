@@ -395,6 +395,7 @@ class ResultViewController extends Controller
 
     private function indexResult($contestId, $groupId, $participantModel, $genderCategory)
     {
+
         $participants = $participantModel::where('contest_id', $contestId)
             ->with(['scoreJudgings.judges', 'scoreJudgings.participant', 'scoreJudgings.teamParticipant'])
             ->get();

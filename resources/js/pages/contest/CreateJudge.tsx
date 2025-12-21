@@ -24,8 +24,7 @@ export default function CreateJudge({ contest }: PROPS) {
                 toast.error(error[0]);
             },
         });
-        const formValues = Object.fromEntries(data.entries());
-        console.log(formValues);
+
     };
 
     return (

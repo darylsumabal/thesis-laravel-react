@@ -26,7 +26,7 @@ export default function Index() {
     const handleCreateJudge = async ({ data }: { id: string | null; data: FormData }) => {
         setIsPending(true);
 
-        router.post('/accounts', data, {
+        router.post('/account', data, {
             onSuccess: (page) => {
                 setIsPending(false);
                 toast.success(page.props.flash?.success);

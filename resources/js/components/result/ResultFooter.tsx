@@ -14,7 +14,7 @@ const ResultFooter = ({ sortedUniqueJudges }: { sortedUniqueJudges: JudgesGroup[
     const { auth } = usePage<AUTH>().props;
     return (
         // grid w-full grid-cols-[repeat(auto-fit,minmax(18rem,1fr))]
-        <div className="mt-20 w-full p-2">
+        <div className="mt-20 w-full p-2 uppercase">
             <div className="flex flex-row flex-wrap items-center justify-center gap-10">
                 {sortedUniqueJudges?.map((i) => (
                     <div className="w-72 text-center" key={i.id}>

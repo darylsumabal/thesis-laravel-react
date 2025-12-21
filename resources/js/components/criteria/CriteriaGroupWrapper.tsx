@@ -46,24 +46,8 @@ export function CriteriaGroupWrapper({ group, criteriaGroup }: { group: Criteria
 
     useEcho('submit-score', 'JudgeSubmit', (event: { contestId: number; groupId: number }) => {
         if (event.contestId == contestId && event.groupId == groupId) {
-            // toast.promise(
-            //     new Promise((resolve, reject) => {
-            //         router.reload({
-            //             only: ['judge'],
-            //             onFinish: () => resolve('success'),
-            //             onError: () => reject('error'),
-            //         });
-            //     }),
-            //     {
-            //         loading: 'Refreshing...',
-            //         success: 'You can now edit',
-            //         error: 'Failed to refresh results',
-            //     },
-            // );
             router.reload({
                 only: ['judge'],
-                // onFinish: () => resolve('success'),
-                // onError: () => reject('error'),
             });
         }
     });

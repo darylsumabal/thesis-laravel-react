@@ -29,19 +29,11 @@ export const addAccountSchema = z
         path: ['password_confirmation'],
     });
 
-export const editAccountSchema = z
-    .object({
-        password: z.string().refine((value) => value.length > 0, {
-            message: 'Password must be at least 6 character',
-        }),
-        password_confirmation: z.string().refine((value) => value.length > 0, {
-            message: 'Password must be at least 6 character',
-        }),
-    })
-    .refine((data) => data.password === data.password_confirmation, {
-        message: 'Password and confirm password does not match',
-        path: ['password_confirmation'],
-    });
+export const editAccountSchema = z.object({
+    name: z.string(),
+    panelRole: z.string(),
+    judgeNumber: z.string(),
+});
 
 type EditAccountDefaultValues = {
     password: string;

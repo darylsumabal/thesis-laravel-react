@@ -3,6 +3,8 @@ export type Account = {
     name: string;
     email: string;
     accountType: string;
+    role:string,
+    judge_number:string
     contest?: {
         contest_name: string;
         contest_scoring_type: string;

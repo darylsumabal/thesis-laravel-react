@@ -65,6 +65,7 @@ const ActionDialog = <TSchema extends ZodSchema>(props: DialogProps<TSchema>) =>
 
     const [isOpen, setIsOpen] = useState(open);
 
+
     useEffect(() => {
         if (open !== undefined) {
             setIsOpen(open);
@@ -107,6 +108,7 @@ const ActionDialog = <TSchema extends ZodSchema>(props: DialogProps<TSchema>) =>
                 // Append all fields to formData correctly
                 for (const key in data) {
                     const value = data[key as keyof typeof data];
+               
                     if (value !== undefined && value !== null) {
                         // For the date field, format properly if needed
                         if (key === 'contest_date' && typeof value === 'string') {
