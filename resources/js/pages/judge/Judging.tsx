@@ -27,7 +27,7 @@ export default function Judging() {
                     });
                 }),
                 {
-                    loading: 'Refreshing results...',
+                    loading: 'Refreshing...',
                     success: 'Score tabulated successfully!',
                     error: 'Failed to refresh results',
                 },

@@ -51,17 +51,7 @@ export const ScoreTable = ({ data, gender }: { data: ParticipantScore[]; gender:
                         {data?.map((participant) => (
                             <TableRow key={participant.participant_id}>
                                 <TableCell className="text-center font-medium whitespace-nowrap">{participant.participant_no}</TableCell>
-                                {/* {participant.scores.map((i) => (
-                    <TableCell
-                      key={i.id}
-                      className="whitespace-nowrap font-medium  text-center"
-                    >
-                      <div className="flex justify-evenly">
-                        <div>{i.score}</div>
-                        <div>{i.round_score}</div>
-                      </div>
-                    </TableCell>
-                  ))} */}
+
                                 {[...participant.scores]
                                     .sort((a) => (a.criteria === 'Preliminary' ? -1 : 1)) // ✅ Preliminary first
                                     .map((i) => (
