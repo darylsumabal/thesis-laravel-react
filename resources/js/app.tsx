@@ -15,12 +15,11 @@ configureEcho({
     wsHost: import.meta.env.VITE_REVERB_HOST,
     wsPort: import.meta.env.VITE_REVERB_PORT,
     wssPort: import.meta.env.VITE_REVERB_PORT,
-    // forceTLS: (import.meta.env.VITE_REVERB_SCHEME ?? 'https') === 'https',
     forceTLS: false,
     enabledTransports: ['ws', 'wss'],
 });
 
-// const appName = import.meta.env.VITE_APP_NAME || 'Laravel';
+const appName = import.meta.env.VITE_APP_NAME || 'Laravel';
 
 const queryClient = new QueryClient({
     defaultOptions: {
@@ -31,8 +30,7 @@ const queryClient = new QueryClient({
     },
 });
 createInertiaApp({
-    // title: (title) => `${title} - ${appName}`,
-    title: (title) => `${title} - Judging Tabulation`,
+    title: (title) => `${title} - ${appName}`,
     resolve: (name) => resolvePageComponent(`./pages/${name}.tsx`, import.meta.glob('./pages/**/*.tsx')),
     setup({ el, App, props }) {
         const root = createRoot(el);
@@ -53,8 +51,8 @@ createInertiaApp({
 // This will set light / dark mode on load...
 initializeTheme();
 
-// "dev": "npx concurrently -c \"#93c5fd,#c4b5fd,#fdba74\" \"php artisan serve --host=192.168.1.38 --port=8000\" \"php artisan queue:listen --tries=1\" \"npm run dev\" --names='server,queue,vite'"
-// }
-
-// "Composer\\Config::disableProcessTimeout",
-//             "npx concurrently -c \"#93c5fd,#c4b5fd,#fdba74\" \"php artisan serve\" \"php artisan queue:listen --tries=1\" \"npm run dev\" --names='server,queue,vite'"
+// "dev:ssr": [
+//     "npm run build:ssr",
+//     "Composer\\Config::disableProcessTimeout",
+//     "npx concurrently -c \"#93c5fd,#c4b5fd,#fb7185,#fdba74\" \"php artisan serve --host=0.0.0.0 --port=8000\" \"php artisan queue:listen --tries=1\" \"php artisan pail --timeout=0\" \"php artisan inertia:start-ssr\" \"php artisan reverb:start\" --names=server,queue,logs,ssr,reverb"
+// ],

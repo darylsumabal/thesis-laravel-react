@@ -23,9 +23,6 @@ export const columns: ColumnDef<Account>[] = [
         cell: ({ row }) => <div className="text-base">{row.getValue('email')}</div>,
     },
     {
-        accessorFn: (f) => {
-            return `${f.role} ${f.judge_number ?? ""}`;
-        },
         id: 'role',
         header: ({ column }) => {
             return (
@@ -37,7 +34,7 @@ export const columns: ColumnDef<Account>[] = [
         },
         cell: ({ row }) => (
             <div className="text-base">
-                {row.getValue('role')} {row.getValue('judge_number')}
+                {row.original.role} {row.original.judge_number ?? ''}
             </div>
         ),
     },

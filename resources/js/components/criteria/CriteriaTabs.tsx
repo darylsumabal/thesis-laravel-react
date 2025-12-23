@@ -16,16 +16,6 @@ export function CriteriaTabs({ criteriaGroups }: { criteriaGroups: CriteriaTests
 
     useEcho('submit-score', 'JudgeSubmit', (event: { contestId: number; groupId: number }) => {
         if (event.contestId == contestId && event.groupId == groupId) {
-            // toast.promise(
-            //     new Promise((resolve, reject) => {
-
-            //     }),
-            //     {
-            //         loading: 'Refreshing...',
-            //         success: 'You can now edit',
-            //         error: 'Failed to refresh results',
-            //     },
-            // );
             router.reload({
                 only: ['rounds', 'criteriaGroups', 'participants'],
             });
@@ -40,31 +30,8 @@ export function CriteriaTabs({ criteriaGroups }: { criteriaGroups: CriteriaTests
                     </TabsTrigger>
 
                     {criteriaGroups.map((group, index) => {
-                        // find matching criteria status
-                        // const criteriaStatus = finished?.find(
-                        //   (f) => f.criteria === group.criteria
-                        // );
-
-                        // check if all judges finished in THIS criteria
-                        // const isFinished = criteriaStatus?.all_finished;
-
-                        // ✅ logic: only enable the FIRST unfinished criteria
-                        // - if this is the first unfinished, enable it
-                        // - if finished, keep enabled
-                        // - everything else = disabled       // const firstUnfinishedIndex = finished?.findIndex(
-                        //   (f) => !f.all_finished
-                        // );
-                        // const isCurrent =
-                        //   firstUnfinishedIndex === -1
-                        //     ? index === 0 // fallback: if all finished, enable first
-                        //     : index === firstUnfinishedIndex;
-
-                        // const isDisabled = !isFinished && !isCurrent;
                         const isFinalRound = group.items?.[0]?.round === 'Final';
 
-                        // Disable if:
-                        // 1. There's a pending submit
-                        // 2. It's Final Round AND preliminary is not finished
                         const isDisabled = pendingSubmitScore || (isFinalRound && !isPreliminaryFinished);
 
                         return (
