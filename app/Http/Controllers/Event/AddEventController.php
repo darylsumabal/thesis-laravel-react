@@ -30,9 +30,8 @@ class AddEventController extends Controller
 
         if ($request->hasFile('poster')) {
             $cloudPath = Storage::disk('cloudinary')
-                ->put('poster', $request->file('poster'));
+                ->put('poster', $request->file($posterPath));
 
-            // Save image path to account
             $validate['poster'] = $cloudPath;
         }
 
