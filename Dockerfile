@@ -1,4 +1,4 @@
-FROM php:8.2-apache
+FROM php:8.3.3-apache
 
 # 1. Install System Deps + Node.js (Upgraded to Node 22 LTS)
 RUN apt-get update && apt-get install -y \
@@ -16,7 +16,8 @@ RUN apt-get update && apt-get install -y \
     && update-ca-certificates
 
 # 2. Install PHP extensions (Added zip)
-RUN docker-php-ext-install pdo_mysql mbstring exif pcntl bcmath gd zip
+RUN docker-php-ext-configure intl \
+    && docker-php-ext-install pdo_mysql mbstring exif pcntl bcmath gd zip intl
 RUN a2enmod rewrite
 
 # 3. Install Composer
