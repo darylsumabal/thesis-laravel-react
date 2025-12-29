@@ -65,7 +65,7 @@ return [
             'secret' => env('CLOUDINARY_SECRET'),
             'cloud' => env('CLOUDINARY_CLOUD_NAME'),
             'url' => env('CLOUDINARY_URL'),
-            'secure' => (bool) env('CLOUDINARY_SECURE', true),
+            // 'secure' => (bool) env('CLOUDINARY_SECURE', true),
             'prefix' => env('CLOUDINARY_PREFIX'),
         ],
 
