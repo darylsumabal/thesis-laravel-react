@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Event;
 use App\Http\Controllers\Controller;
 use App\Models\Event;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 
 class AddEventController extends Controller
 {
@@ -28,11 +29,11 @@ class AddEventController extends Controller
         $poster->storeAs('poster', $posterName, 'public');
 
         if ($request->hasFile('poster')) {
-            $cloudPath = Storage::disk('cloudinary')
+            Storage::disk('cloudinary')
                 ->put('poster', $request->file('poster'));
 
             // Save image path to account
-            $validate['poster'] = $cloudPath;
+            // $validate['poster'] = $cloudPath;
         }
 
         Event::create([
