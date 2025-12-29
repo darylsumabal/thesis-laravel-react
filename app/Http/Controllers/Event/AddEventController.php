@@ -28,12 +28,13 @@ class AddEventController extends Controller
 
         $poster->storeAs('poster', $posterName, 'public');
 
-        if ($request->hasFile('poster')) {
-            $cloudPath = Storage::disk('cloudinary')
-                ->put($posterName, $request->file('poster'));
 
-            $validate['poster'] = $cloudPath;
-        }
+        $cloudPath = Storage::disk('cloudinary')
+            ->put('poster', $request->file('poster'));
+
+        $posterPath =  $validate['poster'] = $cloudPath;
+
+
 
         Event::create([
             'organizer_id' => $organizerId,
