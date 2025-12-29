@@ -29,11 +29,11 @@ class AddEventController extends Controller
         $poster->storeAs('poster', $posterName, 'public');
 
         if ($request->hasFile('poster')) {
-            Storage::disk('cloudinary')
+            $cloudPath = Storage::disk('cloudinary')
                 ->put('poster', $request->file('poster'));
 
             // Save image path to account
-            // $validate['poster'] = $cloudPath;
+            $validate['poster'] = $cloudPath;
         }
 
         Event::create([
@@ -49,6 +49,4 @@ class AddEventController extends Controller
 
         return redirect()->back()->with('success', 'Event created successfully');
     }
-
-
 }
