@@ -49,6 +49,14 @@ class UpcomingEventController extends Controller
 
             $poster->storeAs('poster', $posterName, 'public');
 
+            if ($request->hasFile('poster')) {
+                $cloudPath = Storage::disk('cloudinary')
+                    ->put('poster', $request->file('poster'));
+
+                // Save image path to account
+                $validated['poster'] = $cloudPath;
+            }
+
             Contest::create([
                 'organizer_id' => $organizerId,
                 'contest_name' => $validated['contest_name'],
