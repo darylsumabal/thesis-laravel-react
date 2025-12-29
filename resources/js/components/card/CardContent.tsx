@@ -12,6 +12,7 @@ import ActionPopover from '../ActionPopover';
 import { Button } from '../ui/button';
 import { Card } from '../ui/card';
 import { Popover, PopoverContent, PopoverTrigger } from '../ui/popover';
+import { imageSrc } from '@/lib/src';
 
 type CardContentProps<T extends { id: string; poster: string }, U> = {
     tanstack?: boolean;
@@ -169,7 +170,8 @@ const CardContent = <T extends { id: string; poster: string }, U>({
                     {item.poster ? (
                         <img
                             // src={`${urlSrc}${item.poster}`}
-                            src={`/storage/${item.poster}`}
+                            src={`${imageSrc}/${item.poster}`}
+                            // src={`/storage/${item.poster}`}
                             alt={`${item.poster}`}
                             className="w-full rounded-md border-[1px] object-fill xl:h-96"
                         />
