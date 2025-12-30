@@ -47,4 +47,6 @@ RUN sed -ri -e 's!/var/www/html!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/apache2.
 EXPOSE 80
 
 # 8. Start Command (Wait for migration, then start Apache)
-CMD php artisan migrate --force && apache2-foreground
+# CMD php artisan migrate --force && apache2-foreground
+# 8. Start Command (Start SSR in background, then start Apache)
+CMD php artisan migrate --force && (php artisan inertia:start-ssr &) && apache2-foreground
