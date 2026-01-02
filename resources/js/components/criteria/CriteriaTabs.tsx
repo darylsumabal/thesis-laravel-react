@@ -2,6 +2,7 @@ import { router, usePage } from '@inertiajs/react';
 import { Card } from '../ui/card';
 
 import { useContextUser } from '@/context/ContesxtProvider';
+import { imageSrc } from '@/lib/src';
 import { useEcho } from '@laravel/echo-react';
 import { ScrollArea, ScrollBar } from '../ui/scroll-area';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../ui/tabs';
@@ -48,7 +49,7 @@ export function CriteriaTabs({ criteriaGroups }: { criteriaGroups: CriteriaTests
                 <div>
                     <div>
                         {poster ? (
-                            <img src={`/storage/${poster}`} className="h-96 w-full rounded-md object-cover object-center" alt="poster" />
+                            <img src={`${imageSrc}/${poster}`} className="h-96 w-full rounded-md object-cover object-center" alt="poster" />
                         ) : (
                             <img src="photo" className="h-96 w-full rounded-md bg-gray-200 object-cover object-center text-black" alt="poster.img" />
                         )}
@@ -63,7 +64,12 @@ export function CriteriaTabs({ criteriaGroups }: { criteriaGroups: CriteriaTests
                                             <div key={index} className="rounded border p-4 text-center shadow-md">
                                                 <p className="font-semibold">Candidate No. {p.participant_no}</p>
                                                 {p.poster_url ? (
-                                                    <img src={`/storage/${p.poster_url}`} className="mx-auto h-48 w-48 rounded-md" alt="" />
+                                                    <img
+                                                        // src={`/storage/${p.poster_url}`}
+                                                        src={`${imageSrc}/${poster}`}
+                                                        className="mx-auto h-48 w-48 rounded-md"
+                                                        alt=""
+                                                    />
                                                 ) : (
                                                     <img src="photo" className="mx-auto h-48 w-48 rounded-md bg-white text-black" alt="" />
                                                 )}
@@ -87,7 +93,12 @@ export function CriteriaTabs({ criteriaGroups }: { criteriaGroups: CriteriaTests
                                         femaleParticipants?.map((p, index) => (
                                             <div key={index} className="rounded border p-4 text-center shadow-md">
                                                 <p className="font-semibold">Candidate No. {p.participant_no}</p>
-                                                <img src={`/storage/${poster}`} className="mx-auto h-48 w-48 rounded-md" alt="" />
+                                                <img
+                                                    // src={`/storage/${poster}`}
+                                                    src={`${imageSrc}/${poster}`}
+                                                    className="mx-auto h-48 w-48 rounded-md"
+                                                    alt=""
+                                                />
                                                 <p>
                                                     {p.first_name} {p.last_name}
                                                 </p>

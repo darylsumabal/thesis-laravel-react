@@ -15,6 +15,7 @@ import {
     UPLOAD_FIELD_TEAM_PARTICIPANT,
     UPLOAD_FIELD_TEAM_PARTICIPANT_CONTEST,
 } from '@/lib/constant/contest';
+import { imageSrc } from '@/lib/src';
 import {
     addImportTeamParticipantSchema,
     addTeamParticipantSchema,
@@ -156,7 +157,7 @@ export default function Team({ contest, participant, poster }: PROPS) {
                     <div>
                         <div className="mb-8 space-y-2">
                             {poster ? (
-                                <img src={`/storage/${poster}`} className="h-96 w-full rounded-md" alt="poster" />
+                                <img src={`${imageSrc}/${poster}`} className="h-96 w-full rounded-md" alt="poster" />
                             ) : (
                                 <div className="flex h-96 w-full items-center justify-center rounded-md bg-gray-200 text-black">
                                     No Poster Available

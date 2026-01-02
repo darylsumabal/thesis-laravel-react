@@ -2,7 +2,7 @@ import { Contests } from '@/api/contest';
 import { Score, TeamParticipant } from '@/api/result';
 import { CriteriaItem } from '@/components/criteria/CriteriaGroupWrapper';
 import { CriteriaTabsTeam } from '@/components/criteria/CriteriaTabsTeam';
-import { Toaster } from '@/components/ui/sonner';
+import { imageSrc } from '@/lib/src';
 import { format } from 'date-fns';
 
 export type ScoreTestTeam = {
@@ -37,10 +37,10 @@ const CriteriaJudgingTeam = ({ data }: CriteriaJudgingProps) => {
                     <div key={contestant.id} className="flex flex-col gap-2">
                         <div className="flex flex-col items-center justify-center">
                             {contestant.contest.contest_poster ? (
-                                <img src={`/storage/${contestant.contest.contest_poster}`} className="w-44 rounded-md" alt="poster" />
+                                <img src={`${imageSrc}/${contestant.contest.contest_poster}`} className="w-44 rounded-md" alt="poster" />
                             ) : (
                                 <img
-                                    src={`/storage/${contestant.contest.contest_poster}`}
+                                    src={`${imageSrc}/${contestant.contest.contest_poster}`}
                                     className="w-44 rounded-md bg-gray-200 text-black"
                                     alt="image"
                                 />

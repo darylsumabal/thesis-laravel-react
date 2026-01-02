@@ -1,11 +1,12 @@
 import { useContextUser } from '@/context/ContesxtProvider';
+import { imageSrc } from '@/lib/src';
 import { CriteriaTestsTeam } from '@/pages/judge/CriteriaJudgingTeam';
 import { router, usePage } from '@inertiajs/react';
+import { useEcho } from '@laravel/echo-react';
 import { Card } from '../ui/card';
 import { ScrollArea, ScrollBar } from '../ui/scroll-area';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../ui/tabs';
 import { CriteriaGroupWrapperTeam } from './CriteriaGroupWrapperTeam';
-import { useEcho } from '@laravel/echo-react';
 
 export function CriteriaTabsTeam({ criteriaGroups }: { criteriaGroups: CriteriaTestsTeam[] }) {
     const { teamParticipants, poster, rounds } = usePage().props;
@@ -57,7 +58,7 @@ export function CriteriaTabsTeam({ criteriaGroups }: { criteriaGroups: CriteriaT
                 <div className="space-y-2">
                     <div>
                         {poster ? (
-                            <img src={`/storage/${poster}`} className="h-96 w-full rounded-md object-cover object-center" alt="poster" />
+                            <img src={`${imageSrc}/${poster}`} className="h-96 w-full rounded-md object-cover object-center" alt="poster" />
                         ) : (
                             <img src="photo" className="h-96 w-full rounded-md bg-gray-200 object-cover object-center text-black" alt="poster.img" />
                         )}
@@ -73,7 +74,7 @@ export function CriteriaTabsTeam({ criteriaGroups }: { criteriaGroups: CriteriaT
                                             <p className="font-semibold">No. {p.team_participant_no}</p>
 
                                             {p.poster_url ? (
-                                                <img src={`/storage/${p.poster_url}`} className="mx-auto h-48 w-48 rounded-md" alt="photo.img" />
+                                                <img src={`${imageSrc}/${poster}`} className="mx-auto h-48 w-48 rounded-md" alt="photo.img" />
                                             ) : (
                                                 <img src="photo" className="mx-auto h-48 w-48 rounded-md bg-white text-black" alt="photo.img" />
                                             )}

@@ -2,6 +2,7 @@ import { Contests } from '@/api/contest';
 import { Participant, Score } from '@/api/result';
 import { CriteriaItem } from '@/components/criteria/CriteriaGroupWrapper';
 import { CriteriaTabs } from '@/components/criteria/CriteriaTabs';
+import { imageSrc } from '@/lib/src';
 
 import { format } from 'date-fns';
 
@@ -31,7 +32,6 @@ type CriteriaJudgingProps = {
 };
 
 const CriteriaJudging = ({ data }: CriteriaJudgingProps) => {
-
     return (
         <div className="h-full gap-10">
             <div className="space-y-4">
@@ -39,10 +39,10 @@ const CriteriaJudging = ({ data }: CriteriaJudgingProps) => {
                     <div key={contestant.id} className="flex flex-col gap-2">
                         <div className="flex flex-col items-center justify-center">
                             {contestant.contest.contest_poster ? (
-                                <img src={`/storage/${contestant.contest.contest_poster}`} className="w-44 rounded-md" alt="poster" />
+                                <img src={`${imageSrc}/${contestant.contest.contest_poster}`} className="w-44 rounded-md" alt="poster" />
                             ) : (
                                 <img
-                                    src={`/storage/${contestant.contest.contest_poster}`}
+                                    src={`${imageSrc}/${contestant.contest.contest_poster}`}
                                     className="w-44 rounded-md bg-gray-200 text-black"
                                     alt="image"
                                 />
