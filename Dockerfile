@@ -84,7 +84,7 @@ RUN apt-get update && apt-get install -y \
 # 2. Install PHP extensions
 RUN docker-php-ext-configure intl \
     && docker-php-ext-install pdo_mysql mbstring exif pcntl bcmath gd zip intl
-RUN a2enmod rewrite rewrite proxy proxy_http proxy_wstunnel
+RUN a2enmod rewrite
 
 # 3. Install Composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
@@ -109,22 +109,8 @@ ENV APACHE_DOCUMENT_ROOT /var/www/html/public
 RUN sed -ri -e 's!/var/www/html!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/sites-available/*.conf
 RUN sed -ri -e 's!/var/www/html!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/apache2.conf /etc/apache2/conf-available/*.conf
 
-
-RUN echo ' \
-<VirtualHost *:80> \n\
-    DocumentRoot /var/www/html/public \n\
-    ProxyPass /app ws://127.0.0.1:8080/app \n\
-    ProxyPassReverse /app ws://127.0.0.1:8080/app \n\
-    <Directory /var/www/html/public> \n\
-        AllowOverride All \n\
-        Require all granted \n\
-    </Directory> \n\
-</VirtualHost>' > /etc/apache2/sites-available/000-default.conf
-
 EXPOSE 80
 
 # 8. Start Command
 # CMD php artisan migrate --force && apache2-foreground
-CMD php artisan migrate --force && \
-    php artisan reverb:start --host=0.0.0.0 --port=8080 & \
-    apache2-foreground
+CMD CMD php artisan migrate --force && apache2-foreground
