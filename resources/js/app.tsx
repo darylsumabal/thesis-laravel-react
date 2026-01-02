@@ -9,18 +9,28 @@ import { Toaster } from './components/ui/sonner';
 import { ContextProvider } from './context/ContesxtProvider';
 import { initializeTheme } from './hooks/use-appearance';
 
+// configureEcho({
+//     broadcaster: 'reverb',
+//     key: import.meta.env.VITE_REVERB_APP_KEY,
+//     wsHost: import.meta.env.VITE_REVERB_HOST,
+//     wsPort: import.meta.env.VITE_REVERB_PORT,
+//     wssPort: import.meta.env.VITE_REVERB_PORT,
+//     forceTLS: false,
+//     enabledTransports: ['ws', 'wss'],
+// });
+
 configureEcho({
     broadcaster: 'reverb',
     key: import.meta.env.VITE_REVERB_APP_KEY,
     wsHost: import.meta.env.VITE_REVERB_HOST,
-    wsPort: import.meta.env.VITE_REVERB_PORT,
-    wssPort: import.meta.env.VITE_REVERB_PORT,
-    forceTLS: false,
+    wsPort: import.meta.env.VITE_REVERB_PORT ?? 443,
+    wssPort: import.meta.env.VITE_REVERB_PORT ?? 443,
+    forceTLS: true,
     enabledTransports: ['ws', 'wss'],
 });
 
 // const appName = import.meta.env.VITE_APP_NAME || 'Laravel';
-const appName = "Judging Tabulation";
+const appName = 'Judging Tabulation';
 
 const queryClient = new QueryClient({
     defaultOptions: {

@@ -138,6 +138,11 @@ class ContestController extends Controller
                 $posterName = uniqid() . '-' . $poster->getClientOriginalName();
                 $posterPath = 'poster/' . $posterName;
                 $poster->storeAs('poster', $posterName, 'public');
+
+
+                $cloudPath = Storage::disk('cloudinary')
+                    ->put('poster', $request->file('poster_url'));
+                $posterPath =   $validated['poster_url'] = $cloudPath;
             }
 
             // Create participant
@@ -204,6 +209,10 @@ class ContestController extends Controller
                 if ($participant->poster_url && Storage::disk('public')->exists($participant->poster_url)) {
                     Storage::disk('public')->delete($participant->poster_url);
                 }
+
+                $cloudPath = Storage::disk('cloudinary')
+                    ->put('poster', $request->file('poster_url'));
+                $posterPath =   $validated['poster_url'] = $cloudPath;
             }
 
             // ✅ Update participant
@@ -251,6 +260,10 @@ class ContestController extends Controller
                 $posterName = uniqid() . '-' . $poster->getClientOriginalName();
                 $posterPath = 'poster/' . $posterName;
                 $poster->storeAs('poster', $posterName, 'public');
+
+                $cloudPath = Storage::disk('cloudinary')
+                    ->put('poster', $request->file('poster_url'));
+                $posterPath =   $validated['poster_url'] = $cloudPath;
             }
 
             // ✅ Create new participant
@@ -310,6 +323,10 @@ class ContestController extends Controller
                 if ($participant->poster_url && Storage::disk('public')->exists($participant->poster_url)) {
                     Storage::disk('public')->delete($participant->poster_url);
                 }
+
+                $cloudPath = Storage::disk('cloudinary')
+                    ->put('poster', $request->file('poster_url'));
+                $posterPath =   $validated['poster_url'] = $cloudPath;
             }
 
             // ✅ Update participant
