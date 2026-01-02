@@ -28,6 +28,9 @@ configureEcho({
     forceTLS: true,
     enabledTransports: ['ws', 'wss'],
 });
+console.log('VITE_REVERB_APP_KEY:', import.meta.env.VITE_REVERB_APP_KEY);
+console.log('VITE_REVERB_HOST:', import.meta.env.VITE_REVERB_HOST);
+console.log('VITE_REVERB_PORT:', import.meta.env.VITE_REVERB_PORT);
 
 // const appName = import.meta.env.VITE_APP_NAME || 'Laravel';
 const appName = 'Judging Tabulation';
