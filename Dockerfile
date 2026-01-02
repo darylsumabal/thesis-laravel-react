@@ -112,4 +112,7 @@ RUN sed -ri -e 's!/var/www/html!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/apache2.
 EXPOSE 80
 
 # 8. Start Command
-CMD php artisan migrate --force && apache2-foreground
+# CMD php artisan migrate --force && apache2-foreground
+CMD php artisan migrate --force && \
+    php artisan reverb:start --host=0.0.0.0 --port=8080 & \
+    apache2-foreground
