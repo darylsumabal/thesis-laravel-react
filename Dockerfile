@@ -113,4 +113,4 @@ EXPOSE 80
 
 # 8. Start Command
 # CMD php artisan migrate --force && apache2-foreground
-CMD CMD php artisan migrate --force && apache2-foreground
+CMD php artisan migrate --force && apache2-foreground
