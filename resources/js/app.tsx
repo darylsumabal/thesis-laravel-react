@@ -19,7 +19,8 @@ configureEcho({
     enabledTransports: ['ws', 'wss'],
 });
 
-const appName = import.meta.env.APP_NAME || 'Laravel';
+// const appName = import.meta.env.VITE_APP_NAME || 'Laravel';
+const appName = "Judging Tabulation";
 
 const queryClient = new QueryClient({
     defaultOptions: {
