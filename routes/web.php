@@ -11,7 +11,6 @@ Route::get('/', function () {
 
 Route::middleware(['auth', 'verified'])->group(function () {
 
-   
     require __DIR__ . '/account.php';
     require __DIR__ . '/event.php';
     require __DIR__ . '/judging.php';

@@ -3,7 +3,7 @@
 use App\Http\Controllers\Criteria\CriteriaController;
 use Illuminate\Support\Facades\Route;
 
-Route::prefix('criteria')->group(function () {
+Route::middleware('is_admin')->prefix('criteria')->group(function () {
 
   Route::get('/criteria-list', [CriteriaController::class, 'indexCriteriaTable']);
 

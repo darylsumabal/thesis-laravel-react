@@ -6,19 +6,18 @@ use App\Http\Controllers\Judging\JudgingController;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('judging')->group(function () {
-    // Route::get('/', [AccountController::class, 'indexUser']);
 
     Route::post('/', [JudgingController::class, 'storeJudge']);
 
-    Route::post('/edit-score/{contestId}/{groupId}/{judgeId}', [JudgingController::class, 'updateFinishedUpdate']);
-
-    // Route::put('/{id}', [AccountController::class, 'update']);
-
     Route::delete('/{id}', [AccountController::class, 'destroy']);
 
-    Route::get('/contest-list', [CriteriaController::class, 'indexCriteriaTable'])->name('judgesTable');
+    Route::middleware('is_judge')->group(function () {
+        Route::post('/edit-score/{contestId}/{groupId}/{judgeId}', [JudgingController::class, 'updateFinishedUpdate'])->middleware('is_judge');
 
-    Route::post('/score/{judgeId}/{contestId}/{groupId}/{roundType}', [JudgingController::class, 'storeJudging']);
+        Route::get('/contest-list', [CriteriaController::class, 'indexCriteriaTable'])->name('judgesTable')->middleware('is_judge');
 
-    Route::get('/criteria-list/{contestId}/{groupId}', [JudgingController::class, 'indexCriteria']);
+        Route::post('/score/{judgeId}/{contestId}/{groupId}/{roundType}', [JudgingController::class, 'storeJudging'])->middleware('is_judge');
+
+        Route::get('/criteria-list/{contestId}/{groupId}', [JudgingController::class, 'indexCriteria'])->middleware('is_judge');
+    });
 });

@@ -7,7 +7,7 @@ use App\Http\Controllers\Result\ResultController;
 use App\Http\Controllers\Result\ResultViewController;
 use Illuminate\Support\Facades\Route;
 
-Route::prefix('result')->group(function () {
+Route::middleware('is_admin')->prefix('result')->group(function () {
 
     Route::get('/{contestId}/{groupId}/individual', [ResultViewController::class, 'indexJudgesFinished']);
 

@@ -3,7 +3,7 @@
 use App\Http\Controllers\Contest\ContestController;
 use Illuminate\Support\Facades\Route;
 
-Route::prefix('contest')->group(function () {
+Route::middleware('is_admin')->prefix('contest')->group(function () {
 
     Route::post('/{contestId}/{participantType}/upload', [ContestController::class, 'storeImportParticipant']);
 

@@ -6,16 +6,7 @@ use App\Http\Controllers\Event\EventController;
 use App\Http\Controllers\Event\UpcomingEventController;
 use Illuminate\Support\Facades\Route;
 
-Route::prefix('event')->group(function () {
-    // Route::get('/', [UpcomingEventController::class, 'index']);
-
-    // Route::get('/archived/{organizerId}', [UpcomingEventController::class, 'indexArchivedEvent']);
-
-    // Route::get('/organizer/{organizerId}/{eventId}', [UpcomingEventController::class, 'indexOrganizer']);
-
-
-    // Route::get('/', [EventController::class, 'index']);
-
+Route::middleware('is_admin')->prefix('event')->group(function () {
     //event list table
     Route::get('/event-list', [EventController::class, 'indexOrganizerTable']);
 
@@ -40,7 +31,6 @@ Route::prefix('event')->group(function () {
 
     Route::post('/update/{eventId}', [EventController::class, 'update']);
 
-
     //archived event
     Route::post('/archived/{eventId}', [EventController::class, 'archivedEvent']);
 
@@ -50,10 +40,6 @@ Route::prefix('event')->group(function () {
     //delete event
     Route::delete('/{id}', [EventController::class, 'destroy']);
 
-    // Route::get('/judge/{judgeId}/{eventId}', [UpcomingEventController::class, 'indexJudges']);
-
-    // Route::get('/judge/{judgeId}', [UpcomingEventController::class, 'indexJudges']);
-
     Route::post('/', [AddEventController::class, 'store']);
 
 
@@ -62,8 +48,4 @@ Route::prefix('event')->group(function () {
         'storePoster'
     ]);
 
-    // Route::get('/event-list/{eventId}/contest/{contestId}/poster', [
-    //     UpcomingEventController::class,
-    //     'poster'
-    // ]);
 });
