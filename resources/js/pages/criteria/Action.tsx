@@ -1,7 +1,6 @@
 import { CriteriaInfos } from '@/api/criteria';
 import { Button } from '@/components/ui/button';
 import { router } from '@inertiajs/react';
-
 import { Row } from '@tanstack/react-table';
 import { toast } from 'sonner';
 
