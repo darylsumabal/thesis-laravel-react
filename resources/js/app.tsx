@@ -7,7 +7,7 @@ import { ContextProvider } from './context/ContesxtProvider';
 import { initializeTheme } from './hooks/use-appearance';
 import { configureEcho } from '@laravel/echo-react';
 
-const appName = 'Judging Tabulation';
+const appName =  import.meta.env.VITE_APP_NAME;
 
 configureEcho({
     broadcaster: 'pusher',

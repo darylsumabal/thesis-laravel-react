@@ -43,7 +43,7 @@ RUN composer install --no-interaction --no-dev --optimize-autoloader --no-script
 # 5. Build React Assets (Environment variables are now available)
 RUN npm install
 RUN npm run build
-
+RUN
 # 6. Permissions
 RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache /var/www/html/public
 RUN chmod -R 775 /var/www/html/storage /var/www/html/bootstrap/cache /var/www/html/public
@@ -56,6 +56,6 @@ RUN sed -ri -e 's!/var/www/html!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/apache2.
 EXPOSE 80
 
 # 8. Start Command
-CMD php artisan migrate --force && apache2-foreground
+CMD apache2-foreground
 
 
