@@ -5,7 +5,7 @@ import {
   useScroll,
   useTransform
 } from "motion/react";
-import React, { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 
 export type ActivityLog = {
@@ -48,7 +48,7 @@ export const Timeline = () => {
   const ref = useRef<HTMLDivElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const [height, setHeight] = useState(0);
-  const {activity} = usePage<{activity:ActivityLog[]}>().props 
+  const {activity} = usePage<{activity:ActivityLog[]}>().props
   useEffect(() => {
     if (ref.current) {
       const rect = ref.current.getBoundingClientRect();
@@ -70,7 +70,7 @@ export const Timeline = () => {
     ref={containerRef}
   >
     <div className="max-w-7xl mx-auto py-20 px-4 md:px-8 lg:px-10">
-      <h2 className="text-lg md:text-4xl mb-4 text-black max-w-4xl">
+      <h2 className="text-lg md:text-4xl mb-4 max-w-4xl">
         Activity Logs
       </h2>
     </div>
@@ -82,9 +82,9 @@ export const Timeline = () => {
           <div key={index} className="flex justify-start pt-5 ">
             <div className="sticky flex flex-col md:flex-row z-40 items-center top-40 self-start max-w-xs lg:max-w-sm md:w-full">
               <div className="h-10 absolute left-3 md:left-3 w-10 rounded-full  flex items-center justify-center">
-                <div className="h-4 w-4 rounded-full bg-black border border-black  p-2" />
+                <div className="h-4 w-4 rounded-full dark:bg-white dark:border-white bg-black border border-black  p-2" />
               </div>
-              <div className="hidden md:block text-base md:pl-20 text-black">
+              <div className="hidden md:block text-base md:pl-20">
                 <p className="uppercase font-bold">{item.action}</p>
                 <p>
                   {new Date(item.updated_at).toLocaleDateString("en-US", {
@@ -102,7 +102,7 @@ export const Timeline = () => {
               <p className="font-bold uppercase">
                 {item.judge.role} {item.judge.name}
               </p>
-              <div className="text-black">
+              <div>
                 <p>
                   <span className="font-medium">Criteria: </span>
                   {item.model_data.criteria}
