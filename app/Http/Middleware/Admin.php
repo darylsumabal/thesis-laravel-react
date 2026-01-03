@@ -17,7 +17,7 @@ class Admin
     {
 
         $user = auth()->user();
-        logger($user->accountType);
+ 
         if ($user->accountType !== 'ADMIN') {
             abort(403);
         }

@@ -25,8 +25,7 @@ class AccountController extends Controller
 
     public function update(Request $request, $judgeId)
     {
-        logger($request);
-        logger($judgeId);
+
         try {
             // ✅ Validate request data
             $validated = $request->validate([
