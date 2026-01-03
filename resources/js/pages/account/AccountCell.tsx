@@ -63,7 +63,7 @@ const AccountCell = ({ row }: { row: Row<Account> }) => {
                 useFormData={true}
                 buttonSaveTitle="Save"
                 buttonTitle="Edit"
-                dialogTitle="Create an account"
+                dialogTitle="Edit an account"
                 dialogDescription="Account Info"
                 dialogInputLabel={EDIT_ACCOUNT}
                 comboboxField={COMBOBOX_INPUT_PANEL}
