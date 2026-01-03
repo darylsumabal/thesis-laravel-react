@@ -1,6 +1,16 @@
 # FROM php:8.3.3-apache
 
-# # 1. Install System Deps + Node.js (Upgraded to Node 22 LTS)
+# # Accept build arguments for Vite
+# ARG VITE_PUSHER_APP_KEY
+# ARG VITE_PUSHER_APP_CLUSTER
+# ARG VITE_APP_NAME
+
+# # Set as environment variables for the build
+# ENV VITE_PUSHER_APP_KEY=$VITE_PUSHER_APP_KEY
+# ENV VITE_PUSHER_APP_CLUSTER=$VITE_PUSHER_APP_CLUSTER
+# ENV VITE_APP_NAME=$VITE_APP_NAME
+
+# # 1. Install System Deps + Node.js
 # RUN apt-get update && apt-get install -y \
 #     libpng-dev \
 #     libonig-dev \
@@ -15,7 +25,7 @@
 #     && apt-get install -y nodejs \
 #     && update-ca-certificates
 
-# # 2. Install PHP extensions (Added zip)
+# # 2. Install PHP extensions
 # RUN docker-php-ext-configure intl \
 #     && docker-php-ext-install pdo_mysql mbstring exif pcntl bcmath gd zip intl
 # RUN a2enmod rewrite
@@ -26,16 +36,15 @@
 # WORKDIR /var/www/html
 # COPY . .
 
-# # 4. Install PHP dependencies (CRITICAL: Added --no-scripts)
-# # This prevents Laravel from crashing during build due to missing ENV vars
+# # 4. Install PHP dependencies
 # ENV COMPOSER_MEMORY_LIMIT=-1
 # RUN composer install --no-interaction --no-dev --optimize-autoloader --no-scripts
 
-# # 5. Build React Assets
+# # 5. Build React Assets (Environment variables are now available)
 # RUN npm install
 # RUN npm run build
 
-# # 6. Permissions (Added public/storage for safety)
+# # 6. Permissions
 # RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache /var/www/html/public
 # RUN chmod -R 775 /var/www/html/storage /var/www/html/bootstrap/cache /var/www/html/public
 
@@ -46,24 +55,20 @@
 
 # EXPOSE 80
 
-# # 8. Start Command (Wait for migration, then start Apache)
+# # 8. Start Command
 # CMD php artisan migrate --force && apache2-foreground
 
 
 FROM php:8.3.3-apache
 
 # Accept build arguments for Vite
-ARG VITE_REVERB_APP_KEY
-ARG VITE_REVERB_HOST
-ARG VITE_REVERB_PORT
-ARG VITE_REVERB_SCHEME
+ARG VITE_PUSHER_APP_KEY
+ARG VITE_PUSHER_APP_CLUSTER
 ARG VITE_APP_NAME
 
 # Set as environment variables for the build
-ENV VITE_REVERB_APP_KEY=$VITE_REVERB_APP_KEY
-ENV VITE_REVERB_HOST=$VITE_REVERB_HOST
-ENV VITE_REVERB_PORT=$VITE_REVERB_PORT
-ENV VITE_REVERB_SCHEME=$VITE_REVERB_SCHEME
+ENV VITE_PUSHER_APP_KEY=$VITE_PUSHER_APP_KEY
+ENV VITE_PUSHER_APP_CLUSTER=$VITE_PUSHER_APP_CLUSTER
 ENV VITE_APP_NAME=$VITE_APP_NAME
 
 # 1. Install System Deps + Node.js
@@ -79,7 +84,9 @@ RUN apt-get update && apt-get install -y \
     ca-certificates \
     && curl -sL https://deb.nodesource.com/setup_22.x | bash - \
     && apt-get install -y nodejs \
-    && update-ca-certificates
+    && update-ca-certificates \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
 
 # 2. Install PHP extensions
 RUN docker-php-ext-configure intl \
@@ -90,26 +97,39 @@ RUN a2enmod rewrite
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
 WORKDIR /var/www/html
+
+# 4. Copy only dependency files first (for better caching)
+COPY composer.json composer.lock package.json package-lock.json ./
+
+# 5. Install dependencies
+ENV COMPOSER_MEMORY_LIMIT=-1
+RUN composer install --no-interaction --no-dev --optimize-autoloader --no-scripts --no-autoloader
+RUN npm ci --only=production
+
+# 6. Copy the rest of the application
 COPY . .
 
-# 4. Install PHP dependencies
-ENV COMPOSER_MEMORY_LIMIT=-1
-RUN composer install --no-interaction --no-dev --optimize-autoloader --no-scripts
+# 7. Finish Composer installation
+RUN composer dump-autoload --no-dev --optimize
 
-# 5. Build React Assets (Environment variables are now available)
-RUN npm install
+# 8. Build React Assets (Environment variables are now available)
 RUN npm run build
 
-# 6. Permissions
+# 9. Clean up
+RUN npm cache clean --force \
+    && rm -rf node_modules
+
+# 10. Permissions
 RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache /var/www/html/public
 RUN chmod -R 775 /var/www/html/storage /var/www/html/bootstrap/cache /var/www/html/public
 
-# 7. Apache Config
-ENV APACHE_DOCUMENT_ROOT /var/www/html/public
-RUN sed -ri -e 's!/var/www/html!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/sites-available/*.conf
-RUN sed -ri -e 's!/var/www/html!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/apache2.conf /etc/apache2/conf-available/*.conf
+# 11. Apache Config
+ENV APACHE_DOCUMENT_ROOT=/var/www/html/public
+RUN sed -ri -e 's!/var/www/html!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/sites-available/*.conf \
+    && sed -ri -e 's!/var/www/html!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/apache2.conf /etc/apache2/conf-available/*.conf
 
 EXPOSE 80
 
-# 8. Start Command
+# 12. Start Command
 CMD php artisan migrate --force && apache2-foreground
+
