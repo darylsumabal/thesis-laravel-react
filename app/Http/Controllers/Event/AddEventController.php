@@ -28,14 +28,6 @@ class AddEventController extends Controller
 
         $poster->storeAs('poster', $posterName, 'public');
 
-
-        $cloudPath = Storage::disk('cloudinary')
-            ->put('poster', $request->file('poster'));
-
-        $posterPath =  $validate['poster'] = $cloudPath;
-
-
-
         Event::create([
             'organizer_id' => $organizerId,
             'name' => $validate['name'],

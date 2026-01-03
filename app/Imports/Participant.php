@@ -13,7 +13,6 @@ class Participant implements ToCollection, ToModel, WithChunkReading
 {
     private $current = 0;
     private $contestId;
-    private $organizerId;
     public function __construct($contestId)
     {
         $this->contestId = $contestId;
@@ -43,7 +42,6 @@ class Participant implements ToCollection, ToModel, WithChunkReading
             return null;
         }
 
-
         // 🔍 Check for duplicate participant number in this contest
         $existing = Participants::where('contest_id', $this->contestId)
             ->where('participant_no', $rows[0])->where('gender', $rows[5])
@@ -55,7 +53,6 @@ class Participant implements ToCollection, ToModel, WithChunkReading
 
         if ($this->current > 1) {
             Participants::create([
-                // 'organizer_id' => $this->organizerId,
                 'contest_id' => $this->contestId,
                 'participant_no' => $rows[0],
                 'first_name' => $rows[1],
@@ -82,9 +79,6 @@ class Participant implements ToCollection, ToModel, WithChunkReading
 
             // Store the poster file in the 'public' disk
             Storage::disk('public')->putFileAs('poster', $posterUrl, $posterName);
-
-            $posterPath = Storage::disk('cloudinary')
-                ->put('poster', 'poster_url');
 
             // Return the stored poster path to save in the database
             return $posterPath;

@@ -7,28 +7,16 @@ Broadcast::channel('App.Models.User.{id}', function ($user, $id) {
 });
 
 
-Broadcast::channel('top-participants', function ($user) {
-
-    logger()->info('Broadcast auth check', [
-        'user_id' => $user->id,
-    ]);
+Broadcast::channel('top-participants', function () {
     return true;
 });
 
 
-Broadcast::channel('submit-score', function ($user) {
-
-    logger()->info('Broadcast auth check', [
-        'user_id' => $user->id,
-    ]);
+Broadcast::channel('submit-score', function () {
     return true;
 });
 
 
-Broadcast::channel('request-edit', function ($user) {
-
-    logger()->info('Broadcast auth check', [
-        'user_id' => $user->id,
-    ]);
+Broadcast::channel('request-edit', function () {
     return true;
 });

@@ -6,12 +6,10 @@ import { Form } from '@/components/ui/form';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { scoreMap } from '@/lib/constant/contest';
 import { CriteriaAddRound, CriteriaAddSchema, CriteriaRound, CriteriaRoundSr, CriteriaSchema, judgesSchema } from '@/schema/scoring';
-
 import { Contests } from '@/api/contest';
 import { Participant, TeamParticipant } from '@/api/result';
 import { JudgesData } from '@/api/scoring';
 import TableCardCriteria from '@/components/table/TableCardCriteria';
-import { Toaster } from '@/components/ui/sonner';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { router, usePage } from '@inertiajs/react';
 import { flexRender, getCoreRowModel, useReactTable } from '@tanstack/react-table';

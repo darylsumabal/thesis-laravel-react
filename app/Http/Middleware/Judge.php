@@ -16,7 +16,7 @@ class Judge
     public function handle(Request $request, Closure $next): Response
     {
         $user = auth()->user();
-        logger($user->accountType);
+
         if ($user->accountType !== 'JUDGE') {
             abort(403);
         }

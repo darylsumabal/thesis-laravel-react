@@ -15,7 +15,6 @@ class TeamParticipant implements ToCollection, ToModel, WithChunkReading
     private $current = 0;
 
     private $contestId;
-    private $organizerId;
     public function __construct($contestId)
     {
         $this->contestId = $contestId;
@@ -53,7 +52,6 @@ class TeamParticipant implements ToCollection, ToModel, WithChunkReading
 
         if ($this->current > 1) {
             TeamParticipants::create([
-                // 'organizer_id' => $this->organizerId,
                 'contest_id' => $this->contestId,
                 'team_participant_no' => $row[0],
                 'team_name' => $row[1],
