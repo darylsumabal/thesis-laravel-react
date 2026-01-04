@@ -186,6 +186,7 @@ class ContestController extends Controller
             $existingParticipant = Participants::where('contest_id', $contest->id)
                 ->where('participant_no', $validated['participant_no'])
                 ->where('gender', $validated['gender'])
+                ->where('id', '<>', $participant->id)
                 ->first();
 
             if ($existingParticipant) {
@@ -292,6 +293,7 @@ class ContestController extends Controller
             // ✅ Check if team_participant_no is already used by another team
             $existingParticipant = TeamParticipants::where('contest_id', $contest->id)
                 ->where('team_participant_no', $validated['team_participant_no'])
+                ->where('id', '<>', $participant->id)
                 ->first();
 
             if ($existingParticipant) {
