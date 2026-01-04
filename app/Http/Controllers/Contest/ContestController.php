@@ -13,6 +13,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Models\ContestParticipantPoster;
+use Cloudinary\Cloudinary;
 use Inertia\Inertia;
 
 class ContestController extends Controller
@@ -66,8 +67,16 @@ class ContestController extends Controller
 
         $imagePath = $participant->poster_url;
 
-        if ($imagePath && Storage::disk('public')->exists($imagePath)) {
+        if ($imagePath) {
             Storage::disk('public')->delete($imagePath);
+
+            $publicId = pathinfo($imagePath, PATHINFO_FILENAME);
+            $folder = dirname($imagePath);
+
+            $publicId = $folder . '/' . $publicId;
+
+            $cloudinary = new Cloudinary(config('cloudinary'));
+            $cloudinary->uploadApi()->destroy($publicId);
         }
 
         $participant->delete();
@@ -80,8 +89,16 @@ class ContestController extends Controller
 
         $imagePath = $participant->poster_url;
 
-        if ($imagePath && Storage::disk('public')->exists($imagePath)) {
+        if ($imagePath) {
             Storage::disk('public')->delete($imagePath);
+
+            $publicId = pathinfo($imagePath, PATHINFO_FILENAME);
+            $folder = dirname($imagePath);
+
+            $publicId = $folder . '/' . $publicId;
+
+            $cloudinary = new Cloudinary(config('cloudinary'));
+            $cloudinary->uploadApi()->destroy($publicId);
         }
 
         $participant->delete();
@@ -191,6 +208,7 @@ class ContestController extends Controller
             $existingParticipant = Participants::where('contest_id', $contest->id)
                 ->where('participant_no', $validated['participant_no'])
                 ->where('gender', $validated['gender'])
+                ->where('id', '<>', $participant->id)
                 ->first();
 
             if ($existingParticipant) {
@@ -206,8 +224,17 @@ class ContestController extends Controller
                 $poster->storeAs('poster', $posterName, 'public');
 
                 // delete old poster if exists
-                if ($participant->poster_url && Storage::disk('public')->exists($participant->poster_url)) {
+                if ($participant->poster_url) {
                     Storage::disk('public')->delete($participant->poster_url);
+
+
+                    $publicId = pathinfo($participant->poster_url, PATHINFO_FILENAME);
+                    $folder = dirname($participant->poster_url);
+
+                    $publicId = $folder . '/' . $publicId;
+
+                    $cloudinary = new Cloudinary(config('cloudinary'));
+                    $cloudinary->uploadApi()->destroy($publicId);
                 }
 
                 $cloudPath = Storage::disk('cloudinary')
@@ -305,6 +332,7 @@ class ContestController extends Controller
             // ✅ Check if team_participant_no is already used by another team
             $existingParticipant = TeamParticipants::where('contest_id', $contest->id)
                 ->where('team_participant_no', $validated['team_participant_no'])
+                ->where('id', '<>', $participant->id)
                 ->first();
 
             if ($existingParticipant) {
@@ -320,8 +348,16 @@ class ContestController extends Controller
                 $poster->storeAs('poster', $posterName, 'public');
 
                 // delete old poster if exists
-                if ($participant->poster_url && Storage::disk('public')->exists($participant->poster_url)) {
+                if ($participant->poster_url) {
                     Storage::disk('public')->delete($participant->poster_url);
+
+                    $publicId = pathinfo($participant->poster_url, PATHINFO_FILENAME);
+                    $folder = dirname($participant->poster_url);
+
+                    $publicId = $folder . '/' . $publicId;
+
+                    $cloudinary = new Cloudinary(config('cloudinary'));
+                    $cloudinary->uploadApi()->destroy($publicId);
                 }
 
                 $cloudPath = Storage::disk('cloudinary')
@@ -367,10 +403,21 @@ class ContestController extends Controller
 
                 // store in storage/app/public/poster/
                 $poster->storeAs('poster', $posterName, 'public');
-
+                $cloudPath = Storage::disk('cloudinary')
+                    ->put('poster', $request->file('contest_poster'));
+                $posterPath = $validated['contest_poster'] = $cloudPath;
                 // ✅ Delete old poster if exists
-                if ($contest->poster && Storage::disk('public')->exists($contest->poster)) {
-                    Storage::disk('public')->delete($contest->poster);
+                $imagePath = $contest->contest_poster;
+                if ($imagePath) {
+                    Storage::disk('public')->delete($imagePath);
+
+                    $publicId = pathinfo($imagePath, PATHINFO_FILENAME);
+                    $folder = dirname($imagePath);
+
+                    $publicId = $folder . '/' . $publicId;
+
+                    $cloudinary = new Cloudinary(config('cloudinary'));
+                    $cloudinary->uploadApi()->destroy($publicId);
                 }
 
                 // ✅ Update new poster path
@@ -397,8 +444,16 @@ class ContestController extends Controller
         $contest = Contest::findOrFail($id);
         $imagePath = $contest->contest_poster;
 
-        if ($imagePath && Storage::disk('public')->exists($imagePath)) {
+        if ($imagePath) {
             Storage::disk('public')->delete($imagePath);
+
+            $publicId = pathinfo($imagePath, PATHINFO_FILENAME);
+            $folder = dirname($imagePath);
+
+            $publicId = $folder . '/' . $publicId;
+
+            $cloudinary = new Cloudinary(config('cloudinary'));
+            $cloudinary->uploadApi()->destroy($publicId);
         }
         $contest->delete();
 

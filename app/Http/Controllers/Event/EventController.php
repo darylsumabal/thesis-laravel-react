@@ -4,8 +4,8 @@ namespace App\Http\Controllers\Event;
 
 use App\Http\Controllers\Controller;
 use App\Models\Contest;
-use App\Models\ContestParticipantPoster;
 use App\Models\Event;
+use Cloudinary\Cloudinary;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
@@ -27,9 +27,9 @@ class EventController extends Controller
         // }
 
         $events = $eventQuery
-        ->where('is_archived', 0)
-        ->paginate(10)
-        ->withQueryString();
+            ->where('is_archived', 0)
+            ->paginate(10)
+            ->withQueryString();
 
         // If empty, still return Inertia — avoid early JSON return
         // (better for consistency)
@@ -96,9 +96,17 @@ class EventController extends Controller
 
         $event = Event::findOrFail($id);
         $imagePath = $event->poster;
-
-        if ($imagePath && Storage::disk('public')->exists($imagePath)) {
+        // && Storage::disk('public')->exists($imagePath)
+        if ($imagePath) {
             Storage::disk('public')->delete($imagePath);
+
+            $publicId = pathinfo($imagePath, PATHINFO_FILENAME);
+            $folder = dirname($imagePath);
+
+            $publicId = $folder . '/' . $publicId;
+
+            $cloudinary = new Cloudinary(config('cloudinary'));
+            $cloudinary->uploadApi()->destroy($publicId);
         }
 
         $event->delete();
@@ -131,12 +139,23 @@ class EventController extends Controller
                 $posterName = uniqid() . '-' . $poster->getClientOriginalName();
                 $posterPath = 'poster/' . $posterName;
 
-                // store in storage/app/public/poster/
                 $poster->storeAs('poster', $posterName, 'public');
+                $cloudPath = Storage::disk('cloudinary')
+                    ->put('poster', $request->file('poster'));
+                $posterPath = $validated['poster'] = $cloudPath;
 
-                // ✅ Delete old poster if exists
-                if ($event->poster && Storage::disk('public')->exists($event->poster)) {
-                    Storage::disk('public')->delete($event->poster);
+                $imagePath = $event->poster;
+
+                if ($imagePath) {
+                    Storage::disk('public')->delete($imagePath);
+
+                    $publicId = pathinfo($imagePath, PATHINFO_FILENAME);
+                    $folder = dirname($imagePath);
+
+                    $publicId = $folder . '/' . $publicId;
+
+                    $cloudinary = new Cloudinary(config('cloudinary'));
+                    $cloudinary->uploadApi()->destroy($publicId);
                 }
 
                 // ✅ Update new poster path

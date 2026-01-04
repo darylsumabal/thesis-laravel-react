@@ -34,8 +34,6 @@ class AddEventController extends Controller
 
         $posterPath =  $validate['poster'] = $cloudPath;
 
-
-
         Event::create([
             'organizer_id' => $organizerId,
             'name' => $validate['name'],

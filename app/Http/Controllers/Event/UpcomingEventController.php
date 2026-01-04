@@ -6,10 +6,9 @@ use App\Http\Controllers\Controller;
 use App\Models\Contest;
 use App\Models\ContestParticipantPoster;
 use App\Models\Event;
-use App\Models\Score;
+use Cloudinary\Cloudinary;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
-use Inertia\Inertia;
 
 class UpcomingEventController extends Controller
 {
@@ -53,7 +52,6 @@ class UpcomingEventController extends Controller
                 ->put('poster', $request->file('contest_poster'));
             $posterPath =   $validated['contest_poster'] = $cloudPath;
 
-
             Contest::create([
                 'organizer_id' => $organizerId,
                 'contest_name' => $validated['contest_name'],
@@ -85,17 +83,24 @@ class UpcomingEventController extends Controller
 
         try {
             // Validate
-            $request->validate([
+            $validated = $request->validate([
                 'poster' => 'required|image|mimes:jpeg,png,jpg,webp|max:2097152'
             ]);
 
             // Find contest and its existing poster record
             // $contest = Contest::findOrFail($contestId);
             $existingPoster = ContestParticipantPoster::where('contest_id', $contestId)->first();
-
+            // && Storage::disk('public')->exists($existingPoster->poster_url)
             // If old poster exists, delete it from storage
-            if ($existingPoster && Storage::disk('public')->exists($existingPoster->poster_url)) {
+            if ($existingPoster) {
                 Storage::disk('public')->delete($existingPoster->poster_url);
+                $publicId = pathinfo($existingPoster->poster_url, PATHINFO_FILENAME);
+                $folder = dirname($existingPoster->poster_url);
+
+                $publicId = $folder . '/' . $publicId;
+
+                $cloudinary = new Cloudinary(config('cloudinary'));
+                $cloudinary->uploadApi()->destroy($publicId);
             }
 
             // Upload new file
@@ -103,6 +108,11 @@ class UpcomingEventController extends Controller
             $posterName = uniqid() . '-' . $poster->getClientOriginalName();
             $posterPath = 'poster/' . $posterName;
             $poster->storeAs('poster', $posterName, 'public');
+
+
+            $cloudPath = Storage::disk('cloudinary')
+                ->put('poster', $request->file('poster'));
+            $posterPath =   $validated['poster'] = $cloudPath;
 
             // Update or create poster record
             ContestParticipantPoster::updateOrCreate(
