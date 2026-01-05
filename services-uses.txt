@@ -1,0 +1,6 @@
+https://render.com/   // hosting platform  
+https://pusher.com/   // real time connection
+https://www.pingcap.com/  // database
+https://cloudinary.com/   // media management or image storage
+https://uptimerobot.com/ // monitor 24/7
+
