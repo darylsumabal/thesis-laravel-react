@@ -23,27 +23,16 @@ const sidebarNavItems: NavItem[] = [
         href: '/settings/appearance',
         icon: null,
     },
-    {
-        title: 'Admin',
-        href: '/admin/env-editor',
-        icon: null,
-    },
+
 ];
 
 export default function SettingsLayout({ children }: PropsWithChildren) {
     // When server-side rendering, we only render the layout on the client...
-    const { auth } = usePage<AUTH>().props;
+
     if (typeof window === 'undefined') {
         return null;
     }
 
-    const filteredNavItems = sidebarNavItems.filter((item) => {
-        // Only show the Admin link if user is admin
-        if (item.title === 'Admin' && auth.user.role !== 'Admin') {
-            return false;
-        }
-        return true;
-    });
     const currentPath = window.location.pathname;
 
     return (
@@ -53,7 +42,7 @@ export default function SettingsLayout({ children }: PropsWithChildren) {
             <div className="flex flex-col space-y-8 lg:flex-row lg:space-y-0 lg:space-x-12">
                 <aside className="w-full max-w-xl lg:w-48">
                     <nav className="flex flex-col space-y-1 space-x-0">
-                        {filteredNavItems.map((item, index) => (
+                        {sidebarNavItems.map((item, index) => (
                             <Button
                                 key={`${item.href}-${index}`}
                                 size="sm"
