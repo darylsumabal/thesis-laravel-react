@@ -93,11 +93,11 @@ function TableRankedFinal({ scoringType, contest }: PROPS) {
     return (
         <div className="w-full">
             <ResultHeader contest={contest ?? { contest: [], message: '' }} />
-            <div className="mt-14 mb-10 text-center text-3xl font-medium uppercase">
+            <div className="mt-14 mb-10 text-center text-3xl font-bold  uppercase">
                 <p>CONSOLIDATED RESULT</p>
             </div>
             <div className="flex flex-col">
-                <div className="mb-4 flex w-full flex-col items-center justify-center rounded-md bg-[#45226b] p-4 text-center text-3xl font-medium text-white">
+                <div className="mb-4 flex w-full flex-col items-center justify-center rounded-md bg-[#45226b] p-4 text-center text-3xl font-bold text-white">
                     <p className="uppercase">{data?.[0]?.criteria}</p>
                 </div>
                 <div className="flex flex-col xl:flex-row gap-4">
@@ -117,17 +117,17 @@ function TableRankedFinal({ scoringType, contest }: PROPS) {
                         return (
                             <div key={gender} className="mb-12 w-full">
                                 <div className="mb-2 rounded-lg p-4 text-center">
-                                    <h2 className="text-2xl font-medium uppercase">{gender} Candidates</h2>
+                                    <h2 className="text-2xl font-bold uppercase">{gender} Candidates</h2>
                                 </div>
                                 <div className="w-full overflow-x-auto rounded-md border">
                                     <Table>
                                         <TableHeader>
                                             <TableRow>
-                                                <TableHead className="text-center text-xs font-medium uppercase">Contestant No.</TableHead>
+                                                <TableHead className="text-center text-xs font-bold uppercase">Contestant No.</TableHead>
                                                 {judges.map((judge) => (
                                                     <TableHead
                                                         key={judge}
-                                                        className="space-y-2 p-2 text-center text-xs font-medium tracking-wider break-words whitespace-normal uppercase"
+                                                        className="space-y-2 p-2 text-center text-xs font-bold tracking-wider break-words whitespace-normal uppercase"
                                                     >
                                                         <div>{judge}</div>
                                                         <div className="flex justify-between uppercase">
@@ -139,10 +139,10 @@ function TableRankedFinal({ scoringType, contest }: PROPS) {
 
                                                 {scoringRank.includes(scoringType) && (
                                                     <>
-                                                        <TableHead className="text-center text-xs font-medium break-words whitespace-normal uppercase">
+                                                        <TableHead className="text-center text-xs font-bold break-words whitespace-normal uppercase">
                                                             Total %
                                                         </TableHead>
-                                                        <TableHead className="text-center text-xs font-medium break-words whitespace-normal uppercase">
+                                                        <TableHead className="text-center text-xs font-bold break-words whitespace-normal uppercase">
                                                             Total Rank
                                                         </TableHead>
                                                     </>
@@ -150,15 +150,15 @@ function TableRankedFinal({ scoringType, contest }: PROPS) {
 
                                                 {scoringPoint.includes(scoringType) && (
                                                     <>
-                                                        <TableHead className="text-center text-xs font-medium break-words whitespace-normal uppercase">
+                                                        <TableHead className="text-center text-xs font-bold break-words whitespace-normal uppercase">
                                                             Total %
                                                         </TableHead>
-                                                        <TableHead className="text-center text-xs font-medium break-words whitespace-normal uppercase">
+                                                        <TableHead className="text-center text-xs font-bold break-words whitespace-normal uppercase">
                                                             Total Rank
                                                         </TableHead>
                                                     </>
                                                 )}
-                                                <TableHead className="text-center text-xs font-medium break-words whitespace-normal uppercase">
+                                                <TableHead className="text-center text-xs font-bold break-words whitespace-normal uppercase">
                                                     Final Rank
                                                 </TableHead>
                                             </TableRow>
@@ -169,7 +169,7 @@ function TableRankedFinal({ scoringType, contest }: PROPS) {
                                                 <>
                                                     {groupedData.map((participant) => (
                                                         <TableRow key={participant.participant_no}>
-                                                            <TableCell className="text-center font-medium whitespace-nowrap">
+                                                            <TableCell className="text-center font-bold whitespace-nowrap">
                                                                 {participant.participant_no}
                                                             </TableCell>
 
@@ -183,10 +183,10 @@ function TableRankedFinal({ scoringType, contest }: PROPS) {
                                                                         >
                                                                             {judgeScore ? (
                                                                                 <div className="flex justify-between">
-                                                                                    <div className="font-medium">
+                                                                                    <div className="font-bold">
                                                                                         {parseFloat(String(judgeScore.total)).toFixed(2)}
                                                                                     </div>
-                                                                                    <div className="font-medium">
+                                                                                    <div className="font-bold">
                                                                                         {parseFloat(judgeScore.rank).toFixed(2)}
                                                                                     </div>
                                                                                 </div>
@@ -198,14 +198,14 @@ function TableRankedFinal({ scoringType, contest }: PROPS) {
                                                                 }),
                                                             )}
 
-                                                            <TableCell className="text-center font-medium whitespace-nowrap">
+                                                            <TableCell className="text-center font-bold whitespace-nowrap">
                                                                 {participant.total_score}
                                                             </TableCell>
-                                                            <TableCell className="text-center font-medium whitespace-nowrap">
+                                                            <TableCell className="text-center font-bold whitespace-nowrap">
                                                                 {participant.total_rank}
                                                             </TableCell>
                                                             <TableCell
-                                                                className={`text-center font-medium whitespace-nowrap ${getRankBgClass(
+                                                                className={`text-center font-bold whitespace-nowrap ${getRankBgClass(
                                                                     participant.final_rank,
                                                                     qualified,
                                                                 )} `}
@@ -221,7 +221,7 @@ function TableRankedFinal({ scoringType, contest }: PROPS) {
                                                 <>
                                                     {groupedData.map((participant) => (
                                                         <TableRow key={participant.participant_no}>
-                                                            <TableCell className="text-center font-medium whitespace-nowrap">
+                                                            <TableCell className="text-center font-bold whitespace-nowrap">
                                                                 {participant.participant_no}
                                                             </TableCell>
 
@@ -235,10 +235,10 @@ function TableRankedFinal({ scoringType, contest }: PROPS) {
                                                                         >
                                                                             {judgeScore ? (
                                                                                 <div className="flex justify-between">
-                                                                                    <div className="font-medium">
+                                                                                    <div className="font-bold">
                                                                                         {parseFloat(String(judgeScore.total)).toFixed(2)}
                                                                                     </div>
-                                                                                    <div className="font-medium">
+                                                                                    <div className="font-bold">
                                                                                         {parseFloat(judgeScore.rank).toFixed(2)}
                                                                                     </div>
                                                                                 </div>
@@ -250,14 +250,14 @@ function TableRankedFinal({ scoringType, contest }: PROPS) {
                                                                 }),
                                                             )}
 
-                                                            <TableCell className="text-center font-medium whitespace-nowrap">
+                                                            <TableCell className="text-center font-bold whitespace-nowrap">
                                                                 {participant.total_score}
                                                             </TableCell>
-                                                            <TableCell className="text-center font-medium whitespace-nowrap">
+                                                            <TableCell className="text-center font-bold whitespace-nowrap">
                                                                 {participant.total_rank}
                                                             </TableCell>
                                                             <TableCell
-                                                                className={`text-center font-medium whitespace-nowrap ${getRankBgClass(
+                                                                className={`text-center font-bold whitespace-nowrap ${getRankBgClass(
                                                                     participant.final_rank,
                                                                     qualified,
                                                                 )} `}

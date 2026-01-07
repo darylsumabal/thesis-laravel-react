@@ -39,7 +39,7 @@ const JudgesResult = ({
             scores: item.scores.filter((score) => score.judgeId === judgeId),
         };
     });
- 
+
     const computeTotalsAndRanks = (byParticipant: Record<string, JudgeScore[]>) => {
         // Step 1: Compute totals
         const totals = Object.entries(byParticipant).map(([participantNo, scores]) => {
@@ -277,7 +277,7 @@ const JudgesResult = ({
             <div>
                 <div className="mt-10 flex flex-wrap justify-center gap-10">
                     <div className="w-72 text-center">
-                        <div className="uppercase">{judgeName}</div>
+                        <div className="font-bold uppercase">{judgeName}</div>
                         <hr className="h-[2px] bg-slate-950" />
                         <div className="text-xs">
                             {judgeRole} {judgeNumber}
@@ -287,7 +287,7 @@ const JudgesResult = ({
 
                 <div className="mt-10 flex flex-wrap justify-center gap-10">
                     <div className="w-72 text-center">
-                        <div className="uppercase">{auth.user.name}</div>
+                        <div className="font-bold uppercase">{auth.user.name}</div>
                         <hr className="h-[2px] bg-slate-950" />
                         <div className="text-xs">Tabulator</div>
                     </div>

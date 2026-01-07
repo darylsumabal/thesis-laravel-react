@@ -89,11 +89,11 @@ function TableResultTypeTeamMultiple({ scoringType, contest }: { scoringType: st
     return (
         <div className="flex flex-col">
             <ResultHeader contest={contest ?? { contest: [], message: '' }} />
-            <div className="mt-14 mb-10 text-center text-3xl font-medium">
+            <div className="mt-14 mb-10 text-center text-3xl font-bold">
                 <p>CONSOLIDATED RESULT</p>
             </div>
 
-            <div className="mb-4 flex w-full flex-col items-center justify-center rounded-md bg-[#45226b] p-4 text-center text-3xl font-medium text-white">
+            <div className="mb-4 flex w-full flex-col items-center justify-center rounded-md bg-[#45226b] p-4 text-center text-3xl font-bold text-white">
                 <p className="">Top {qualified} Finalists</p>
                 <p className="text-base font-normal uppercase">({scoringType})</p>
                 <p className="text-base font-normal uppercase">({prelimScoringType} ROUND)</p>
@@ -117,13 +117,13 @@ function TableResultTypeTeamMultiple({ scoringType, contest }: { scoringType: st
                     return (
                         <div key={index} className="mb-12 w-full">
                             <div className="mb-6 rounded-lg p-4 text-center">
-                                <h2 className="text-2xl font-medium"> Candidates</h2>
+                                <h2 className="text-2xl font-bold"> Candidates</h2>
                             </div>
                             <div className="overflow-x-auto rounded-md border">
                                 <Table>
                                     <TableHeader>
                                         <TableRow>
-                                            <TableHead className="text-center text-xs font-medium uppercase">Contestant No.</TableHead>
+                                            <TableHead className="text-center text-xs font-bold uppercase">Contestant No.</TableHead>
 
                                             {criteria.map((crit) =>
                                                 judges.map((judge) => {
@@ -132,7 +132,7 @@ function TableResultTypeTeamMultiple({ scoringType, contest }: { scoringType: st
                                                     return (
                                                         <TableHead
                                                             key={`${crit}-${judge}`}
-                                                            className="space-y-2 p-2 text-center text-xs font-medium uppercase"
+                                                            className="space-y-2 p-2 text-center text-xs font-bold uppercase"
                                                         >
                                                             {prelimScoringType === 'weighted' && <p>{weight}%</p>}
                                                             <div className="break-words whitespace-normal">{crit}</div>
@@ -146,7 +146,7 @@ function TableResultTypeTeamMultiple({ scoringType, contest }: { scoringType: st
 
                                                                 {scoringType == 'Rank Based Multiple Round' && (
                                                                     <>
-                                                                        <p>Total Points</p>
+                                                                        {/* <p>Total Points</p> */}
                                                                         <p>Total Rank</p>
                                                                         <p>Final Rank</p>
                                                                     </>
@@ -158,8 +158,8 @@ function TableResultTypeTeamMultiple({ scoringType, contest }: { scoringType: st
                                             )}
                                             {scoringType == 'Point Based Multiple Round' && (
                                                 <>
-                                                    <TableHead className="text-center text-xs font-medium uppercase">Total %</TableHead>
-                                                    <TableHead className="text-center text-xs font-medium break-words whitespace-normal uppercase">
+                                                    <TableHead className="text-center text-xs font-bold uppercase">Total %</TableHead>
+                                                    <TableHead className="text-center text-xs font-bold break-words whitespace-normal uppercase">
                                                         Total Rank
                                                     </TableHead>
                                                 </>
@@ -167,16 +167,16 @@ function TableResultTypeTeamMultiple({ scoringType, contest }: { scoringType: st
                                             {scoringType == 'Rank Based Multiple Round' && (
                                                 <>
                                                     {prelimScoringType == 'weighted' ? (
-                                                        <TableHead className="text-center text-xs font-medium uppercase">Total Rank</TableHead>
+                                                        <TableHead className="text-center text-xs font-bold uppercase">Total Rank</TableHead>
                                                     ) : (
-                                                        <TableHead className="text-center text-xs font-medium uppercase">Total Points</TableHead>
+                                                        <TableHead className="text-center text-xs font-bold uppercase">Total Points</TableHead>
                                                     )}
-                                                    <TableHead className="text-center text-xs font-medium break-words whitespace-normal uppercase">
+                                                    <TableHead className="text-center text-xs font-bold break-words whitespace-normal uppercase">
                                                         Total %
                                                     </TableHead>
                                                 </>
                                             )}
-                                            <TableHead className="text-center text-xs font-medium break-words whitespace-normal uppercase">
+                                            <TableHead className="text-center text-xs font-bold break-words whitespace-normal uppercase">
                                                 Final Rank
                                             </TableHead>
                                         </TableRow>
@@ -184,7 +184,7 @@ function TableResultTypeTeamMultiple({ scoringType, contest }: { scoringType: st
                                     <TableBody>
                                         {groupedData.map((participant) => (
                                             <TableRow key={participant.participant_no}>
-                                                <TableCell className="text-center font-medium whitespace-nowrap">
+                                                <TableCell className="text-center font-bold whitespace-nowrap">
                                                     {participant.participant_no}
                                                 </TableCell>
 
@@ -202,32 +202,32 @@ function TableResultTypeTeamMultiple({ scoringType, contest }: { scoringType: st
                                                                             <>
                                                                                 {prelimScoringType == 'weighted' ? (
                                                                                     <>
-                                                                                        <div className="font-medium">{judgeScore.total_points}%</div>
+                                                                                        <div className="font-bold">{judgeScore.total_points}%</div>
                                                                                     </>
                                                                                 ) : (
                                                                                     <>
-                                                                                        <div className="font-medium">{judgeScore.score}%</div>
+                                                                                        <div className="font-bold">{judgeScore.score}%</div>
                                                                                     </>
                                                                                 )}
 
-                                                                                <div className="font-medium">{formatRank(judgeScore.rank)}</div>
+                                                                                <div className="font-bold">{formatRank(judgeScore.rank)}</div>
                                                                             </>
                                                                         ) : (
                                                                             <>
-                                                                                <div className="font-medium">
+                                                                                {/* <div className="font-bold">
                                                                                     {parseFloat(judgeScore.score).toFixed(2)}
-                                                                                </div>
+                                                                                </div> */}
                                                                                 {prelimScoringType == 'weighted' ? (
                                                                                     <>
-                                                                                        <div className="font-medium">
+                                                                                        <div className="font-bold">
                                                                                             {parseFloat(judgeScore.rank).toFixed(2)}
                                                                                         </div>
-                                                                                        <div className="font-medium">{judgeScore.total_rank}</div>
+                                                                                        <div className="font-bold">{judgeScore.total_rank}</div>
                                                                                     </>
                                                                                 ) : (
                                                                                     <>
-                                                                                        <div className="font-medium">{judgeScore.total_rank}</div>
-                                                                                        <div className="font-medium">
+                                                                                        <div className="font-bold">{judgeScore.total_rank}</div>
+                                                                                        <div className="font-bold">
                                                                                             {parseFloat(judgeScore.rank).toFixed(2)}
                                                                                         </div>
                                                                                     </>
@@ -248,16 +248,16 @@ function TableResultTypeTeamMultiple({ scoringType, contest }: { scoringType: st
 
                                                 {scoringType == 'Point Based Multiple Round' ? (
                                                     <>
-                                                        <TableCell className="text-center font-medium">{participant.total}</TableCell>
-                                                        <TableCell className="text-center font-medium">{participant.total_rank}</TableCell>
+                                                        <TableCell className="text-center font-bold">{participant.total}</TableCell>
+                                                        <TableCell className="text-center font-bold">{participant.total_rank}</TableCell>
                                                     </>
                                                 ) : (
                                                     <>
-                                                        <TableCell className="text-center font-medium">{participant.total_points}</TableCell>
-                                                        <TableCell className="text-center font-medium">{participant.total}</TableCell>
+                                                        <TableCell className="text-center font-bold">{participant.total_points}</TableCell>
+                                                        <TableCell className="text-center font-bold">{participant.total}</TableCell>
                                                     </>
                                                 )}
-                                                <TableCell className={`text-center font-medium ${getRankBgClass(participant.final_rank, qualified)}`}>
+                                                <TableCell className={`text-center font-bold ${getRankBgClass(participant.final_rank, qualified)}`}>
                                                     {formatRank(participant.final_rank)}
                                                 </TableCell>
                                             </TableRow>

@@ -121,7 +121,7 @@ export default function TableResultTestTeam({ criteriaName }: { criteriaName: st
     return (
         <div className="mb-12">
             <div className="mb-6 p-4 text-center">
-                <p className="text-2xl font-medium">Team Candidates</p>
+                <p className="text-2xl font-bold">Team Candidates</p>
             </div>
             <div className="overflow-x-auto rounded-md border">
                 <Table>
@@ -152,7 +152,7 @@ export default function TableResultTestTeam({ criteriaName }: { criteriaName: st
 
                             return (
                                 <TableRow key={index}>
-                                    <TableCell className="text-center font-medium whitespace-nowrap">{participantNo}</TableCell>
+                                    <TableCell className="text-center font-bold whitespace-nowrap">{participantNo}</TableCell>
 
                                     {/* Loop through ALL judges for this participant */}
                                     {judges.map((judge) => {
@@ -162,8 +162,8 @@ export default function TableResultTestTeam({ criteriaName }: { criteriaName: st
                                             <TableCell key={`${participantNo}-${judge}`} className="text-center whitespace-nowrap">
                                                 {judgeScore ? (
                                                     <div className="flex justify-around">
-                                                        <div className="font-medium">{parseInt(judgeScore.total)}%</div>
-                                                        <div className="font-medium">{formatRank(judgeScore.rank)}</div>
+                                                        <div className="font-bold">{parseInt(judgeScore.total)}%</div>
+                                                        <div className="font-bold">{formatRank(judgeScore.rank)}</div>
                                                     </div>
                                                 ) : (
                                                     <div className="text-gray-400">-</div>
@@ -171,10 +171,10 @@ export default function TableResultTestTeam({ criteriaName }: { criteriaName: st
                                             </TableCell>
                                         );
                                     })}
-                                    <TableCell className="text-center font-medium whitespace-nowrap">{participant.total_score || '0'}</TableCell>
-                                    <TableCell className="text-center font-medium whitespace-nowrap">{participant.total_rank || '0'}</TableCell>
+                                    <TableCell className="text-center font-bold whitespace-nowrap">{participant.total_score || '0'}</TableCell>
+                                    <TableCell className="text-center font-bold whitespace-nowrap">{participant.total_rank || '0'}</TableCell>
                                     <TableCell
-                                        className={`text-center font-medium whitespace-nowrap ${getRankBgClass(
+                                        className={`text-center font-bold whitespace-nowrap ${getRankBgClass(
                                             participant.final_rank || '0',
                                             qualified,
                                         )}`}

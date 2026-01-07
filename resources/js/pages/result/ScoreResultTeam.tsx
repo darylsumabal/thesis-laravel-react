@@ -286,7 +286,7 @@ export default function ScoreResultTeam() {
                                             scoringType={`${contest.contest_scoring_type} based`}
                                         />
                                         <div className="mb-4 flex w-full flex-col items-center justify-center rounded-md bg-[#45226b] p-4 text-center text-3xl font-bold text-white">
-                                            <p>Final Score</p>
+                                            <p className="uppercase">Final Score</p>
                                         </div>
                                         <div className="flex w-full gap-2">
                                             <ScoreTableTeam data={groupedArray} />
@@ -315,7 +315,7 @@ export default function ScoreResultTeam() {
                                 {award?.map((i, idx) => (
                                     <div key={idx} className="mt-4 flex w-full flex-col items-center justify-center gap-4">
                                         <div className="w-full text-center">
-                                            <p className="text-base font-bold">Best in {i.criteria}</p>
+                                            <p className="text-base font-bold uppercase">Best in {i.criteria}</p>
                                             <p className="text-sm">Category</p>
                                         </div>
 

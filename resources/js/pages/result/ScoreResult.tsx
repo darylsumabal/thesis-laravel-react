@@ -352,7 +352,7 @@ export default function ScoreResult() {
                                     <>
                                         <TableRankedFinal contest={contest} scoringType={`${contest.contest_scoring_type}`} />
                                         <div className="mb-4 flex w-full flex-col items-center justify-center rounded-md bg-[#45226b] p-4 text-center text-3xl font-bold text-white">
-                                            <p>Final Score</p>
+                                            <p className="uppercase">FINAL SCORE</p>
                                         </div>
                                         <div className="flex w-full flex-col gap-4 xl:flex-row">
                                             {maleParticipants.length > 0 && <ScoreTable data={maleParticipants} gender="Male" />}
@@ -382,7 +382,7 @@ export default function ScoreResult() {
                                 {award?.map((i, index) => (
                                     <div key={index} className="mt-4 flex w-full flex-col items-center justify-center gap-4">
                                         <div className="w-full text-center">
-                                            <p className="text-base font-bold">Best in {i.criteria}</p>
+                                            <p className="text-base font-bold uppercase">Best in {i.criteria}</p>
                                             <p className="text-sm">Category</p>
                                         </div>
 

@@ -64,7 +64,7 @@ const ResultSingleRound = ({
                                         <p className="text-lg font-bold uppercase">
                                             {criteria} {getPlacement(index, resultSingleRound.length)}
                                         </p>
-                                        <p className="text-center">Category</p>
+                                        <p className="text-center" >Category</p>
                                     </div>
 
                                     <div className="flex w-full justify-between">

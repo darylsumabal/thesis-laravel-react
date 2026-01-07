@@ -5,7 +5,7 @@ export type JudgeScoreTest = {
     score: string;
     total: number;
     participant_no: string;
-    team_participant_no:string
+    team_participant_no: string;
     participant_id: number;
     participant_gender: string;
     total_score: string;
@@ -30,17 +30,13 @@ type GroupedParticipant = {
         Record<string, JudgeScoreTest> // judgeName -> JudgeScoreTest
     >;
 };
-
-
-import { useParams } from 'react-router-dom';
-
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../ui/table';
 import { Contest } from '@/api/contest';
 import { formatRank, getRankBgClass } from '@/pages/utils/function/rank';
-import ResultHeader from '../result/ResultHeader';
 import { usePage } from '@inertiajs/react';
+import ResultHeader from '../result/ResultHeader';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../ui/table';
 function TableRankedFinalTeam({ scoringType, contest }: { scoringType: string; contest: Contest }) {
-      const { tableRankedFinalTeam, qualified } = usePage().props;
+    const { tableRankedFinalTeam, qualified } = usePage().props;
 
     const data: JudgeScoreTest[] = tableRankedFinalTeam?.flatMap((r) => r.judges_score) ?? [];
 
@@ -89,11 +85,11 @@ function TableRankedFinalTeam({ scoringType, contest }: { scoringType: string; c
         <div className="w-full">
             <ResultHeader contest={contest ?? { contest: [], message: '' }} />
 
-            <div className="mt-14 mb-10 text-center text-3xl font-medium">
+            <div className="mt-14 mb-10 text-center text-3xl font-bold">
                 <p>CONSOLIDATED RESULT</p>
             </div>
             <div className="flex flex-col">
-                <div className="mb-4 flex w-full flex-col items-center justify-center rounded-md bg-[#45226b] p-4 text-center text-3xl font-medium text-white">
+                <div className="mb-4 flex w-full flex-col items-center justify-center rounded-md bg-[#45226b] p-4 text-center text-3xl font-bold text-white">
                     <p className="uppercase">{data?.[0]?.criteria}</p>
                 </div>
                 <div className="flex gap-4">
@@ -114,17 +110,17 @@ function TableRankedFinalTeam({ scoringType, contest }: { scoringType: string; c
                         return (
                             <div className="mb-12 w-full">
                                 <div className="mb-2 rounded-lg p-4 text-center">
-                                    <h2 className="text-2xl font-medium">Candidates</h2>
+                                    <h2 className="text-2xl font-bold">Candidates</h2>
                                 </div>
-                                <div className="w-full overflow-x-auto border rounded-md">
+                                <div className="w-full overflow-x-auto rounded-md border">
                                     <Table>
                                         <TableHeader>
                                             <TableRow>
-                                                <TableHead className="text-center text-xs font-medium  uppercase">Contestant No.</TableHead>
+                                                <TableHead className="text-center text-xs font-bold uppercase">Contestant No.</TableHead>
                                                 {judges.map((judge) => (
                                                     <TableHead
                                                         key={judge}
-                                                        className="space-y-2 p-2 text-center text-xs font-medium tracking-wider break-words whitespace-normal  uppercase"
+                                                        className="space-y-2 p-2 text-center text-xs font-bold tracking-wider break-words whitespace-normal uppercase"
                                                     >
                                                         <div>{judge}</div>
                                                         <div className="flex justify-around uppercase">
@@ -136,10 +132,10 @@ function TableRankedFinalTeam({ scoringType, contest }: { scoringType: string; c
 
                                                 {scoringType == 'rank based' && (
                                                     <>
-                                                        <TableHead className="text-center text-xs font-medium break-words whitespace-normal  uppercase">
+                                                        <TableHead className="text-center text-xs font-bold break-words whitespace-normal uppercase">
                                                             Total %
                                                         </TableHead>
-                                                        <TableHead className="text-center text-xs font-medium break-words whitespace-normal  uppercase">
+                                                        <TableHead className="text-center text-xs font-bold break-words whitespace-normal uppercase">
                                                             Total Rank
                                                         </TableHead>
                                                     </>
@@ -147,15 +143,15 @@ function TableRankedFinalTeam({ scoringType, contest }: { scoringType: string; c
 
                                                 {scoringType == 'point based' && (
                                                     <>
-                                                        <TableHead className="text-center text-xs font-medium break-words whitespace-normal  uppercase">
+                                                        <TableHead className="text-center text-xs font-bold break-words whitespace-normal uppercase">
                                                             Total %
                                                         </TableHead>
-                                                        <TableHead className="text-center text-xs font-medium break-words whitespace-normal  uppercase">
+                                                        <TableHead className="text-center text-xs font-bold break-words whitespace-normal uppercase">
                                                             Total Rank
                                                         </TableHead>
                                                     </>
                                                 )}
-                                                <TableHead className="text-center text-xs font-medium break-words whitespace-normal  uppercase">
+                                                <TableHead className="text-center text-xs font-bold break-words whitespace-normal uppercase">
                                                     Final Rank
                                                 </TableHead>
                                             </TableRow>
@@ -166,7 +162,7 @@ function TableRankedFinalTeam({ scoringType, contest }: { scoringType: string; c
                                                 <>
                                                     {groupedData.map((participant) => (
                                                         <TableRow key={participant.participant_no}>
-                                                            <TableCell className="text-center font-medium whitespace-nowrap ">
+                                                            <TableCell className="text-center font-bold whitespace-nowrap">
                                                                 {participant.participant_no}
                                                             </TableCell>
 
@@ -180,10 +176,10 @@ function TableRankedFinalTeam({ scoringType, contest }: { scoringType: string; c
                                                                         >
                                                                             {judgeScore ? (
                                                                                 <div className="flex justify-around">
-                                                                                    <div className="font-medium">
+                                                                                    <div className="font-bold">
                                                                                         {parseFloat(String(judgeScore.total)).toFixed(2)}
                                                                                     </div>
-                                                                                    <div className="font-medium">
+                                                                                    <div className="font-bold">
                                                                                         {parseFloat(judgeScore.rank).toFixed(2)}
                                                                                     </div>
                                                                                 </div>
@@ -195,14 +191,14 @@ function TableRankedFinalTeam({ scoringType, contest }: { scoringType: string; c
                                                                 }),
                                                             )}
 
-                                                            <TableCell className="text-center font-medium whitespace-nowrap">
+                                                            <TableCell className="text-center font-bold whitespace-nowrap">
                                                                 {participant.total_points}
                                                             </TableCell>
-                                                            <TableCell className="text-center font-medium whitespace-nowrap">
+                                                            <TableCell className="text-center font-bold whitespace-nowrap">
                                                                 {participant.total_rank}
                                                             </TableCell>
                                                             <TableCell
-                                                                className={`text-center font-medium whitespace-nowrap ${getRankBgClass(
+                                                                className={`text-center font-bold whitespace-nowrap ${getRankBgClass(
                                                                     participant.final_rank,
                                                                     qualified,
                                                                 )} `}
@@ -218,7 +214,7 @@ function TableRankedFinalTeam({ scoringType, contest }: { scoringType: string; c
                                                 <>
                                                     {groupedData.map((participant) => (
                                                         <TableRow key={participant.participant_no}>
-                                                            <TableCell className="text-center font-medium whitespace-nowrap ">
+                                                            <TableCell className="text-center font-bold whitespace-nowrap">
                                                                 {participant.participant_no}
                                                             </TableCell>
 
@@ -232,10 +228,10 @@ function TableRankedFinalTeam({ scoringType, contest }: { scoringType: string; c
                                                                         >
                                                                             {judgeScore ? (
                                                                                 <div className="flex justify-between">
-                                                                                    <div className="font-medium">
+                                                                                    <div className="font-bold">
                                                                                         {parseFloat(String(judgeScore.total)).toFixed(2)}
                                                                                     </div>
-                                                                                    <div className="font-medium">
+                                                                                    <div className="font-bold">
                                                                                         {parseFloat(judgeScore.rank).toFixed(2)}
                                                                                     </div>
                                                                                 </div>
@@ -247,14 +243,14 @@ function TableRankedFinalTeam({ scoringType, contest }: { scoringType: string; c
                                                                 }),
                                                             )}
 
-                                                            <TableCell className="text-center font-medium whitespace-nowrap">
+                                                            <TableCell className="text-center font-bold whitespace-nowrap">
                                                                 {participant.total_score}
                                                             </TableCell>
-                                                            <TableCell className="text-center font-medium whitespace-nowrap">
+                                                            <TableCell className="text-center font-bold whitespace-nowrap">
                                                                 {participant.total_rank}
                                                             </TableCell>
                                                             <TableCell
-                                                                className={`text-center font-medium whitespace-nowrap ${getRankBgClass(
+                                                                className={`text-center font-bold whitespace-nowrap ${getRankBgClass(
                                                                     participant.final_rank,
                                                                     qualified,
                                                                 )} `}

@@ -157,17 +157,17 @@ export default function TableResultTest({
     return (
         <div className="mb-12 w-full">
             <div className="mb-6 p-4 text-center">
-                <p className="text-2xl font-medium uppercase">{getGenderTitle(gender)}</p>
+                <p className="text-2xl font-bold uppercase">{getGenderTitle(gender)}</p>
             </div>
             <div className="overflow-x-auto rounded-md border">
                 <Table>
                     <TableHeader>
                         <TableRow>
-                            <TableHead className="text-center text-xs font-medium tracking-wider uppercase">Contestant No.</TableHead>
+                            <TableHead className="text-center text-xs font-bold tracking-wider uppercase">Contestant No.</TableHead>
                             {judges.map((judge) => (
                                 <TableHead
                                     key={judge}
-                                    className="p-2 text-center text-xs font-medium tracking-wider break-words whitespace-normal uppercase"
+                                    className="p-2 text-center text-xs font-bold tracking-wider break-words whitespace-normal uppercase"
                                 >
                                     <div>{judge}</div>
                                     <div className="flex justify-between uppercase">
@@ -176,23 +176,23 @@ export default function TableResultTest({
                                     </div>
                                 </TableHead>
                             ))}
-                            <TableHead className="text-center text-xs font-medium tracking-wider uppercase">Total %</TableHead>
-                            <TableHead className="text-center text-xs font-medium tracking-wider uppercase">Total Rank</TableHead>
-                            <TableHead className="text-center text-xs font-medium tracking-wider uppercase">Final Rank</TableHead>
+                            <TableHead className="text-center text-xs font-bold tracking-wider uppercase">Total %</TableHead>
+                            <TableHead className="text-center text-xs font-bold tracking-wider uppercase">Total Rank</TableHead>
+                            <TableHead className="text-center text-xs font-bold tracking-wider uppercase">Final Rank</TableHead>
                         </TableRow>
                     </TableHeader>
                     <TableBody>
                         {groupedData.map((participant) => (
                             <TableRow key={participant.participant_no}>
-                                <TableCell className="text-center font-medium whitespace-nowrap">{participant.participant_no}</TableCell>
+                                <TableCell className="text-center font-bold whitespace-nowrap">{participant.participant_no}</TableCell>
                                 {judges.map((judge) => {
                                     const judgeScore = participant.judges_scores[judge];
                                     return (
                                         <TableCell key={judge} className="text-center whitespace-nowrap">
                                             {judgeScore ? (
                                                 <div className="flex justify-between">
-                                                    <div className="font-medium">{parseInt(judgeScore.total)}%</div>
-                                                    <div className="font-medium">{formatRank(judgeScore.rank)}</div>
+                                                    <div className="font-bold">{parseInt(judgeScore.total)}%</div>
+                                                    <div className="font-bold">{formatRank(judgeScore.rank)}</div>
                                                 </div>
                                             ) : (
                                                 <div className="text-gray-400">-</div>
@@ -200,10 +200,10 @@ export default function TableResultTest({
                                         </TableCell>
                                     );
                                 })}
-                                <TableCell className="text-center font-medium whitespace-nowrap">{participant.total_score}</TableCell>
-                                <TableCell className="text-center font-medium whitespace-nowrap">{participant.total_rank}</TableCell>
+                                <TableCell className="text-center font-bold whitespace-nowrap">{participant.total_score}</TableCell>
+                                <TableCell className="text-center font-bold whitespace-nowrap">{participant.total_rank}</TableCell>
                                 <TableCell
-                                    className={`text-center font-medium whitespace-nowrap ${getRankBgClass(participant.final_rank, qualified)}`}
+                                    className={`text-center font-bold whitespace-nowrap ${getRankBgClass(participant.final_rank, qualified)}`}
                                 >
                                     {formatRank(participant.final_rank)}
                                 </TableCell>
