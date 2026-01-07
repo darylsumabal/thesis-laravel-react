@@ -50,21 +50,21 @@ export const ScoreTable = ({ data, gender }: { data: ParticipantScore[]; gender:
                     <TableBody>
                         {data?.map((participant) => (
                             <TableRow key={participant.participant_id}>
-                                <TableCell className="text-center font-medium whitespace-nowrap">{participant.participant_no}</TableCell>
+                                <TableCell className="text-center font-bold whitespace-nowrap">{participant.participant_no}</TableCell>
 
                                 {[...participant.scores]
                                     .sort((a) => (a.criteria === 'Preliminary' ? -1 : 1)) // ✅ Preliminary first
                                     .map((i) => (
-                                        <TableCell key={i.id} className="text-center font-medium whitespace-nowrap">
+                                        <TableCell key={i.id} className="text-center font-bold whitespace-nowrap">
                                             <div className="flex justify-evenly">
                                                 <div>{i.score}</div>
                                                 <div>{i.round_score}</div>
                                             </div>
                                         </TableCell>
                                     ))}
-                                <TableCell className="text-center font-medium whitespace-nowrap">{participant.total}</TableCell>
+                                <TableCell className="text-center font-bold whitespace-nowrap">{participant.total}</TableCell>
                                 <TableCell
-                                    className={`text-center font-medium whitespace-nowrap ${getRankBgClass(participant.final_rank, qualified)}`}
+                                    className={`text-center font-bold whitespace-nowrap ${getRankBgClass(participant.final_rank, qualified)}`}
                                 >
                                     {formatRank(participant.final_rank)}
                                 </TableCell>

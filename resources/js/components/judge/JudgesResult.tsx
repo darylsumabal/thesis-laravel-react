@@ -39,7 +39,7 @@ const JudgesResult = ({
             scores: item.scores.filter((score) => score.judgeId === judgeId),
         };
     });
- 
+
     const computeTotalsAndRanks = (byParticipant: Record<string, JudgeScore[]>) => {
         // Step 1: Compute totals
         const totals = Object.entries(byParticipant).map(([participantNo, scores]) => {
@@ -114,19 +114,19 @@ const JudgesResult = ({
 
                     return (
                         <div key={criteriaItem.criteria} className="mx-auto mb-12">
-                            <h2 className="mb-4 rounded-md bg-[#45226b] p-2 text-center text-3xl font-medium text-white uppercase">
+                            <h2 className="mb-4 rounded-md bg-[#45226b] p-2 text-center text-3xl font-bold text-white uppercase">
                                 {criteriaItem.criteria}
                             </h2>
 
                             <div className="flex w-full flex-col gap-6 xl:flex-row">
                                 {maleScores.length > 0 && (
                                     <div className="w-full">
-                                        <h3 className="mb-4 text-center text-xl font-medium uppercase">Male Candidates</h3>
+                                        <h3 className="mb-4 text-center text-xl font-bold uppercase">Male Candidates</h3>
                                         <div className="rounded-md border">
                                             <Table>
                                                 <TableHeader>
                                                     <TableRow>
-                                                        <TableHead className="text-center text-xs font-medium tracking-wider uppercase">
+                                                        <TableHead className="text-center text-xs font-bold tracking-wider uppercase">
                                                             Contestant No.
                                                         </TableHead>
                                                         {maleCriteria.map((criteria) => {
@@ -136,7 +136,7 @@ const JudgesResult = ({
                                                             return (
                                                                 <TableHead
                                                                     key={criteria}
-                                                                    className="p-2 text-center text-xs font-medium tracking-wider uppercase"
+                                                                    className="p-2 text-center text-xs font-bold tracking-wider uppercase"
                                                                 >
                                                                     <div className="flex flex-col gap-2">
                                                                         <p className="break-words whitespace-normal">{criteria}</p>
@@ -145,7 +145,7 @@ const JudgesResult = ({
                                                                 </TableHead>
                                                             );
                                                         })}
-                                                        <TableHead className="text-center text-xs font-medium tracking-wider uppercase">
+                                                        <TableHead className="text-center text-xs font-bold tracking-wider uppercase">
                                                             <div className="flex flex-col gap-2">
                                                                 <p>Total Points</p>
                                                                 <p>
@@ -160,29 +160,24 @@ const JudgesResult = ({
                                                                 </p>
                                                             </div>
                                                         </TableHead>
-                                                        <TableHead className="text-center text-xs font-medium tracking-wider uppercase">
-                                                            Rank
-                                                        </TableHead>
+                                                        <TableHead className="text-center text-xs font-bold tracking-wider uppercase">Rank</TableHead>
                                                     </TableRow>
                                                 </TableHeader>
                                                 <TableBody>
                                                     {maleRanked.map(({ participantNo, scores, total, rank }) => (
                                                         <TableRow key={participantNo}>
-                                                            <TableCell className="text-center font-medium">{participantNo}</TableCell>
+                                                            <TableCell className="text-center font-bold">{participantNo}</TableCell>
                                                             {maleCriteria.map((criteria) => {
                                                                 const score = scores.find((s) => s.evaluation_criteria === criteria);
                                                                 return (
-                                                                    <TableCell
-                                                                        key={`${participantNo}-${criteria}`}
-                                                                        className="text-center font-medium"
-                                                                    >
+                                                                    <TableCell key={`${participantNo}-${criteria}`} className="text-center font-bold">
                                                                         {score ? score.score : '-'}
                                                                     </TableCell>
                                                                 );
                                                             })}
-                                                            <TableCell className="text-center font-medium">{total}</TableCell>
+                                                            <TableCell className="text-center font-bold">{total}</TableCell>
                                                             <TableCell
-                                                                className={`text-center font-medium whitespace-nowrap ${getRankBgClass(String(rank), qualified)}`}
+                                                                className={`text-center font-bold whitespace-nowrap ${getRankBgClass(String(rank), qualified)}`}
                                                             >
                                                                 {rank}
                                                             </TableCell>
@@ -196,12 +191,12 @@ const JudgesResult = ({
                                 {/* Female Table */}
                                 {femaleScores.length > 0 && (
                                     <div className="w-full">
-                                        <h3 className="mb-4 text-center text-xl font-medium uppercase">Female Candidates</h3>
+                                        <h3 className="mb-4 text-center text-xl font-bold uppercase">Female Candidates</h3>
                                         <div className="rounded-md border">
                                             <Table>
                                                 <TableHeader>
                                                     <TableRow>
-                                                        <TableHead className="text-center text-xs font-medium tracking-wider uppercase">
+                                                        <TableHead className="text-center text-xs font-bold tracking-wider uppercase">
                                                             Contestant No.
                                                         </TableHead>
                                                         {femaleCriteria.map((criteria) => {
@@ -210,7 +205,7 @@ const JudgesResult = ({
                                                             return (
                                                                 <TableHead
                                                                     key={criteria}
-                                                                    className="p-2 text-center text-xs font-medium tracking-wider uppercase"
+                                                                    className="p-2 text-center text-xs font-bold tracking-wider uppercase"
                                                                 >
                                                                     <div className="flex flex-col gap-2">
                                                                         <p className="break-words whitespace-normal">{criteria}</p>
@@ -219,7 +214,7 @@ const JudgesResult = ({
                                                                 </TableHead>
                                                             );
                                                         })}
-                                                        <TableHead className="text-center text-xs font-medium tracking-wider uppercase">
+                                                        <TableHead className="text-center text-xs font-bold tracking-wider uppercase">
                                                             <div className="flex flex-col gap-2">
                                                                 <p>Total Points</p>
                                                                 <p>
@@ -234,29 +229,24 @@ const JudgesResult = ({
                                                                 </p>
                                                             </div>
                                                         </TableHead>
-                                                        <TableHead className="text-center text-xs font-medium tracking-wider uppercase">
-                                                            Rank
-                                                        </TableHead>
+                                                        <TableHead className="text-center text-xs font-bold tracking-wider uppercase">Rank</TableHead>
                                                     </TableRow>
                                                 </TableHeader>
                                                 <TableBody>
                                                     {femaleRanked.map(({ participantNo, scores, total, rank }) => (
                                                         <TableRow key={participantNo}>
-                                                            <TableCell className="text-center font-medium">{participantNo}</TableCell>
+                                                            <TableCell className="text-center font-bold">{participantNo}</TableCell>
                                                             {femaleCriteria.map((criteria) => {
                                                                 const score = scores.find((s) => s.evaluation_criteria === criteria);
                                                                 return (
-                                                                    <TableCell
-                                                                        key={`${participantNo}-${criteria}`}
-                                                                        className="text-center font-medium"
-                                                                    >
+                                                                    <TableCell key={`${participantNo}-${criteria}`} className="text-center font-bold">
                                                                         {score ? score.score : '-'}
                                                                     </TableCell>
                                                                 );
                                                             })}
-                                                            <TableCell className="text-center font-medium">{total}</TableCell>
+                                                            <TableCell className="text-center font-bold">{total}</TableCell>
                                                             <TableCell
-                                                                className={`text-center font-medium whitespace-nowrap ${getRankBgClass(String(rank), qualified)}`}
+                                                                className={`text-center font-bold whitespace-nowrap ${getRankBgClass(String(rank), qualified)}`}
                                                             >
                                                                 {rank}
                                                             </TableCell>
@@ -272,12 +262,12 @@ const JudgesResult = ({
                     );
                 })
             ) : (
-                <p className="h-96 text-center text-2xl font-medium">No Result Yet!</p>
+                <p className="h-96 text-center text-2xl font-bold">No Result Yet!</p>
             )}
             <div>
                 <div className="mt-10 flex flex-wrap justify-center gap-10">
                     <div className="w-72 text-center">
-                        <div className="uppercase">{judgeName}</div>
+                        <div className="font-bold uppercase">{judgeName}</div>
                         <hr className="h-[2px] bg-slate-950" />
                         <div className="text-xs">
                             {judgeRole} {judgeNumber}
@@ -287,7 +277,7 @@ const JudgesResult = ({
 
                 <div className="mt-10 flex flex-wrap justify-center gap-10">
                     <div className="w-72 text-center">
-                        <div className="uppercase">{auth.user.name}</div>
+                        <div className="font-bold uppercase">{auth.user.name}</div>
                         <hr className="h-[2px] bg-slate-950" />
                         <div className="text-xs">Tabulator</div>
                     </div>

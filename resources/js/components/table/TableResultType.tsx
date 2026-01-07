@@ -99,7 +99,7 @@ export default function TableResultType({ criteriaName, gender, routeCardSr }: {
     return (
         <div className="mb-12">
             <div className="mb-6 p-4 text-center">
-                <p className="text-2xl font-medium capitalize">{gender} Candidates</p>
+                <p className="text-2xl font-bold capitalize">{gender} Candidates</p>
             </div>
             <div className="overflow-x-auto rounded-md border">
                 <Table>
@@ -108,7 +108,7 @@ export default function TableResultType({ criteriaName, gender, routeCardSr }: {
                             <TableHead className="text-center text-xs font-bold tracking-wider uppercase">Contestant No.</TableHead>
 
                             {judges.map((judge) => (
-                                <TableHead className="p-2 text-center text-xs font-medium uppercase">
+                                <TableHead className="p-2 text-center text-xs font-bold uppercase">
                                     <div>{judge}</div>
                                     <div className="flex justify-around font-bold uppercase">
                                         {routeCardSr ? <p>Total Points</p> : <p>Total Rank</p>}
@@ -125,10 +125,10 @@ export default function TableResultType({ criteriaName, gender, routeCardSr }: {
                     <TableBody>
                         {participants.map((participantNo, index) => {
                             const participant = participantData[participantNo];
-                     
+
                             return (
                                 <TableRow key={index}>
-                                    <TableCell className="text-center font-medium whitespace-nowrap">{participantNo}</TableCell>
+                                    <TableCell className="text-center font-bold whitespace-nowrap">{participantNo}</TableCell>
 
                                     {judges.map((judge) => {
                                         const judgeScore = participant.judgeScores[judge];
@@ -137,7 +137,7 @@ export default function TableResultType({ criteriaName, gender, routeCardSr }: {
                                             <TableCell key={`${participantNo}-${judge}`} className="whitespace-nowrap">
                                                 {judgeScore ? (
                                                     <div className="flex justify-around">
-                                                        <div className="font-medium">
+                                                        <div className="font-bold">
                                                             {routeCardSr ? formatRank(String(judgeScore.total)) : formatRank(judgeScore.rank)}
                                                         </div>
                                                     </div>
@@ -147,11 +147,11 @@ export default function TableResultType({ criteriaName, gender, routeCardSr }: {
                                             </TableCell>
                                         );
                                     })}
-                                    <TableCell className="text-center font-medium whitespace-nowrap">
+                                    <TableCell className="text-center font-bold whitespace-nowrap">
                                         {routeCardSr ? participant.total_score || '0' : participant.total_rank || '0'}
                                     </TableCell>
                                     <TableCell
-                                        className={`text-center font-medium whitespace-nowrap ${getRankBgClass(
+                                        className={`text-center font-bold whitespace-nowrap ${getRankBgClass(
                                             participant.final_rank || '0',
                                             qualified,
                                         )}`}

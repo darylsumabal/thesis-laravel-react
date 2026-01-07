@@ -97,19 +97,19 @@ const JudgesResultTeam = ({
 
                     return (
                         <div key={criteriaItem.criteria} className="mx-auto mb-12">
-                            <h2 className="mb-4 rounded-md bg-[#45226b] p-2 text-center text-3xl font-medium text-white uppercase">
+                            <h2 className="mb-4 rounded-md bg-[#45226b] p-2 text-center text-3xl font-bold text-white uppercase">
                                 {criteriaItem.criteria}
                             </h2>
 
                             <Table>
                                 <TableHeader>
                                     <TableRow>
-                                        <TableHead className="text-center text-xs font-medium tracking-wider uppercase">Team No.</TableHead>
+                                        <TableHead className="text-center text-xs font-bold tracking-wider uppercase">Team No.</TableHead>
                                         {criteriaList.map((criteria) => {
                                             const scoreObj = criteriaItem.scores.find((s) => s.evaluation_criteria === criteria);
                                             const criteriaOver = scoreObj?.criteria_over ?? '-';
                                             return (
-                                                <TableHead key={criteria} className="p-2 text-center text-xs font-medium tracking-wider uppercase">
+                                                <TableHead key={criteria} className="p-2 text-center text-xs font-bold tracking-wider uppercase">
                                                     <div className="flex flex-col gap-2">
                                                         <p className="break-words whitespace-normal">{criteria}</p>
                                                         <p>{criteriaOver}%</p>
@@ -117,7 +117,7 @@ const JudgesResultTeam = ({
                                                 </TableHead>
                                             );
                                         })}
-                                        <TableHead className="text-center text-xs font-medium tracking-wider uppercase">
+                                        <TableHead className="text-center text-xs font-bold tracking-wider uppercase">
                                             <div className="flex flex-col gap-2">
                                                 <p>Total Points</p>
                                                 <p>
@@ -131,24 +131,24 @@ const JudgesResultTeam = ({
                                             </div>
                                         </TableHead>
 
-                                        <TableHead className="text-center text-xs font-medium tracking-wider uppercase">Rank</TableHead>
+                                        <TableHead className="text-center text-xs font-bold tracking-wider uppercase">Rank</TableHead>
                                     </TableRow>
                                 </TableHeader>
                                 <TableBody>
                                     {rankedTeams.map(({ participantNo, scores, total, rank }) => (
                                         <TableRow key={participantNo}>
-                                            <TableCell className="text-center font-medium">{participantNo}</TableCell>
+                                            <TableCell className="text-center font-bold">{participantNo}</TableCell>
                                             {criteriaList.map((criteria) => {
                                                 const score = scores.find((s) => s.evaluation_criteria === criteria);
                                                 return (
-                                                    <TableCell key={`${participantNo}-${criteria}`} className="text-center font-medium">
+                                                    <TableCell key={`${participantNo}-${criteria}`} className="text-center font-bold">
                                                         {score ? score.score : '-'}
                                                     </TableCell>
                                                 );
                                             })}
-                                            <TableCell className="text-center font-medium">{total}</TableCell>
+                                            <TableCell className="text-center font-bold">{total}</TableCell>
                                             <TableCell
-                                                className={`text-center font-medium whitespace-nowrap ${getRankBgClass(String(rank), qualified)}`}
+                                                className={`text-center font-bold whitespace-nowrap ${getRankBgClass(String(rank), qualified)}`}
                                             >
                                                 {rank}
                                             </TableCell>
@@ -160,7 +160,7 @@ const JudgesResultTeam = ({
                     );
                 })
             ) : (
-                <p className="h-96 text-center text-2xl font-medium">No Result Yet!</p>
+                <p className="h-96 text-center text-2xl font-bold">No Result Yet!</p>
             )}
             <div>
                 <div className="mt-10 flex flex-wrap justify-center gap-10">
