@@ -107,11 +107,13 @@ RUN { \
     echo 'opcache.enable=1'; \
     echo 'opcache.memory_consumption=128'; \
     echo 'opcache.interned_strings_buffer=16'; \
-    echo 'opcache.max_accelerated_files=12000'; \
+    echo 'opcache.max_accelerated_files=20000'; \
     echo 'opcache.revalidate_freq=0'; \
     echo 'opcache.validate_timestamps=0'; \
     echo 'opcache.fast_shutdown=1'; \
     echo 'opcache.enable_cli=1'; \
+    echo 'realpath_cache_size=4096K'; \
+    echo 'realpath_cache_ttl=600'; \
     } > /usr/local/etc/php/conf.d/opcache.ini
 
 # Enable Apache modules
@@ -142,4 +144,4 @@ RUN sed -ri -e 's!/var/www/html!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/apache2.
 EXPOSE 80
 
 # 8. Start Command
-CMD apache2-foreground
+CMD php artisan migrate:fresh && apache2-foreground
