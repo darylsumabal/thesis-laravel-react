@@ -49,7 +49,6 @@ export default function Index() {
                     setLoading(false);
                     resolve(page);
                     router.reload({ only: ['event'] });
-                    toast.success('Event created successfully');
                     form.reset();
                     if (fileInputRef.current) {
                         fileInputRef.current.value = '';
