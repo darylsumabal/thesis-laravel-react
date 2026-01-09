@@ -184,7 +184,21 @@ class CriteriaController extends Controller
             'participant' => $this->getParticipantsByContest($contestId)
         ]);
     }
+    public function updateWeight(Request $request, $contestId, $groupId)
+    {
+        $weights = $request->input('weight', []);
 
+        foreach ($weights as $contestName => $weight) {
+            PrelimScoringMethod::where('contest_id', $contestId)
+                ->where('group_id', $groupId)
+                ->where('contest_name', $contestName) // match by contest_name
+                ->update([
+                    'weight' => $weight,
+                ]);
+        }
+
+        return redirect()->back()->with('success', 'Weight updated successfully');
+    }
 
     public function store(Request $request, $contestId)
     {

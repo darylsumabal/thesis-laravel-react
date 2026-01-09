@@ -19,7 +19,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { useFieldArray, useForm, UseFormReturn } from 'react-hook-form';
 import { toast } from 'sonner';
 import { z } from 'zod';
-import { DeleteCriteria, DialogAddCriteria, DialogAddJudges, DialogEditQualified, UpdatePercentage } from './Dialog';
+import { DeleteCriteria, DialogAddCriteria, DialogAddJudges, DialogEditQualified, UpdatePercentage, UpdateWeighted, Weighted } from './Dialog';
 import { column } from './columns';
 
 export type PROPS = {
@@ -40,9 +40,10 @@ export type PROPS = {
     contestId: number;
     groupId: string;
     participant: Participant[] | TeamParticipant[];
+    prelimMethod: Weighted[];
 };
 
-const ViewMultipleRound = ({ contest, criteria, judgesCriteria, prelimFinal, qualified, judges, roundScore, participant }: PROPS) => {
+const ViewMultipleRound = ({ contest, criteria, judgesCriteria, prelimFinal, qualified, judges, roundScore, participant, prelimMethod }: PROPS) => {
     const [open, setOpen] = useState<boolean>(false);
     const [openAddCriteria, setOpenAddCriteria] = useState<boolean>(false);
     const { contestId, groupId } = usePage().props;
@@ -393,6 +394,8 @@ const ViewMultipleRound = ({ contest, criteria, judgesCriteria, prelimFinal, qua
                     />
                     <DialogEditQualified />
                     {prelimFinal === 'PrelimFinal' && <UpdatePercentage roundScore={roundScore} />}
+
+                    {prelimMethod[0].preliminary_method == 'weighted' && <UpdateWeighted prelimData={prelimMethod ?? []} />}
                 </div>
                 {Object.entries(groupedByRoundAndCriteria).map(([round, criteriaGroups]) => (
                     <div key={round} className="mb-4">

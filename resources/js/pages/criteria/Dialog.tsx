@@ -526,3 +526,123 @@ export function UpdatePercentage({ roundScore }: UpdatePercentageProps) {
         </Dialog>
     );
 }
+
+export type Weighted = {
+    weight: string;
+    preliminary_method: string;
+    contest_name: string;
+};
+export type UpdateWeightedProps = {
+    prelimData: Weighted[];
+};
+
+export function UpdateWeighted({ prelimData }: UpdateWeightedProps) {
+    const [open, setOpen] = useState<boolean>(false);
+    const [loading, setLoading] = useState<boolean>(false);
+    const { contestId, groupId } = usePage().props;
+
+    const formSchema = z.object({
+        weight: z.record(
+            z.string(),
+            z.coerce.number().min(1, { message: 'Must be between 1 and 100' }).max(100, { message: 'Must be between 1 and 100' }),
+        ),
+    });
+
+    const defaultValues = {
+        weight: Object.fromEntries(prelimData.map((i) => [i.contest_name, Number(i.weight) || 0])),
+    };
+
+    const form = useForm({
+        resolver: zodResolver(formSchema),
+        defaultValues,
+    });
+
+    const watchedWeights = form.watch('weight') ?? {};
+
+    const totalWeight: number = Object.values(watchedWeights).reduce((sum: number, w) => sum + (Number(w) || 0), 0);
+
+    const handleUpdate = (data: z.infer<typeof formSchema>) => {
+        if (totalWeight > 100 || totalWeight != 100) {
+            toast.error('Total weight must be max of 100');
+            return;
+        }
+        setLoading(true);
+        const promise = new Promise((resolve, reject) => {
+            router.post(`/criteria/update/weight/${contestId}/${groupId}`, data, {
+                preserveScroll: true,
+                onSuccess: (page) => {
+                    setLoading(false);
+                    router.reload({ only: ['prelimData'] });
+                    setOpen(false);
+                    resolve(page);
+                },
+                onError: (error) => {
+                    setLoading(false);
+                    console.log(error);
+                    reject(error);
+                },
+            });
+        });
+
+        toast.promise(promise, {
+            loading: 'Loading...',
+            success: 'Updated successfully!',
+            error: 'Failed to update.',
+        });
+    };
+
+    return (
+        <Dialog open={open} onOpenChange={setOpen}>
+            <DialogTrigger asChild>
+                <Button>Edit Weight</Button>
+            </DialogTrigger>
+
+            <DialogContent>
+                <Form {...form}>
+                    <form onSubmit={form.handleSubmit(handleUpdate)} className="space-y-8">
+                        <DialogHeader>
+                            <DialogTitle>Weighted Round</DialogTitle>
+                            <DialogDescription>Update Weight Percentage</DialogDescription>
+                        </DialogHeader>
+                        {prelimData.map((i, index) => (
+                            <FormField
+                                key={index}
+                                control={form.control}
+                                name={`weight.${i.contest_name}`}
+                                render={({ field }) => (
+                                    <FormItem>
+                                        <FormLabel>{i.contest_name}</FormLabel>
+                                        <FormControl>
+                                            <Input
+                                                {...field}
+                                                type="number"
+                                                max={100}
+                                                onInput={(e) => {
+                                                    const target = e.target as HTMLInputElement;
+
+                                                    if (target.value.length > 3) {
+                                                        target.value = target.value.slice(0, 3);
+                                                    }
+                                                }}
+                                                placeholder="Enter a number"
+                                            />
+                                        </FormControl>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
+                        ))}
+                        <div className="font-bold">
+                            <span>Total Weight:</span> {totalWeight as number}
+                        </div>
+                        <DialogFooter>
+                            <Button type="submit" disabled={loading}>
+                                Save
+                            </Button>
+                        </DialogFooter>
+                    </form>
+                </Form>
+            </DialogContent>
+        </Dialog>
+    );
+}
