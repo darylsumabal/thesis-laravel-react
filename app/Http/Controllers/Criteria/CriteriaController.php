@@ -145,6 +145,7 @@ class CriteriaController extends Controller
 
         $prelimFinal = FinalScoringMethod::where('contest_id', $contestId)->where('group_id', $groupId)->value('scoring_method');;
 
+        $prelimScoringMethod = PrelimScoringMethod::where('contest_id', $contestId)->where('group_id', $groupId)->get();
 
         $roundScore = CriteriaRoundScore::where('contest_id', $contestId)->where('group_id', $groupId)->get();
 
@@ -181,6 +182,7 @@ class CriteriaController extends Controller
             'judges' => $judges,
             'contestId' => $contestId,
             'groupId' => $groupId,
+            'prelimMethod' => $prelimScoringMethod,
             'participant' => $this->getParticipantsByContest($contestId)
         ]);
     }
@@ -407,6 +409,22 @@ class CriteriaController extends Controller
         ]);
 
         return redirect()->back()->with('success', 'Round percentages updated successfully.');
+    }
+
+    public function updateWeight(Request $request, $contestId, $groupId)
+    {
+        $weights = $request->input('weight', []);
+
+        foreach ($weights as $contestName => $weight) {
+            PrelimScoringMethod::where('contest_id', $contestId)
+                ->where('group_id', $groupId)
+                ->where('contest_name', $contestName) // match by contest_name
+                ->update([
+                    'weight' => $weight,
+                ]);
+        }
+
+        return redirect()->back()->with('success', 'Weight updated successfully');
     }
 
     public function destroyCriteria(Request $request, $contestId, $groupId)

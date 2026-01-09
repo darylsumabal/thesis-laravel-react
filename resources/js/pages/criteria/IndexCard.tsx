@@ -15,7 +15,8 @@ const breadcrumbs: BreadcrumbItem[] = [
 ];
 
 export default function IndexCard() {
-    const { criteriaInfo, criteria, contest, judgesCriteria, prelimFinal, qualified, judges, roundScore, participant } = usePage<PROPS>().props;
+    const { criteriaInfo, criteria, contest, judgesCriteria, prelimFinal, qualified, judges, roundScore, participant, prelimMethod } =
+        usePage<PROPS>().props;
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
@@ -35,6 +36,7 @@ export default function IndexCard() {
                         qualified={qualified}
                         judges={judges}
                         participant={participant}
+                        prelimMethod={prelimMethod}
                     />
                 </TabsContent>
                 <TabsContent value="contest">

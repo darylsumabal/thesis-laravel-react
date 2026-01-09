@@ -27,6 +27,7 @@ Route::middleware('is_admin')->prefix('criteria')->group(function () {
   //update criteria
   Route::post('/update/{contestId}/{groupId}', [CriteriaController::class, 'updateCriteria']);
 
+  Route::post('/update/weight/{contestId}/{groupId}', [CriteriaController::class, 'updateWeight']);
 
   Route::post('/add-judges/{contestId}/{groupId}', [CriteriaController::class, 'storeJudge']);
 
