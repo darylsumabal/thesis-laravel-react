@@ -23,10 +23,14 @@ class AddEventController extends Controller
         ]);
 
         $poster = $request->file('poster');
-        $posterName = uniqid() . '-' . $poster->getClientOriginalName();
-        $posterPath = 'poster/' . $posterName;
+        $posterPath = null;
+        if ($poster) {
 
-        $poster->storeAs('poster', $posterName, 'public');
+            $posterName = uniqid() . '-' . $poster->getClientOriginalName();
+            $posterPath = 'poster/' . $posterName;
+
+            $poster->storeAs('poster', $posterName, 'public');
+        }
 
         Event::create([
             'organizer_id' => $organizerId,
