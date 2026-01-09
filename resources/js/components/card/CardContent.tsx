@@ -85,7 +85,6 @@ const CardContent = <T extends { id: string; poster: string }, U>({
         router.post(`/contest/update/${id}`, data, {
             preserveScroll: true,
             onSuccess: () => {
-                console.log('Contest updated!');
                 router.reload({ only: ['contest'] });
                 toast.success('Contest updated successfully!');
             },

@@ -68,7 +68,6 @@ type PROPS = {
 
 export default function CreateCriteria() {
     const { judgesCategory, judges, participants, roundType, contestId } = usePage<PROPS>().props;
-    console.log(judgesCategory);
     const isSingleRound = roundType?.includes('sr');
     const isMultipleRound = roundType?.includes('mr');
     const [loading, setLoading] = useState<boolean>(false);
