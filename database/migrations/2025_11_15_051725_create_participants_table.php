@@ -21,7 +21,7 @@ return new class extends Migration
             $table->text('description');
             $table->string('age');
             $table->string('gender');
-            $table->string('poster_url');
+            $table->string('poster_url')->nullable();
             $table->timestamps();
         });
     }

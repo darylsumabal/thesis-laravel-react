@@ -25,7 +25,7 @@ return new class extends Migration
             $table->string('contest_type');
             $table->string('contest_gender_category')->nullable();
             $table->string('contest_venue');
-            $table->string('contest_poster');
+            $table->string('contest_poster')->nullable();
             $table->unsignedBigInteger('event_id');
             $table->foreign('event_id')->references('id')->on('events')->onDelete('cascade');
             $table->boolean('is_archived')->default(false);

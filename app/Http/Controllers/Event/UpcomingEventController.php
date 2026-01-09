@@ -30,7 +30,7 @@ class UpcomingEventController extends Controller
                 'contest_type' => 'required|string|min:1',
                 'contest_gender_category' => 'required|string|min:1',
                 'contest_venue' => 'required|string|min:1',
-                'contest_poster' => 'required|image|mimes:png,jpg,jpeg,svg,jfif,webp|max:20480',
+                'contest_poster' => 'nullable|image|mimes:png,jpg,jpeg,svg,jfif,webp|max:20480',
             ]);
 
             $genderMapping = [
