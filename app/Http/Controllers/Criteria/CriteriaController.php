@@ -148,6 +148,8 @@ class CriteriaController extends Controller
 
         $roundScore = CriteriaRoundScore::where('contest_id', $contestId)->where('group_id', $groupId)->get();
 
+        $prelimScoringMethod = PrelimScoringMethod::where('contest_id', $contestId)->where('group_id', $groupId)->get();
+
         $qualified = Qualified::where('contest_id', $contestId)->where('group_id', $groupId)->value('qualified');
 
         $judges = User::with('contest')->where('accountType', 'JUDGE')->get();
@@ -176,6 +178,7 @@ class CriteriaController extends Controller
             'contest' => $contest,
             'judgesCriteria' => $judgesCriteria,
             'prelimFinal' => $prelimFinal,
+            'prelimMethod' => $prelimScoringMethod,
             'roundScore' => $roundScore,
             'qualified' => $qualified,
             'judges' => $judges,
