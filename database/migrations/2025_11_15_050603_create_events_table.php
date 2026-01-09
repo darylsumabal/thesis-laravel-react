@@ -21,7 +21,7 @@ return new class extends Migration
             $table->string('organizer');
             $table->string('venue');
             $table->string('address');
-            $table->string('poster');
+            $table->string('poster')->nullable();
             $table->boolean('is_archived')->default(false);
             $table->timestamps();
         });
