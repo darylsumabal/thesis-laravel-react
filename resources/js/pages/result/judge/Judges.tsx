@@ -8,7 +8,7 @@ import { scoreMap, scoringTypeMap } from '@/lib/constant/contest';
 import { router, usePage } from '@inertiajs/react';
 import { useEcho } from '@laravel/echo-react';
 import { Loader2, NotebookPen } from 'lucide-react';
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { toast } from 'sonner';
 import ScoreResult from '../ScoreResult';
 import ScoreResultTeam from '../ScoreResultTeam';
@@ -247,10 +247,10 @@ export default function Judges() {
                                     ?.map((i) => i.criteria)
                                     .filter((v, i, a) => a.indexOf(v) === i)
                                     .map((criteria, index) => (
-                                        <>
-                                            <TableHead key={index}>{criteria}</TableHead>
+                                        <React.Fragment key={index}>
+                                            <TableHead>{criteria}</TableHead>
                                             <TableHead className="w-1/12">ACTION</TableHead>
-                                        </>
+                                        </React.Fragment>
                                     ))}
                             </TableRow>
                         </TableHeader>
@@ -266,8 +266,8 @@ export default function Judges() {
                                             const isThisButtonLoading = loadingButton === buttonId;
                                             const scoreData = judgeData.scores[criteria];
                                             return (
-                                                <>
-                                                    <TableCell key={index}>
+                                                <React.Fragment key={index}>
+                                                    <TableCell>
                                                         <div className="flex items-center justify-between uppercase">
                                                             <p>{scoreData?.is_finished ? 'Submitted' : 'Pending'}</p>
                                                         </div>
@@ -289,7 +289,7 @@ export default function Judges() {
                                                             ENABLED
                                                         </Button>
                                                     </TableCell>
-                                                </>
+                                                </React.Fragment>
                                             );
                                         })}
                                 </TableRow>
@@ -313,10 +313,10 @@ export default function Judges() {
                                         ?.map((i) => i.criteria)
                                         .filter((v, i, a) => a.indexOf(v) === i)
                                         .map((criteria, index) => (
-                                            <>
-                                                <TableHead key={index}>{criteria}</TableHead>
+                                            <React.Fragment key={index}>
+                                                <TableHead>{criteria}</TableHead>
                                                 <TableHead className="w-1/12">ACTION</TableHead>
-                                            </>
+                                            </React.Fragment>
                                         ))}
                                 </TableRow>
                             </TableHeader>
@@ -332,8 +332,8 @@ export default function Judges() {
                                                 const isThisButtonLoading = loadingButton === buttonId;
                                                 const scoreData = judgeData.scores[criteria];
                                                 return (
-                                                    <>
-                                                        <TableCell key={index}>
+                                                    <React.Fragment key={index}>
+                                                        <TableCell>
                                                             <div className="flex items-center justify-between uppercase">
                                                                 <p>{scoreData?.is_finished ? 'Submitted' : 'Pending'}</p>
                                                             </div>
@@ -355,7 +355,7 @@ export default function Judges() {
                                                                 ENABLED
                                                             </Button>
                                                         </TableCell>
-                                                    </>
+                                                    </React.Fragment>
                                                 );
                                             })}
                                     </TableRow>
@@ -374,7 +374,3 @@ export default function Judges() {
         </div>
     );
 }
-// "dev": [
-//     "Composer\\Config::disableProcessTimeout",
-//     "npx concurrently -c \"#93c5fd,#c4b5fd,#fdba74\" \"php artisan serve\" \"php artisan queue:listen --tries=1\" \"npm run dev\" --names='server,queue,vite'"
-// ],

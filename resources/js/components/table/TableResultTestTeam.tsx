@@ -1,6 +1,7 @@
 import { formatRank, getRankBgClass } from '@/pages/utils/function/rank';
 import { usePage } from '@inertiajs/react';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../ui/table';
+import { toast } from 'sonner';
 
 export type JudgeScoreTeam = {
     id: number;
@@ -109,7 +110,7 @@ export default function TableResultTestTeam({ criteriaName }: { criteriaName: st
     };
 
     const { participantData, participants, judges } = createParticipantData(criteriaName);
-    console.log(participantData);
+  
     if (participants.length === 0) {
         return (
             <div className="rounded-lg bg-gray-50 p-8 text-center text-gray-500">
@@ -117,76 +118,82 @@ export default function TableResultTestTeam({ criteriaName }: { criteriaName: st
             </div>
         );
     }
-
+    const hasAnyTie = participants.some((participantNo) => {
+        const participant = participantData[participantNo];
+        return !Number.isInteger(Number(participant.final_rank));
+    });
     return (
-        <div className="mb-12">
-            <div className="mb-6 p-4 text-center">
-                <p className="text-2xl font-bold">Team Candidates</p>
-            </div>
-            <div className="overflow-x-auto rounded-md border">
-                <Table>
-                    <TableHeader>
-                        <TableRow>
-                            <TableHead className="text-center text-xs font-bold tracking-wider uppercase">Contestant No.</TableHead>
-                            {judges.map((judge) => (
-                                <TableHead
-                                    key={judge}
-                                    className="p-2 text-center text-xs font-bold tracking-wider break-words whitespace-normal uppercase"
-                                >
-                                    <div>{judge}</div>
-                                    <div className="flex justify-around normal-case">
-                                        <p>%</p>
-                                        <p>Rank</p>
-                                    </div>
-                                </TableHead>
-                            ))}
-                            <TableHead className="text-center text-xs font-bold tracking-wider uppercase">Total %</TableHead>
-                            <TableHead className="text-center text-xs font-bold tracking-wider uppercase">Total Rank</TableHead>
-                            <TableHead className="text-center text-xs font-bold tracking-wider uppercase">Final Rank</TableHead>
-                        </TableRow>
-                    </TableHeader>
-
-                    <TableBody>
-                        {participants.map((participantNo, index) => {
-                            const participant = participantData[participantNo];
-
-                            return (
-                                <TableRow key={index}>
-                                    <TableCell className="text-center font-bold whitespace-nowrap">{participantNo}</TableCell>
-
-                                    {/* Loop through ALL judges for this participant */}
-                                    {judges.map((judge) => {
-                                        const judgeScore = participant.judgeScores[judge];
-
-                                        return (
-                                            <TableCell key={`${participantNo}-${judge}`} className="text-center whitespace-nowrap">
-                                                {judgeScore ? (
-                                                    <div className="flex justify-around">
-                                                        <div className="font-bold">{parseInt(judgeScore.total)}%</div>
-                                                        <div className="font-bold">{formatRank(judgeScore.rank)}</div>
-                                                    </div>
-                                                ) : (
-                                                    <div className="text-gray-400">-</div>
-                                                )}
-                                            </TableCell>
-                                        );
-                                    })}
-                                    <TableCell className="text-center font-bold whitespace-nowrap">{participant.total_score || '0'}</TableCell>
-                                    <TableCell className="text-center font-bold whitespace-nowrap">{participant.total_rank || '0'}</TableCell>
-                                    <TableCell
-                                        className={`text-center font-bold whitespace-nowrap ${getRankBgClass(
-                                            participant.final_rank || '0',
-                                            qualified,
-                                        )}`}
+        <>
+            {hasAnyTie && toast.warning('There is a tie in the rankings')}
+            <div className="mb-12">
+                <div className="mb-6 p-4 text-center">
+                    <p className="text-2xl font-bold">Team Candidates</p>
+                </div>
+                <div className="overflow-x-auto rounded-md border">
+                    <Table>
+                        <TableHeader>
+                            <TableRow>
+                                <TableHead className="text-center text-xs font-bold tracking-wider uppercase">Contestant No.</TableHead>
+                                {judges.map((judge) => (
+                                    <TableHead
+                                        key={judge}
+                                        className="p-2 text-center text-xs font-bold tracking-wider break-words whitespace-normal uppercase"
                                     >
-                                        {formatRank(participant.final_rank || '0')}
-                                    </TableCell>
-                                </TableRow>
-                            );
-                        })}
-                    </TableBody>
-                </Table>
+                                        <div>{judge}</div>
+                                        <div className="flex justify-around normal-case">
+                                            <p>%</p>
+                                            <p>Rank</p>
+                                        </div>
+                                    </TableHead>
+                                ))}
+                                <TableHead className="text-center text-xs font-bold tracking-wider uppercase">Total %</TableHead>
+                                <TableHead className="text-center text-xs font-bold tracking-wider uppercase">Total Rank</TableHead>
+                                <TableHead className="text-center text-xs font-bold tracking-wider uppercase">Final Rank</TableHead>
+                            </TableRow>
+                        </TableHeader>
+
+                        <TableBody>
+                            {participants.map((participantNo, index) => {
+                                const participant = participantData[participantNo];
+
+                                return (
+                                    <TableRow key={index}>
+                                        <TableCell className="text-center font-bold whitespace-nowrap">{participantNo}</TableCell>
+
+                                        {/* Loop through ALL judges for this participant */}
+                                        {judges.map((judge) => {
+                                            const judgeScore = participant.judgeScores[judge];
+
+                                            return (
+                                                <TableCell key={`${participantNo}-${judge}`} className="text-center whitespace-nowrap">
+                                                    {judgeScore ? (
+                                                        <div className="flex justify-around">
+                                                            <div className="font-bold">{parseInt(judgeScore.total)}%</div>
+                                                            <div className="font-bold">{formatRank(judgeScore.rank)}</div>
+                                                        </div>
+                                                    ) : (
+                                                        <div className="text-gray-400">-</div>
+                                                    )}
+                                                </TableCell>
+                                            );
+                                        })}
+                                        <TableCell className="text-center font-bold whitespace-nowrap">{participant.total_score || '0'}</TableCell>
+                                        <TableCell className="text-center font-bold whitespace-nowrap">{participant.total_rank || '0'}</TableCell>
+                                        <TableCell
+                                            className={`text-center font-bold whitespace-nowrap ${getRankBgClass(
+                                                participant.final_rank || '0',
+                                                qualified,
+                                            )}`}
+                                        >
+                                            {formatRank(participant.final_rank || '0')}
+                                        </TableCell>
+                                    </TableRow>
+                                );
+                            })}
+                        </TableBody>
+                    </Table>
+                </div>
             </div>
-        </div>
+        </>
     );
 }
