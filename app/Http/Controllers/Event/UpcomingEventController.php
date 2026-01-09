@@ -43,14 +43,17 @@ class UpcomingEventController extends Controller
 
             $genderCategory = $genderMapping[$validated['contest_gender_category']] ?? null;
             $poster = $request->file('contest_poster');
-            $posterName = uniqid() . '-' . $poster->getClientOriginalName();
-            $posterPath = 'poster/' . $posterName;
+            $posterPath = null;
+            if ($poster) {
+                $posterName = uniqid() . '-' . $poster->getClientOriginalName();
+                $posterPath = 'poster/' . $posterName;
 
-            $poster->storeAs('poster', $posterName, 'public');
+                $poster->storeAs('poster', $posterName, 'public');
 
-            $cloudPath = Storage::disk('cloudinary')
-                ->put('poster', $request->file('contest_poster'));
-            $posterPath =   $validated['contest_poster'] = $cloudPath;
+                $cloudPath = Storage::disk('cloudinary')
+                    ->put('poster', $request->file('contest_poster'));
+                $posterPath =   $validated['contest_poster'] = $cloudPath;
+            }
 
             Contest::create([
                 'organizer_id' => $organizerId,

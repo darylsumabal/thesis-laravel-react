@@ -21,18 +21,23 @@ class AddEventController extends Controller
             'address' => 'required|string|min:1',
             'poster' => 'nullable|image|mimes:png,jpg,jpeg,jfif|max:20480'
         ]);
-
         $poster = $request->file('poster');
-        $posterName = uniqid() . '-' . $poster->getClientOriginalName();
-        $posterPath = 'poster/' . $posterName;
+        $posterPath = null;
+        if ($poster) {
 
-        $poster->storeAs('poster', $posterName, 'public');
+            $posterName = uniqid() . '-' . $poster->getClientOriginalName();
 
 
-        $cloudPath = Storage::disk('cloudinary')
-            ->put('poster', $request->file('poster'));
+            $posterPath = 'poster/' . $posterName;
 
-        $posterPath =  $validate['poster'] = $cloudPath;
+            $poster->storeAs('poster', $posterName, 'public');
+
+
+            $cloudPath = Storage::disk('cloudinary')
+                ->put('poster', $request->file('poster'));
+
+            $posterPath =  $validate['poster'] = $cloudPath;
+        }
 
         Event::create([
             'organizer_id' => $organizerId,

@@ -63,14 +63,7 @@ export const AddEventContestSchema = z.object({
     contest_venue: z.string().min(1, {
         message: 'Please enter a venue',
     }),
-    contest_poster: z
-        .any()
-        .refine((file) => file === null || file instanceof File, {
-            message: 'Please upload a valid image',
-        })
-        .refine((file) => file !== null, {
-            message: 'No image uploaded. Please upload an image.',
-        }),
+    contest_poster: z.any().optional(),
 });
 
 type DefaultValuesEvent = {
@@ -116,5 +109,3 @@ export const defaultValuesAddEvent: DefaultValuesAddEvent = {
     address: '',
     poster: null,
 };
-
-
