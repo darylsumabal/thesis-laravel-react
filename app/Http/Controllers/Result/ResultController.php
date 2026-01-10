@@ -178,7 +178,7 @@ class ResultController extends Controller
                         'participant_id',
                         'criteria',
                         'evaluation_criteria',
-                        DB::raw('SUM(rank) as rank_sum'),
+                        DB::raw('SUM(`rank`) as rank_sum'),
                         DB::raw('COUNT(DISTINCT judges_id) as judge_count')
                     )
                     ->groupBy('participant_id', 'criteria', 'evaluation_criteria')
@@ -293,7 +293,7 @@ class ResultController extends Controller
                 ->select(
                     'participant_id',
                     'judges_id',
-                    DB::raw('AVG(rank) as judge_total_rank')
+                    DB::raw('AVG(`rank`) as judge_total_rank')
                 )
                 ->where('contest_id', $contestId)
                 ->where('group_id', $groupId)
@@ -941,7 +941,7 @@ class ResultController extends Controller
                         'participant_id',
                         'criteria',
                         'evaluation_criteria',
-                        DB::raw('SUM(rank) as rank_sum'),
+                        DB::raw('SUM(`rank`) as rank_sum'),
                         DB::raw('COUNT(DISTINCT judges_id) as judge_count')
                     )
                     ->groupBy('participant_id', 'criteria', 'evaluation_criteria')
@@ -1051,7 +1051,7 @@ class ResultController extends Controller
                 ->select(
                     'participant_id',
                     'judges_id',
-                    DB::raw('AVG(rank) as judge_total_rank')
+                    DB::raw('AVG(`rank`) as judge_total_rank')
                 )
                 ->where('contest_id', $contestId)
                 ->where('group_id', $groupId)
@@ -1411,7 +1411,7 @@ class ResultController extends Controller
                         'participant_id',
                         'criteria',
                         'evaluation_criteria',
-                        DB::raw('SUM(rank) as rank_sum'),
+                        DB::raw('SUM(`rank`) as rank_sum'),
                         DB::raw('COUNT(DISTINCT judges_id) as judge_count')
                     )
                     ->groupBy('participant_id', 'criteria', 'evaluation_criteria')
@@ -1521,7 +1521,7 @@ class ResultController extends Controller
                 ->select(
                     'participant_id',
                     'judges_id',
-                    DB::raw('AVG(rank) as judge_total_rank')
+                    DB::raw('AVG(`rank`) as judge_total_rank')
                 )
                 ->where('contest_id', $contestId)
                 ->where('group_id', $groupId)
@@ -1872,7 +1872,7 @@ class ResultController extends Controller
                         'participant_id',
                         'criteria',
                         'evaluation_criteria',
-                        DB::raw('SUM(rank) as rank_sum'),
+                        DB::raw('SUM(`rank`) as rank_sum'),
                         DB::raw('COUNT(DISTINCT judges_id) as judge_count')
                     )
                     ->groupBy('participant_id', 'criteria', 'evaluation_criteria')
@@ -1982,7 +1982,7 @@ class ResultController extends Controller
                 ->select(
                     'participant_id',
                     'judges_id',
-                    DB::raw('AVG(rank) as judge_total_rank')
+                    DB::raw('AVG(`rank`) as judge_total_rank')
                 )
                 ->where('contest_id', $contestId)
                 ->where('group_id', $groupId)
