@@ -178,7 +178,7 @@ class ResultController extends Controller
                         'participant_id',
                         'criteria',
                         'evaluation_criteria',
-                        DB::raw('SUM(rank) as `rank`'),
+                        DB::raw('SUM(rank) as rank_sum'),
                         DB::raw('COUNT(DISTINCT judges_id) as judge_count')
                     )
                     ->groupBy('participant_id', 'criteria', 'evaluation_criteria')
@@ -191,7 +191,7 @@ class ResultController extends Controller
                         ->where('participant_id', $row->participant_id)
                         ->where('criteria', $row->criteria)
                         ->where('evaluation_criteria', $row->evaluation_criteria)
-                        ->update(['total_rank' => $row->rank]);
+                        ->update(['total_rank' => $row->rank_sum]);
                 }
             }
 
@@ -438,7 +438,7 @@ class ResultController extends Controller
                         ->where('group_id', $groupId)
                         ->where('round', $roundType)
                         ->where('participant_id', $participantId)
-                        ->sum('rank');
+                        ->sum(DB::raw('`rank`'));
 
                     // $criteriaCount = OverallScoring::where('contest_id', $contestId)
                     //     ->where('group_id', $groupId)
@@ -707,7 +707,7 @@ class ResultController extends Controller
 
                 $allParticipants = OverallScoring::where('contest_id', $contestId)
                     ->where('group_id', $groupId)->where('round', $roundType)
-                    ->select('participant_id', DB::raw('SUM(rank) as total_rank'))
+                    ->select('participant_id', DB::raw('SUM(`rank`) as rank_total'))
                     ->groupBy('participant_id')
                     ->get();
 
@@ -717,7 +717,7 @@ class ResultController extends Controller
                         ->where('group_id', $groupId)->where('round', $roundType)
                         ->where('participant_id', $participant->participant_id)
                         ->update([
-                            'total_rank' => $participant->total_rank / $judgeCounts->count(),
+                            'total_rank' => $participant->rank_total  / $judgeCounts->count(),
                         ]);
                 }
 
@@ -941,7 +941,7 @@ class ResultController extends Controller
                         'participant_id',
                         'criteria',
                         'evaluation_criteria',
-                        DB::raw('SUM(rank) as `rank`'),
+                        DB::raw('SUM(rank) as rank_sum'),
                         DB::raw('COUNT(DISTINCT judges_id) as judge_count')
                     )
                     ->groupBy('participant_id', 'criteria', 'evaluation_criteria')
@@ -954,7 +954,7 @@ class ResultController extends Controller
                         ->where('participant_id', $row->participant_id)
                         ->where('criteria', $row->criteria)
                         ->where('evaluation_criteria', $row->evaluation_criteria)
-                        ->update(['total_rank' => $row->rank]);
+                        ->update(['total_rank' => $row->rank_sum]);
                 }
             }
 
@@ -1411,7 +1411,7 @@ class ResultController extends Controller
                         'participant_id',
                         'criteria',
                         'evaluation_criteria',
-                        DB::raw('SUM(rank) as `rank`'),
+                        DB::raw('SUM(rank) as rank_sum'),
                         DB::raw('COUNT(DISTINCT judges_id) as judge_count')
                     )
                     ->groupBy('participant_id', 'criteria', 'evaluation_criteria')
@@ -1424,7 +1424,7 @@ class ResultController extends Controller
                         ->where('participant_id', $row->participant_id)
                         ->where('criteria', $row->criteria)
                         ->where('evaluation_criteria', $row->evaluation_criteria)
-                        ->update(['total_rank' => $row->rank]);
+                        ->update(['total_rank' => $row->rank_sum]);
                 }
             }
 
@@ -1872,7 +1872,7 @@ class ResultController extends Controller
                         'participant_id',
                         'criteria',
                         'evaluation_criteria',
-                        DB::raw('SUM(rank) as `rank`'),
+                        DB::raw('SUM(rank) as rank_sum'),
                         DB::raw('COUNT(DISTINCT judges_id) as judge_count')
                     )
                     ->groupBy('participant_id', 'criteria', 'evaluation_criteria')
@@ -1885,7 +1885,7 @@ class ResultController extends Controller
                         ->where('participant_id', $row->participant_id)
                         ->where('criteria', $row->criteria)
                         ->where('evaluation_criteria', $row->evaluation_criteria)
-                        ->update(['total_rank' => $row->rank]);
+                        ->update(['total_rank' => $row->rank_sum]);
                 }
             }
 
@@ -2134,7 +2134,7 @@ class ResultController extends Controller
                         ->where('group_id', $groupId)
                         ->where('round', $roundType)
                         ->where('participant_id', $participantId)
-                        ->sum('rank');
+                        ->sum(DB::raw('`rank`'));
 
                     // $criteriaCount = OverallScoring::where('contest_id', $contestId)
                     //     ->where('group_id', $groupId)
@@ -2403,7 +2403,7 @@ class ResultController extends Controller
 
                 $allParticipants = OverallScoring::where('contest_id', $contestId)
                     ->where('group_id', $groupId)->where('round', $roundType)
-                    ->select('participant_id', DB::raw('SUM(rank) as total_rank'))
+                    ->select('participant_id', DB::raw('SUM(`rank`) as rank_total'))
                     ->groupBy('participant_id')
                     ->get();
 
@@ -2413,7 +2413,7 @@ class ResultController extends Controller
                         ->where('group_id', $groupId)->where('round', $roundType)
                         ->where('participant_id', $participant->participant_id)
                         ->update([
-                            'total_rank' => $participant->total_rank / $judgeCounts->count(),
+                            'total_rank' => $participant->rank_total / $judgeCounts->count(),
                         ]);
                 }
 
