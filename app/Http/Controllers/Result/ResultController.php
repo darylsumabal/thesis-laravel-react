@@ -178,7 +178,7 @@ class ResultController extends Controller
                         'participant_id',
                         'criteria',
                         'evaluation_criteria',
-                        DB::raw('SUM(rank) as rank'),
+                        DB::raw('SUM(rank) as `rank`'),
                         DB::raw('COUNT(DISTINCT judges_id) as judge_count')
                     )
                     ->groupBy('participant_id', 'criteria', 'evaluation_criteria')
@@ -941,7 +941,7 @@ class ResultController extends Controller
                         'participant_id',
                         'criteria',
                         'evaluation_criteria',
-                        DB::raw('SUM(rank) as rank'),
+                        DB::raw('SUM(rank) as `rank`'),
                         DB::raw('COUNT(DISTINCT judges_id) as judge_count')
                     )
                     ->groupBy('participant_id', 'criteria', 'evaluation_criteria')
@@ -1411,7 +1411,7 @@ class ResultController extends Controller
                         'participant_id',
                         'criteria',
                         'evaluation_criteria',
-                        DB::raw('SUM(rank) as rank'),
+                        DB::raw('SUM(rank) as `rank`'),
                         DB::raw('COUNT(DISTINCT judges_id) as judge_count')
                     )
                     ->groupBy('participant_id', 'criteria', 'evaluation_criteria')
@@ -1872,7 +1872,7 @@ class ResultController extends Controller
                         'participant_id',
                         'criteria',
                         'evaluation_criteria',
-                        DB::raw('SUM(rank) as rank'),
+                        DB::raw('SUM(rank) as `rank`'),
                         DB::raw('COUNT(DISTINCT judges_id) as judge_count')
                     )
                     ->groupBy('participant_id', 'criteria', 'evaluation_criteria')
