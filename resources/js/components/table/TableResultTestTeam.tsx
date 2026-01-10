@@ -125,7 +125,10 @@ export default function TableResultTestTeam({ criteriaName }: { criteriaName: st
 
     return (
         <div className="mb-12">
-            {hasAnyTie && toast.warning('There is a tie in the rankings')}
+            {hasAnyTie &&
+                toast.warning('There is a tie in the rankings', {
+                    duration: 3000,
+                })}
             <div className="mb-6 p-4 text-center">
                 <p className="text-2xl font-bold">Team Candidates</p>
             </div>
