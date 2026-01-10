@@ -156,14 +156,18 @@ export default function TableResultTest({
     }
     const contest = filteredData.map((i) => i.criteria).find((c) => c === criteriaName);
 
-    const hasTie = groupedData.some((item) => {
-        const rank = Number.isInteger(item.final_rank);
+    // const hasTie = groupedData.some((item) => {
+    //     const rank = Number.isInteger(item.final_rank);
 
-        return !Number.isInteger(rank);
-    });
+    //     return !Number.isInteger(rank);
+    // });
+    const hasTie = groupedData.some((item) => !Number.isInteger(Number(item.final_rank)));
     return (
         <>
-            {hasTie && toast.warning(`There is a tie in the rankings ${contest} ${gender}`)}
+            {hasTie &&
+                toast.warning(`There is a tie in the rankings ${contest} ${gender}`, {
+                    duration: 3000,
+                })}
             <div className="mb-12 w-full">
                 <div className="mb-6 p-4 text-center">
                     <p className="text-2xl font-bold uppercase">{getGenderTitle(gender)}</p>

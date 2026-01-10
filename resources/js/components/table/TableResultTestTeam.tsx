@@ -1,7 +1,7 @@
 import { formatRank, getRankBgClass } from '@/pages/utils/function/rank';
 import { usePage } from '@inertiajs/react';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../ui/table';
 import { toast } from 'sonner';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../ui/table';
 
 export type JudgeScoreTeam = {
     id: number;
@@ -110,7 +110,7 @@ export default function TableResultTestTeam({ criteriaName }: { criteriaName: st
     };
 
     const { participantData, participants, judges } = createParticipantData(criteriaName);
-  
+
     if (participants.length === 0) {
         return (
             <div className="rounded-lg bg-gray-50 p-8 text-center text-gray-500">
@@ -122,9 +122,13 @@ export default function TableResultTestTeam({ criteriaName }: { criteriaName: st
         const participant = participantData[participantNo];
         return !Number.isInteger(Number(participant.final_rank));
     });
+
     return (
         <>
-            {hasAnyTie && toast.warning('There is a tie in the rankings')}
+            {hasAnyTie &&
+                toast.warning('There is a tie in the rankings', {
+                    duration: 3000,
+                })}
             <div className="mb-12">
                 <div className="mb-6 p-4 text-center">
                     <p className="text-2xl font-bold">Team Candidates</p>
