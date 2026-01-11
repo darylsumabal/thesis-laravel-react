@@ -76,7 +76,7 @@ export function CriteriaTabsTeam({ criteriaGroups }: { criteriaGroups: CriteriaT
                                             <p className="font-semibold">No. {p.team_participant_no}</p>
 
                                             {p.poster_url ? (
-                                                <img src={`${imageSrc}/${poster}`} className="mx-auto h-48 w-48 rounded-md" alt="photo.img" />
+                                                <img src={`${imageSrc}/${p.poster_url}`} className="mx-auto h-48 w-48 rounded-md" alt="photo.img" />
                                             ) : (
                                                 <div className="flex h-48 w-48 items-center justify-center rounded-md border-[1px] bg-gray-200 text-black">
                                                     No Poster Available

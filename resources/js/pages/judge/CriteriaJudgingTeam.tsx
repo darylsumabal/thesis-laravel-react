@@ -39,11 +39,9 @@ const CriteriaJudgingTeam = ({ data }: CriteriaJudgingProps) => {
                             {contestant.contest.contest_poster ? (
                                 <img src={`${imageSrc}/${contestant.contest.contest_poster}`} className="w-44 rounded-md" alt="poster" />
                             ) : (
-                                <img
-                                    src={`${imageSrc}/${contestant.contest.contest_poster}`}
-                                    className="w-44 rounded-md bg-gray-200 text-black"
-                                    alt="image"
-                                />
+                                <div className="flex w-44 items-center justify-center rounded-md border-[1px] bg-gray-200 text-black">
+                                    No Poster Available
+                                </div>
                             )}
                             <div className="flex flex-col items-center justify-center">
                                 <p className="text-2xl font-medium">{contestant.contest.contest_name}</p>
