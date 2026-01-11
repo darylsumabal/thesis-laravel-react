@@ -79,7 +79,7 @@
 
 // export default InputWithEndButton;
 
-import { ChevronDownIcon, ChevronUpIcon, MinusIcon, PlusIcon } from 'lucide-react';
+import { ChevronDownIcon, ChevronUpIcon } from 'lucide-react';
 import { Button, Group, Input, NumberField } from 'react-aria-components';
 
 const InputWithEndButton = ({ field, item, hasMatch, pendingSubmitScore }) => {
@@ -200,14 +200,14 @@ const InputWithEndButton = ({ field, item, hasMatch, pendingSubmitScore }) => {
                         slot="increment"
                         className="border-input bg-background text-muted-foreground hover:bg-accent hover:text-foreground -me-px flex h-1/2 w-8 flex-1 items-center justify-center border text-sm transition-[color,box-shadow] disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50"
                     >
-                        <ChevronUpIcon className="size-3"  strokeWidth={5}/>
+                        <ChevronUpIcon className="size-3" strokeWidth={5} />
                         <span className="sr-only">Increment</span>
                     </Button>
                     <Button
                         slot="decrement"
                         className="border-input bg-background text-muted-foreground hover:bg-accent hover:text-foreground -me-px -mt-px flex h-1/2 w-8 flex-1 items-center justify-center border text-sm transition-[color,box-shadow] disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50"
                     >
-                        <ChevronDownIcon className="size-3" strokeWidth={5}/>
+                        <ChevronDownIcon className="size-3" strokeWidth={5} />
                         <span className="sr-only">Decrement</span>
                     </Button>
                 </div>
@@ -217,4 +217,3 @@ const InputWithEndButton = ({ field, item, hasMatch, pendingSubmitScore }) => {
 };
 
 export default InputWithEndButton;
-

@@ -99,7 +99,7 @@ export default function Judges() {
 
     const handleTabulate = () => {
         const roundType = 'Preliminary';
-
+        setLoadingTabulate(true);
         const url =
             scoringType === 'mr' && contestType === 'Individual'
                 ? `/result/multiple-round/individual/${contestId}/${groupId}/${resultType}`
