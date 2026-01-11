@@ -49,9 +49,11 @@ export function CriteriaTabs({ criteriaGroups }: { criteriaGroups: CriteriaTests
                 <div>
                     <div>
                         {poster ? (
-                            <img src={`${imageSrc}/${poster}`} className="h-96 w-full rounded-md object-cover object-center" alt="poster" />
+                            <img src={`${imageSrc}/${poster}`} className="h-96 w-full rounded-md object-center" alt="poster" />
                         ) : (
-                            <img src="photo" className="h-96 w-full rounded-md bg-gray-200 object-cover object-center text-black" alt="poster.img" />
+                            <div className="flex h-96 w-full items-center justify-center rounded-md border-[1px] bg-gray-200 text-black">
+                                No Poster Available
+                            </div>
                         )}
                     </div>
                     <div className="flex w-full gap-6 py-4">
@@ -71,7 +73,9 @@ export function CriteriaTabs({ criteriaGroups }: { criteriaGroups: CriteriaTests
                                                         alt=""
                                                     />
                                                 ) : (
-                                                    <img src="photo" className="mx-auto h-48 w-48 rounded-md bg-white text-black" alt="" />
+                                                    <div className="flex h-48 w-48 items-center justify-center rounded-md border-[1px] bg-gray-200 text-black">
+                                                        No Poster Available
+                                                    </div>
                                                 )}
 
                                                 <p>
