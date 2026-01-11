@@ -65,6 +65,7 @@ export type GroupedParticipant = {
 
 import { formatRank, getRankBgClass } from '@/pages/utils/function/rank';
 import { usePage } from '@inertiajs/react';
+import { useEffect } from 'react';
 import { toast } from 'sonner';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../ui/table';
 
@@ -127,6 +128,24 @@ export default function TableResultTest({
 
     const filteredData = getFilteredData(criteriaName, gender);
     const groupedData = groupByParticipant(filteredData);
+    const contest = filteredData.map((i) => i.criteria).find((c) => c === criteriaName);
+
+    // const hasTie = groupedData.some((item) => {
+    //     const rank = Number.isInteger(item.final_rank);
+
+    //     return !Number.isInteger(rank);
+    // });
+    // const hasTie = new Set(groupedData.filter((item) => !Number.isInteger(Number(item.final_rank))).map((item) => item.final_rank)).size > 0;
+    const hasTie = groupedData.some((item) => !Number.isInteger(Number(item.final_rank)));
+
+    useEffect(() => {
+        if (!hasTie) return;
+
+        toast.warning(`There is a tie in the rankings ${contest} ${gender}`, {
+            id: `tie-${contest}-${gender}`, // prevents duplicates
+            duration: 3000,
+        });
+    }, [hasTie, contest, gender]);
 
     // 🧠 Title mapping
     const getGenderTitle = (gender: string) => {
@@ -154,22 +173,13 @@ export default function TableResultTest({
             </div>
         );
     }
-    const contest = filteredData.map((i) => i.criteria).find((c) => c === criteriaName);
-
-    // const hasTie = groupedData.some((item) => {
-    //     const rank = Number.isInteger(item.final_rank);
-
-    //     return !Number.isInteger(rank);
-    // });
-    // const hasTie = new Set(groupedData.filter((item) => !Number.isInteger(Number(item.final_rank))).map((item) => item.final_rank)).size > 0;
-    const hasTie = groupedData.some((item) => !Number.isInteger(Number(item.final_rank)));
 
     return (
         <>
-            {hasTie &&
+            {/* {hasTie &&
                 toast.warning(`There is a tie in the rankings ${contest} ${gender}`, {
                     duration: 3000,
-                })}
+                })} */}
             <div className="mb-12 w-full">
                 <div className="mb-6 p-4 text-center">
                     <p className="text-2xl font-bold uppercase">{getGenderTitle(gender)}</p>
