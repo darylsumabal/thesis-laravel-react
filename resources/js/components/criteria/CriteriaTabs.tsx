@@ -52,7 +52,7 @@ export function CriteriaTabs({ criteriaGroups }: { criteriaGroups: CriteriaTests
                             <img src={`${imageSrc}/${poster}`} className="h-96 w-full rounded-md object-center" alt="poster" />
                         ) : (
                             // <img src="photo" className="h-96 w-full rounded-md bg-gray-200 object-cover object-center text-black" alt="poster.img" />
-                            <div className="flex w-full items-center justify-center rounded-md border-[1px] bg-gray-200 text-black h-96">
+                            <div className="flex h-96 w-full items-center justify-center rounded-md border-[1px] bg-gray-200 text-black">
                                 No Poster Available
                             </div>
                         )}
@@ -69,7 +69,7 @@ export function CriteriaTabs({ criteriaGroups }: { criteriaGroups: CriteriaTests
                                                 {p.poster_url ? (
                                                     <img
                                                         // src={`/storage/${p.poster_url}`}
-                                                        src={`${imageSrc}/${poster}`}
+                                                        src={`${imageSrc}/${p.poster_url}`}
                                                         className="mx-auto h-48 w-48 rounded-md"
                                                         alt=""
                                                     />
@@ -99,12 +99,7 @@ export function CriteriaTabs({ criteriaGroups }: { criteriaGroups: CriteriaTests
                                         femaleParticipants?.map((p, index) => (
                                             <div key={index} className="rounded border p-4 text-center shadow-md">
                                                 <p className="font-semibold">Candidate No. {p.participant_no}</p>
-                                                <img
-                                                    // src={`/storage/${poster}`}
-                                                    src={`${imageSrc}/${poster}`}
-                                                    className="mx-auto h-48 w-48 rounded-md"
-                                                    alt=""
-                                                />
+                                                <img src={`${imageSrc}/${p.poster_url}`} className="mx-auto h-48 w-48 rounded-md" alt="" />
                                                 <p>
                                                     {p.first_name} {p.last_name}
                                                 </p>
