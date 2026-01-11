@@ -25,7 +25,7 @@ export function CriteriaTabs({ criteriaGroups }: { criteriaGroups: CriteriaTests
     return (
         <Tabs defaultValue={criteriaGroups[0]?.criteria} className="mt-4 w-full">
             <ScrollArea className="flex w-full items-center justify-center">
-                <TabsList className="mx-auto flex w-fit items-center justify-center">
+                <TabsList className="mx-auto flex w-fit items-center justify-center mb-3">
                     <TabsTrigger value="candidates" disabled={pendingSubmitScore}>
                         CANDIDATES
                     </TabsTrigger>
