@@ -265,7 +265,7 @@ export function CriteriaGroupWrapper({ group, criteriaGroup }: { group: Criteria
                             // 🔹 Case 3: Male + Female (two cards)
                             if (genderCategory === 'malefemale') {
                                 return (
-                                    <div className="flex w-full flex-col gap-2 xl:flex-row">
+                                    <div className="flex w-full flex-col gap-2 2xl:flex-row">
                                         <CriteriaCard criteriaGroup={group} gender="Male" form={form} />
                                         <CriteriaCard criteriaGroup={group} gender="Female" form={form} />
                                     </div>
