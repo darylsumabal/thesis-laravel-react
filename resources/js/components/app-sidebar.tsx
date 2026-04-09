@@ -39,18 +39,7 @@ const mainNavItems: NavItem[] = [
     },
 ];
 
-const footerNavItems: NavItem[] = [
-    {
-        title: 'Repository',
-        href: 'https://github.com/darylsumabal/thesis-laravel-react',
-        icon: Folder,
-    },
-    {
-        title: 'Developer',
-        href: 'https://portfolio-daryl.vercel.app/home',
-        icon: BookOpen,
-    },
-];
+const footerNavItems: NavItem[] = [];
 
 export function AppSidebar() {
     const { auth } = usePage().props;
